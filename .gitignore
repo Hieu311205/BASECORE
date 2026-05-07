@@ -1,0 +1,28 @@
+# Build output
+bin/
+obj/
+artifacts/
+
+# Visual Studio
+.vs/
+.idea/
+*.user
+*.suo
+*.userosscache
+*.sln.docstates
+
+# Local .NET tooling/cache
+.dotnet-home/
+
+# Node/frontend dependencies and build output
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+ClientApp/build/
+ClientApp/dist/
+BaseCore.WebClient/dist/
+
+# OS/editor noise
+.DS_Store
+Thumbs.db

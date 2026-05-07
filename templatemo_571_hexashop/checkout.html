@@ -1,0 +1,320 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <title>Thanh toán - Lumière Perfume</title>
+
+    <link href="assets/css/bootstrap.min.css" rel="stylesheet">
+    <link href="assets/css/font-awesome.css" rel="stylesheet">
+    <link href="assets/css/templatemo-hexashop.css" rel="stylesheet">
+    <link href="assets/css/perfume-luxury-v2.css" rel="stylesheet">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@500;600;700;800&family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+    <style>
+        .cart-icon { position: relative; }
+        .cart-badge {
+            position: absolute;
+            top: -8px;
+            right: -15px;
+            background: #d4af37;
+            color: #000;
+            border-radius: 50%;
+            padding: 2px 6px;
+            font-size: 12px;
+            font-weight: bold;
+        }
+        .checkout-grid {
+            display: grid;
+            grid-template-columns: minmax(0, 1.1fr) minmax(320px, 0.9fr);
+            gap: 24px;
+        }
+        .checkout-panel {
+            background: #101010;
+            border: 1px solid rgba(212, 175, 55, 0.25);
+            border-radius: 8px;
+            padding: 24px;
+        }
+        .checkout-panel h3 {
+            color: #d4af37;
+            font-family: "Playfair Display", serif;
+            margin-bottom: 18px;
+        }
+        .checkout-form label {
+            color: #d4af37;
+            font-weight: 600;
+            margin-bottom: 6px;
+        }
+        .checkout-form input,
+        .checkout-form textarea {
+            width: 100%;
+            border: 1px solid rgba(212, 175, 55, 0.45);
+            background: #070707;
+            color: #fff;
+            border-radius: 6px;
+            padding: 11px 12px;
+            margin-bottom: 16px;
+        }
+        .checkout-item {
+            display: grid;
+            grid-template-columns: 58px 1fr auto;
+            gap: 12px;
+            align-items: center;
+            border-bottom: 1px solid rgba(212, 175, 55, 0.18);
+            padding: 12px 0;
+        }
+        .checkout-item img {
+            width: 58px;
+            height: 58px;
+            border-radius: 8px;
+            object-fit: cover;
+        }
+        .checkout-item strong,
+        .checkout-total {
+            color: #fff;
+        }
+        .checkout-meta {
+            color: #bbb;
+            font-size: 13px;
+            margin-top: 3px;
+        }
+        .checkout-total {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-top: 2px solid #d4af37;
+            margin-top: 18px;
+            padding-top: 18px;
+            font-size: 20px;
+            font-weight: 700;
+        }
+        .checkout-actions {
+            display: flex;
+            gap: 12px;
+            align-items: center;
+            margin-top: 8px;
+        }
+        .checkout-back {
+            color: #d4af37;
+            text-decoration: none;
+        }
+        .checkout-back:hover {
+            color: #fff;
+        }
+        .checkout-empty {
+            text-align: center;
+            padding: 50px 20px;
+        }
+        @media (max-width: 991px) {
+            .checkout-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="perfume-topbar">
+        <div class="container">
+            <div class="topbar-inner">
+                <span>Miễn phí giao hàng cho đơn từ 1.000.000đ</span>
+                <span>Hotline: 0123 456 789 &nbsp;&nbsp; | &nbsp;&nbsp; lumiereperfume@gmail.com</span>
+            </div>
+        </div>
+    </div>
+
+    <header class="header-area header-sticky">
+        <div class="container">
+            <div class="row">
+                <div class="col-12">
+                    <nav class="main-nav">
+                        <a class="logo" href="index.html">
+                            <span class="logo-text">LUMIÈRE <em>PERFUME</em></span>
+                        </a>
+                        <ul class="nav">
+                            <li><a href="index.html">Trang chủ</a></li>
+                            <li><a href="products.html">Sản phẩm</a></li>
+                            <li><a href="about.html">Về chúng tôi</a></li>
+                            <li><a href="contact.html">Liên hệ</a></li>
+                            <li class="cart-icon">
+                                <a href="cart.html">
+                                    <i class="fa fa-shopping-cart"></i>
+                                    <span class="cart-badge">0</span>
+                                </a>
+                            </li>
+                        </ul>
+                        <a class="menu-trigger"><span>Menu</span></a>
+                    </nav>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <section class="page-hero">
+        <div class="container">
+            <h1>THANH TOÁN</h1>
+            <p>Kiểm tra đơn hàng và nhập thông tin giao hàng trước khi đặt mua.</p>
+        </div>
+    </section>
+
+    <section class="section">
+        <div class="container" id="checkout-container">
+            <div class="checkout-grid">
+                <form class="checkout-panel checkout-form" id="checkout-form">
+                    <h3>Thông tin giao hàng</h3>
+
+                    <label for="customer-name">Họ tên</label>
+                    <input id="customer-name" type="text" placeholder="Nguyễn Văn A" required>
+
+                    <label for="customer-phone">Số điện thoại</label>
+                    <input id="customer-phone" type="tel" placeholder="0123 456 789" required>
+
+                    <label for="customer-email">Email</label>
+                    <input id="customer-email" type="email" placeholder="email@example.com">
+
+                    <label for="shipping-address">Địa chỉ giao hàng</label>
+                    <textarea id="shipping-address" rows="4" placeholder="Số nhà, đường, phường/xã, quận/huyện, tỉnh/thành phố" required></textarea>
+
+                    <label for="order-note">Ghi chú</label>
+                    <textarea id="order-note" rows="3" placeholder="Thời gian nhận hàng, ghi chú thêm..."></textarea>
+
+                    <div class="checkout-actions">
+                        <button type="submit" class="gold-btn" id="place-order-btn">ĐẶT HÀNG</button>
+                        <a href="cart.html" class="checkout-back">Quay lại giỏ hàng</a>
+                    </div>
+                </form>
+
+                <aside class="checkout-panel">
+                    <h3>Đơn hàng của bạn</h3>
+                    <div id="checkout-summary"></div>
+                </aside>
+            </div>
+        </div>
+    </section>
+
+    <footer class="footer">
+        <div class="container">
+            <div class="row">
+                <div class="col-lg-4">
+                    <div class="first-item">
+                        <div class="logo"><span class="logo-text">LUMIÈRE <em>PERFUME</em></span></div>
+                        <ul>
+                            <li><a href="#">Hà Nội, Việt Nam</a></li>
+                            <li><a href="#">lumiereperfume@gmail.com</a></li>
+                            <li><a href="#">0123 456 789</a></li>
+                        </ul>
+                    </div>
+                </div>
+                <div class="col-lg-2"><h4>Danh mục</h4><ul><li><a href="products.html?categoryId=8">Nước hoa nam</a></li><li><a href="products.html?categoryId=9">Nước hoa nữ</a></li><li><a href="products.html?categoryId=10">Unisex</a></li><li><a href="products.html?categoryId=11">Gift set</a></li></ul></div>
+                <div class="col-lg-2"><h4>Hỗ trợ</h4><ul><li><a href="about.html">Về chúng tôi</a></li><li><a href="contact.html">Liên hệ</a></li><li><a href="products.html">Sản phẩm</a></li><li><a href="single-product.html">Chi tiết</a></li></ul></div>
+                <div class="col-lg-4"><h4>Về Lumière</h4><p>Lumière Perfume mang đến các dòng nước hoa chính hãng với phong cách sang trọng, tinh tế và dịch vụ chăm sóc khách hàng tận tâm.</p></div>
+            </div>
+        </div>
+    </footer>
+
+    <script src="assets/js/jquery-2.1.0.min.js"></script>
+    <script src="assets/js/bootstrap.min.js"></script>
+    <script src="assets/custom-js/api.js"></script>
+    <script src="assets/custom-js/cart.js"></script>
+    <script src="assets/custom-js/auth-widget.js"></script>
+
+    <script>
+        function checkoutFormatPrice(value) {
+            if (typeof formatPrice === "function") return formatPrice(value);
+            return Number(value || 0).toLocaleString("vi-VN") + "đ";
+        }
+
+        function checkoutEscapeHtml(value) {
+            if (typeof escapeHtml === "function") return escapeHtml(value);
+            return String(value || "")
+                .replaceAll("&", "&amp;")
+                .replaceAll("<", "&lt;")
+                .replaceAll(">", "&gt;")
+                .replaceAll('"', "&quot;")
+                .replaceAll("'", "&#039;");
+        }
+
+        function checkoutImageUrl(imageUrl) {
+            if (!imageUrl) return "assets/images/default.jpg";
+            if (String(imageUrl).startsWith("http")) return imageUrl;
+            if (String(imageUrl).startsWith("assets/")) return imageUrl;
+            return "assets/images/" + imageUrl;
+        }
+
+        function renderCheckoutSummary() {
+            const cart = getCart();
+            const summary = document.getElementById("checkout-summary");
+            const container = document.getElementById("checkout-container");
+
+            if (!summary || !container) return;
+
+            if (cart.length === 0) {
+                container.innerHTML = `
+                    <div class="checkout-panel checkout-empty">
+                        <i class="fa fa-shopping-cart fa-3x" style="color:#d4af37; margin-bottom:18px;"></i>
+                        <h3>Giỏ hàng đang trống</h3>
+                        <p>Vui lòng chọn sản phẩm trước khi thanh toán.</p>
+                        <a href="products.html" class="gold-btn" style="display:inline-block; margin-top:12px;">Tiếp tục mua sắm</a>
+                    </div>
+                `;
+                return;
+            }
+
+            summary.innerHTML = cart.map(item => `
+                <div class="checkout-item">
+                    <img src="${checkoutEscapeHtml(checkoutImageUrl(item.imageUrl))}" alt="${checkoutEscapeHtml(item.name)}">
+                    <div>
+                        <strong>${checkoutEscapeHtml(item.name)}</strong>
+                        <div class="checkout-meta">${checkoutFormatPrice(item.price)} x ${item.quantity}</div>
+                    </div>
+                    <strong>${checkoutFormatPrice(item.price * item.quantity)}</strong>
+                </div>
+            `).join("") + `
+                <div class="checkout-total">
+                    <span>Tổng cộng</span>
+                    <span>${checkoutFormatPrice(getCartTotal(cart))}</span>
+                </div>
+            `;
+        }
+
+        document.addEventListener("DOMContentLoaded", function () {
+            renderCheckoutSummary();
+
+            const form = document.getElementById("checkout-form");
+            if (!form) return;
+
+            form.addEventListener("submit", async function (event) {
+                event.preventDefault();
+
+                const name = document.getElementById("customer-name").value.trim();
+                const phone = document.getElementById("customer-phone").value.trim();
+                const email = document.getElementById("customer-email").value.trim();
+                const address = document.getElementById("shipping-address").value.trim();
+                const note = document.getElementById("order-note").value.trim();
+
+                const shippingAddress = [
+                    `Khách hàng: ${name}`,
+                    `SĐT: ${phone}`,
+                    email ? `Email: ${email}` : "",
+                    `Địa chỉ: ${address}`,
+                    note ? `Ghi chú: ${note}` : ""
+                ].filter(Boolean).join(" | ");
+
+                const button = document.getElementById("place-order-btn");
+                if (button) {
+                    button.disabled = true;
+                    button.textContent = "ĐANG XỬ LÝ...";
+                }
+
+                const success = await placeOrder(shippingAddress);
+
+                if (!success && button) {
+                    button.disabled = false;
+                    button.textContent = "ĐẶT HÀNG";
+                }
+            });
+        });
+    </script>
+</body>
+</html>

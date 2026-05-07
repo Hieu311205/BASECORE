@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <title>Dang ky - Lumiere Perfume</title>
+
+    <link href="assets/css/bootstrap.min.css" rel="stylesheet">
+    <link href="assets/css/font-awesome.css" rel="stylesheet">
+    <link href="assets/css/templatemo-hexashop.css" rel="stylesheet">
+    <link href="assets/css/perfume-luxury-v2.css" rel="stylesheet">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+    <style>
+        body {
+            background: #050505;
+            color: #fff;
+            font-family: "Poppins", Arial, sans-serif;
+        }
+        .auth-page {
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 48px 16px;
+            background:
+                linear-gradient(rgba(0, 0, 0, 0.65), rgba(0, 0, 0, 0.85)),
+                url("assets/images/perfume-2.jpg") center/cover no-repeat;
+        }
+        .auth-card {
+            width: min(500px, 100%);
+            background: #101010;
+            border: 1px solid rgba(212, 175, 55, 0.34);
+            border-radius: 8px;
+            padding: 32px;
+            box-shadow: 0 28px 70px rgba(0, 0, 0, 0.42);
+        }
+        .auth-card h1 {
+            color: #d4af37;
+            font-family: "Playfair Display", serif;
+            font-size: 34px;
+            margin-bottom: 8px;
+        }
+        .auth-card p {
+            color: #c8c8c8;
+            margin-bottom: 24px;
+        }
+        .auth-card label {
+            color: #d4af37;
+            font-weight: 600;
+        }
+        .auth-card input {
+            width: 100%;
+            border: 1px solid rgba(212, 175, 55, 0.45);
+            background: #070707;
+            color: #fff;
+            border-radius: 6px;
+            padding: 12px;
+            margin: 6px 0 16px;
+        }
+        .auth-card .gold-btn {
+            width: 100%;
+            border: 0;
+            margin-top: 6px;
+        }
+        .auth-links {
+            display: flex;
+            justify-content: space-between;
+            gap: 12px;
+            margin-top: 18px;
+            font-size: 14px;
+        }
+        .auth-links a {
+            color: #d4af37;
+        }
+        .auth-message {
+            display: none;
+            border-radius: 6px;
+            padding: 10px 12px;
+            margin-bottom: 16px;
+            font-size: 14px;
+        }
+        .auth-message.error {
+            background: rgba(220, 53, 69, 0.16);
+            border: 1px solid rgba(220, 53, 69, 0.45);
+            color: #ffb8c0;
+        }
+        .auth-message.success {
+            background: rgba(40, 167, 69, 0.16);
+            border: 1px solid rgba(40, 167, 69, 0.45);
+            color: #b9f6c8;
+        }
+    </style>
+</head>
+<body>
+    <main class="auth-page">
+        <section class="auth-card">
+            <a href="index.html" class="checkout-back" style="color:#d4af37;">&larr; Ve trang chu</a>
+            <h1>Dang ky</h1>
+            <p>Tao tai khoan de luu ma khach hang va dat hang nhanh hon.</p>
+
+            <div id="auth-message" class="auth-message"></div>
+
+            <form id="register-form">
+                <label for="name">Ho ten</label>
+                <input id="name" type="text" autocomplete="name" required>
+
+                <label for="username">Ten dang nhap</label>
+                <input id="username" type="text" autocomplete="username" required>
+
+                <label for="email">Email</label>
+                <input id="email" type="email" autocomplete="email">
+
+                <label for="phone">So dien thoai</label>
+                <input id="phone" type="tel" autocomplete="tel">
+
+                <label for="password">Mat khau</label>
+                <input id="password" type="password" autocomplete="new-password" minlength="6" required>
+
+                <label for="confirm-password">Nhap lai mat khau</label>
+                <input id="confirm-password" type="password" autocomplete="new-password" minlength="6" required>
+
+                <button type="submit" class="gold-btn">DANG KY</button>
+            </form>
+
+            <div class="auth-links">
+                <a href="login.html">Da co tai khoan?</a>
+                <a href="products.html">Tiep tuc mua sam</a>
+            </div>
+        </section>
+    </main>
+
+    <script src="assets/js/jquery-2.1.0.min.js"></script>
+    <script src="assets/js/bootstrap.min.js"></script>
+    <script src="assets/custom-js/api.js"></script>
+    <script src="assets/custom-js/auth-widget.js"></script>
+    <script src="assets/custom-js/auth-pages.js"></script>
+</body>
+</html>

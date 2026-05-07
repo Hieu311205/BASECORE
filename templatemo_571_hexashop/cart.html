@@ -1,0 +1,389 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <title>Giỏ hàng - Lumière Perfume</title>
+
+    <link href="assets/css/bootstrap.min.css" rel="stylesheet">
+    <link href="assets/css/font-awesome.css" rel="stylesheet">
+    <link href="assets/css/templatemo-hexashop.css" rel="stylesheet">
+    <link href="assets/css/owl-carousel.css" rel="stylesheet">
+    <link href="assets/css/lightbox.css" rel="stylesheet"><script src="assets/js/custom.js"></script>
+    <link href="assets/css/perfume-luxury-v2.css" rel="stylesheet">
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@500;600;700;800&family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+    <style>
+        .cart-table-custom {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        .cart-table-custom th, .cart-table-custom td {
+            padding: 15px 10px;
+            vertical-align: middle;
+            border-bottom: 1px solid rgba(213,162,79,0.2);
+        }
+        .cart-table-custom th {
+            color: #d4af37;
+            font-weight: 600;
+        }
+        .cart-qty {
+            width: 70px;
+            padding: 6px;
+            border-radius: 6px;
+            border: 1px solid #d4af37;
+            background: #1a1a1a;
+            color: #fff;
+            text-align: center;
+        }
+        .remove-item {
+            background: none;
+            border: 1px solid #d4af37;
+            color: #d4af37;
+            padding: 6px 12px;
+            border-radius: 30px;
+            transition: 0.3s;
+        }
+        .remove-item:hover {
+            background: #d4af37;
+            color: #000;
+        }
+        .cart-total {
+            margin-top: 30px;
+            text-align: right;
+            border-top: 2px solid #d4af37;
+            padding-top: 20px;
+        }
+        .cart-icon {
+            position: relative;
+        }
+        .cart-badge {
+            position: absolute;
+            top: -8px;
+            right: -15px;
+            background: #d4af37;
+            color: #000;
+            border-radius: 50%;
+            padding: 2px 6px;
+            font-size: 12px;
+            font-weight: bold;
+        }
+        @media (max-width: 768px) {
+            .cart-table-custom thead { display: none; }
+            .cart-table-custom, .cart-table-custom tbody, .cart-table-custom tr, .cart-table-custom td {
+                display: block;
+                width: 100%;
+            }
+            .cart-table-custom tr {
+                margin-bottom: 20px;
+                border: 1px solid #d4af37;
+                border-radius: 12px;
+                padding: 10px;
+            }
+            .cart-table-custom td {
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+                padding: 8px 0;
+                border-bottom: none;
+            }
+            .cart-table-custom td:before {
+                content: attr(data-label);
+                font-weight: bold;
+                color: #d4af37;
+                width: 40%;
+            }
+        }
+
+        /* Menu dropdown */
+        .main-nav ul.nav {
+            display: flex !important;
+            flex-wrap: nowrap !important;
+            align-items: center;
+            gap: 20px;
+            margin: 0;
+            padding: 0;
+            list-style: none;
+        }
+        .main-nav ul.nav > li {
+            position: relative;
+            white-space: nowrap;
+        }
+        .dropdown {
+            position: relative;
+        }
+        .dropdown-toggle {
+            cursor: pointer;
+        }
+        .dropdown-menu {
+            position: absolute;
+            top: 100%;
+            left: 0;
+            background: #0a0a0a;
+            border: 1px solid #d4af37;
+            border-radius: 8px;
+            min-width: 180px;
+            padding: 10px 0;
+            z-index: 1000;
+            list-style: none;
+            display: none;
+        }
+        .dropdown-menu.show {
+            display: block;
+        }
+        .dropdown-menu li a {
+            display: block;
+            padding: 8px 20px;
+            color: #fff;
+            transition: 0.3s;
+            text-decoration: none;
+            cursor: pointer;
+        }
+        .dropdown-menu li a:hover {
+            background: #d4af37;
+            color: #000;
+        }
+        .dropdown-toggle i {
+            margin-left: 5px;
+            font-size: 12px;
+        }
+        @media (max-width: 768px) {
+            .main-nav ul.nav { gap: 12px; }
+            .main-nav ul.nav > li > a { font-size: 13px; padding: 8px 6px; }
+        }
+    </style>
+</head>
+<body>
+
+<div class="perfume-topbar">
+    <div class="container">
+        <div class="topbar-inner">
+            <span>Miễn phí giao hàng cho đơn từ 1.000.000đ</span>
+            <span>Hotline: 0123 456 789 &nbsp;&nbsp; | &nbsp;&nbsp; lumiereperfume@gmail.com</span>
+        </div>
+    </div>
+</div>
+
+<header class="header-area header-sticky">
+    <div class="container">
+        <div class="row">
+            <div class="col-12">
+                <nav class="main-nav">
+                    <a class="logo" href="index.html">
+                        <span class="logo-text">LUMIÈRE <em>PERFUME</em></span>
+                    </a>
+                    <ul class="nav">
+                        <li><a href="index.html">Trang chủ</a></li>
+                        <li class="dropdown">
+                            <a href="javascript:void(0)" class="dropdown-toggle">Sản phẩm <i class="fa fa-angle-down"></i></a>
+                            <ul class="dropdown-menu">
+                                <li><a class="filter-cat-link" data-category-id="8">Nước hoa nam</a></li>
+                                <li><a class="filter-cat-link" data-category-id="9">Nước hoa nữ</a></li>
+                                <li><a class="filter-cat-link" data-category-id="10">Nước hoa unisex</a></li>
+                                <li><a class="filter-cat-link" data-category-id="11">Quà tặng</a></li>
+                            </ul>
+                        </li>
+                        <li><a href="about.html">Về chúng tôi</a></li>
+                        <li><a href="contact.html">Liên hệ</a></li>
+                        <li class="cart-icon">
+                            <a href="cart.html">
+                                <i class="fa fa-shopping-cart"></i>
+                                <span class="cart-badge">0</span>
+                            </a>
+                        </li>
+                    </ul>
+                    <a class="menu-trigger"><span>Menu</span></a>
+                </nav>
+            </div>
+        </div>
+    </div>
+</header>
+
+<section class="page-hero">
+    <div class="container">
+        <h1>GIỎ HÀNG CỦA BẠN</h1>
+        <p>Xem lại sản phẩm, điều chỉnh số lượng hoặc tiến hành thanh toán.</p>
+    </div>
+</section>
+
+<section class="section">
+    <div class="container" id="cart-container">
+        <div class="text-center py-5"><i class="fa fa-spinner fa-spin fa-2x"></i> Đang tải giỏ hàng...</div>
+    </div>
+</section>
+
+<footer class="footer">
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-4">
+                <div class="first-item">
+                    <div class="logo"><span class="logo-text">LUMIÈRE <em>PERFUME</em></span></div>
+                    <ul><li><a href="#">Hà Nội, Việt Nam</a></li><li><a href="#">lumiereperfume@gmail.com</a></li><li><a href="#">0123 456 789</a></li></ul>
+                </div>
+            </div>
+            <div class="col-lg-2"><h4>Danh mục</h4><ul><li><a href="products.html?categoryId=8">Nước hoa nam</a></li><li><a href="products.html?categoryId=9">Nước hoa nữ</a></li><li><a href="products.html?categoryId=10">Unisex</a></li><li><a href="products.html?categoryId=11">Gift set</a></li></ul></div>
+            <div class="col-lg-2"><h4>Hỗ trợ</h4><ul><li><a href="about.html">Về chúng tôi</a></li><li><a href="contact.html">Liên hệ</a></li><li><a href="products.html">Sản phẩm</a></li><li><a href="single-product.html">Chi tiết</a></li></ul></div>
+            <div class="col-lg-4"><h4>Về Lumière</h4><p>Lumière Perfume mang đến các dòng nước hoa chính hãng với phong cách sang trọng, tinh tế và dịch vụ chăm sóc khách hàng tận tâm.</p></div>
+            <div class="col-lg-12"><div class="under-footer"><p>© 2026 Lumière Perfume. All Rights Reserved.</p></div></div>
+        </div>
+    </div>
+</footer>
+
+<script src="assets/js/jquery-2.1.0.min.js"></script>
+<script src="assets/js/bootstrap.min.js"></script>
+<script src="assets/js/owl-carousel.js"></script>
+<script src="assets/js/lightbox.js"></script>
+<script src="https://unpkg.com/scrollreveal"></script>
+<script src="assets/js/custom.js"></script>
+
+<script src="assets/custom-js/api.js"></script>
+<script src="assets/custom-js/cart.js"></script>
+<script src="assets/custom-js/auth-widget.js"></script>
+
+<script>
+    function renderCart() {
+        const cart = getCart();
+        const container = document.getElementById("cart-container");
+        
+        if (!cart || cart.length === 0) {
+            container.innerHTML = `
+                <div class="dark-panel text-center" style="padding: 50px 20px;">
+                    <i class="fa fa-shopping-cart fa-3x" style="color: #d4af37; margin-bottom: 20px;"></i>
+                    <h3>Giỏ hàng của bạn đang trống</h3>
+                    <p>Hãy khám phá những mùi hương tinh tế tại Lumière.</p>
+                    <a href="products.html" class="gold-btn" style="display: inline-block; margin-top: 15px;">Tiếp tục mua sắm</a>
+                </div>
+            `;
+            return;
+        }
+
+        let html = `<div class="dark-panel" style="padding: 20px;"><table class="cart-table-custom">
+            <thead><tr><th>Sản phẩm</th><th>Đơn giá</th><th>Số lượng</th><th>Thành tiền</th><th></th></tr></thead><tbody>`;
+        let total = 0;
+        cart.forEach(item => {
+            const subtotal = item.price * item.quantity;
+            total += subtotal;
+            html += `<tr data-id="${item.id}">
+                <td data-label="Sản phẩm" style="display: flex; align-items: center; gap: 15px;">
+                    <img src="${escapeHtml(item.imageUrl)}" width="60" style="border-radius: 8px; object-fit: cover;">
+                    <strong>${escapeHtml(item.name)}</strong>
+                </td>
+                <td data-label="Đơn giá">${formatPrice(item.price)}</td>
+                <td data-label="Số lượng">
+                    <input type="number" class="cart-qty" value="${item.quantity}" min="1" data-id="${item.id}">
+                </td>
+                <td data-label="Thành tiền" class="subtotal-${item.id}">${formatPrice(subtotal)}</td>
+                <td data-label=""><button class="remove-item" data-id="${item.id}"><i class="fa fa-trash-o"></i> Xóa</button></td>
+            </tr>`;
+        });
+        html += `</tbody></table>
+            <div class="cart-total"><h3>Tổng cộng: <span id="cart-total">${formatPrice(total)}</span></h3>
+            <button class="gold-btn" id="checkout-btn" style="margin-top: 15px;">TIẾN HÀNH THANH TOÁN</button></div></div>`;
+        container.innerHTML = html;
+
+        document.querySelectorAll(".cart-qty").forEach(input => {
+            input.addEventListener("change", function() {
+                const id = parseInt(this.dataset.id);
+                let newQty = parseInt(this.value);
+                if (isNaN(newQty) || newQty < 1) newQty = 1;
+                updateCartItemQuantity(id, newQty);
+                renderCart();
+                updateCartCount();
+            });
+        });
+        document.querySelectorAll(".remove-item").forEach(btn => {
+            btn.addEventListener("click", function() {
+                const id = parseInt(this.dataset.id);
+                removeFromCart(id);
+                renderCart();
+                updateCartCount();
+            });
+        });
+        const checkoutBtn = document.getElementById("checkout-btn");
+        if (checkoutBtn) {
+            checkoutBtn.addEventListener("click", async () => {
+    const cart = getCart();
+    if (!cart.length) {
+        alert("Giỏ hàng trống!");
+        return;
+    }
+
+    const shippingAddress = prompt("Nhập địa chỉ giao hàng:");
+    if (!shippingAddress) return;
+
+    // Giả sử userId đã có (có thể lưu sau login). Hiện tại dùng userId = 1 cho demo.
+    const userId = 1; 
+
+    const orderData = {
+        userId: userId,
+        shippingAddress: shippingAddress,
+        cartItems: cart.map(item => ({
+            productId: item.id,
+            quantity: item.quantity,
+            price: item.price
+        }))
+    };
+
+    try {
+        const response = await fetch('/api/orders', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(orderData)
+        });
+        if (response.ok) {
+            alert("Đặt hàng thành công!");
+            localStorage.removeItem("cart");
+            renderCart();
+            updateCartCount();
+        } else {
+            const error = await response.json();
+            alert("Lỗi: " + error.message);
+        }
+    } catch (err) {
+        alert("Không thể kết nối server.");
+    }
+});
+        }
+    }
+    
+  document.addEventListener('DOMContentLoaded', function() {
+        // Dropdown toggle
+        const dropdownToggle = document.querySelector('.dropdown-toggle');
+        const dropdownMenu = document.querySelector('.dropdown-menu');
+        if (dropdownToggle && dropdownMenu) {
+            dropdownToggle.addEventListener('click', function(e) {
+                e.preventDefault();
+                e.stopPropagation();
+                dropdownMenu.classList.toggle('show');
+            });
+            document.addEventListener('click', function(e) {
+                if (!dropdownToggle.contains(e.target) && !dropdownMenu.contains(e.target)) {
+                    dropdownMenu.classList.remove('show');
+                }
+            });
+        }
+
+        // Xử lý click vào các danh mục: chuyển hướng sang products.html với categoryId
+        const filterLinks = document.querySelectorAll('.filter-cat-link');
+        filterLinks.forEach(link => {
+            link.addEventListener('click', function(e) {
+                e.preventDefault();
+                const catId = this.getAttribute('data-category-id');
+                if (catId) {
+                    window.location.href = `products.html?categoryId=${catId}`;
+                } else {
+                    window.location.href = 'products.html';  // ĐÃ SỬA LỖI CHÍNH TẢ
+                }
+            });
+        });
+
+        // Hiển thị giỏ hàng
+        renderCartPage();
+        updateCartCount();
+    });
+</script>
+</body>
+</html>

@@ -1,0 +1,194 @@
+import React, { useState, useEffect } from 'react';
+import { productApi, userApi, categoryApi, orderApi, suppliersApi } from '../services/api';
+import { useAuth } from '../contexts/AuthContext';
+
+const Dashboard = () => {
+    const [stats, setStats] = useState({
+        products: 0,
+        categories: 0,
+        users: 0,
+        orders: 0,
+        suppliers: 0,
+    });
+
+    const [loading, setLoading] = useState(true);
+    const { isAdmin } = useAuth();
+
+    useEffect(() => {
+        loadStats();
+    }, []);
+
+    const getCount = (data) => {
+        return data?.totalCount || data?.items?.length || data?.data?.length || data?.length || 0;
+    };
+
+    const loadStats = async () => {
+        try {
+            const [productsRes, categoriesRes, ordersRes, suppliersRes] = await Promise.all([
+                productApi.getAll(),
+                categoryApi.getAll(),
+                orderApi.getAll(),
+                suppliersApi.getAll(),
+            ]);
+
+            let usersCount = 0;
+
+            if (isAdmin()) {
+                try {
+                    const usersRes = await userApi.getAll({ page: 1, pageSize: 1 });
+                    usersCount = getCount(usersRes.data);
+                } catch (e) {
+                    console.log('Cannot fetch users count');
+                }
+            }
+
+            setStats({
+                products: getCount(productsRes.data),
+                categories: getCount(categoriesRes.data),
+                users: usersCount,
+                orders: getCount(ordersRes.data),
+                suppliers: getCount(suppliersRes.data),
+            });
+        } catch (error) {
+            console.error('Failed to load stats:', error);
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    return (
+        <div className="content-wrapper">
+            <div className="content-header">
+                <div className="container-fluid">
+                    <div className="row mb-2">
+                        <div className="col-sm-6">
+                            <h1 className="m-0">Dashboard</h1>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <section className="content">
+                <div className="container-fluid">
+                    {loading ? (
+                        <div className="text-center py-5">
+                            <div className="spinner-border text-primary" role="status">
+                                <span className="sr-only">Loading...</span>
+                            </div>
+                        </div>
+                    ) : (
+                        <div className="row">
+                            <div className="col-lg-3 col-6">
+                                <div className="small-box bg-info">
+                                    <div className="inner">
+                                        <h3>{stats.products}</h3>
+                                        <p>Products</p>
+                                    </div>
+                                    <div className="icon">
+                                        <i className="fas fa-box"></i>
+                                    </div>
+                                    <a href="/products" className="small-box-footer">
+                                        More info <i className="fas fa-arrow-circle-right"></i>
+                                    </a>
+                                </div>
+                            </div>
+
+                            <div className="col-lg-3 col-6">
+                                <div className="small-box bg-success">
+                                    <div className="inner">
+                                        <h3>{stats.categories}</h3>
+                                        <p>Categories</p>
+                                    </div>
+                                    <div className="icon">
+                                        <i className="fas fa-tags"></i>
+                                    </div>
+                                    <a href="/categories" className="small-box-footer">
+                                        More info <i className="fas fa-arrow-circle-right"></i>
+                                    </a>
+                                </div>
+                            </div>
+
+                            <div className="col-lg-3 col-6">
+                                <div className="small-box bg-primary">
+                                    <div className="inner">
+                                        <h3>{stats.suppliers}</h3>
+                                        <p>Suppliers</p>
+                                    </div>
+                                    <div className="icon">
+                                        <i className="fas fa-truck"></i>
+                                    </div>
+                                    <a href="/suppliers" className="small-box-footer">
+                                        More info <i className="fas fa-arrow-circle-right"></i>
+                                    </a>
+                                </div>
+                            </div>
+
+                            <div className="col-lg-3 col-6">
+                                <div className="small-box bg-danger">
+                                    <div className="inner">
+                                        <h3>{stats.orders}</h3>
+                                        <p>Orders</p>
+                                    </div>
+                                    <div className="icon">
+                                        <i className="fas fa-shopping-bag"></i>
+                                    </div>
+                                    <a href="/orders" className="small-box-footer">
+                                        More info <i className="fas fa-arrow-circle-right"></i>
+                                    </a>
+                                </div>
+                            </div>
+
+                            {isAdmin() && (
+                                <div className="col-lg-3 col-6">
+                                    <div className="small-box bg-warning">
+                                        <div className="inner">
+                                            <h3>{stats.users}</h3>
+                                            <p>Users</p>
+                                        </div>
+                                        <div className="icon">
+                                            <i className="fas fa-users"></i>
+                                        </div>
+                                        <a href="/users" className="small-box-footer">
+                                            More info <i className="fas fa-arrow-circle-right"></i>
+                                        </a>
+                                    </div>
+                                </div>
+                            )}
+                        </div>
+                    )}
+
+                    <div className="row">
+                        <div className="col-12">
+                            <div className="card">
+                                <div className="card-header">
+                                    <h3 className="card-title">Welcome to BaseCore Sales System</h3>
+                                </div>
+                                <div className="card-body">
+                                    <p>This is a teaching framework for web development using:</p>
+                                    <ul>
+                                        <li><strong>Backend:</strong> .NET Core 8.0 with Entity Framework Core</li>
+                                        <li><strong>Frontend:</strong> React 18 with React Router</li>
+                                        <li><strong>UI:</strong> AdminLTE 3 with Bootstrap 4</li>
+                                        <li><strong>Authentication:</strong> JWT Bearer Token</li>
+                                    </ul>
+
+                                    <p>Features include:</p>
+                                    <ul>
+                                        <li>User Authentication (Login/Logout)</li>
+                                        <li>Product Management (CRUD with Search & Pagination)</li>
+                                        <li>Category Management</li>
+                                        <li>Supplier Management</li>
+                                        <li>User Management (Admin only)</li>
+                                        <li>Order Management</li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </div>
+    );
+};
+
+export default Dashboard;
