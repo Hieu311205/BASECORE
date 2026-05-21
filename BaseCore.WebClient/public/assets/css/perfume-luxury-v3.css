@@ -1,0 +1,78 @@
+
+@import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@400;500;600;700&family=Montserrat:wght@300;400;500;600;700&display=swap');
+:root{--gold:#d4af37;--gold-soft:#c9a34a;--bg:#050505;--panel:#0d0d0d;--text:#f4f1eb;--muted:#bdb6aa;--border:rgba(212,175,55,.28);}
+html,body{background:var(--bg)!important;color:var(--text)!important;font-family:'Montserrat',sans-serif;}
+body{overflow-x:hidden;}
+a{transition:.25s ease;}
+.perfume-topbar{background:#000;border-bottom:1px solid rgba(255,255,255,.08);color:#e7d1a1;font-size:14px;padding:10px 0;}
+.topbar-inner{display:flex;justify-content:space-between;gap:16px;align-items:center;flex-wrap:wrap;}
+.header-area,.background-header{background:rgba(0,0,0,.94)!important;border-bottom:1px solid var(--border)!important;box-shadow:0 10px 40px rgba(0,0,0,.35);}
+.header-area .main-nav .logo{line-height:1!important;display:flex;align-items:center;height:auto!important;padding:18px 0;}
+.logo-text{display:inline-block;font-family:'Cinzel',serif;font-size:34px;line-height:1;color:var(--gold);letter-spacing:2px;font-weight:600;}
+.logo-text em{display:block;font-style:normal;font-size:14px;letter-spacing:5px;color:#e8cf94;margin-top:8px;}
+.header-area .main-nav .nav li a{color:#f5f1ea!important;font-weight:600;text-transform:uppercase;font-size:14px;letter-spacing:.6px;padding:0 18px!important;}
+.header-area .main-nav .nav li a.active,.header-area .main-nav .nav li a:hover{color:var(--gold)!important;}
+.header-area .main-nav .nav li.submenu ul{background:#111!important;border:1px solid var(--border)!important;}
+.header-area .main-nav .nav li.submenu ul li a{padding:12px 16px!important;color:#fff!important;}
+.header-area .main-nav .nav li.submenu ul li a:hover{background:#181818!important;color:var(--gold)!important;}
+.main-banner .left-content .thumb,.main-banner .right-first-image .thumb{border-radius:0!important;overflow:hidden;background:#000;}
+.main-banner .left-content .thumb:after{content:'';position:absolute;inset:0;background:linear-gradient(90deg,rgba(0,0,0,.82) 0%,rgba(0,0,0,.58) 42%,rgba(0,0,0,.08) 100%);z-index:1;}
+.main-banner .left-content .thumb img{filter:saturate(.9) contrast(1.05) brightness(.86);min-height:560px;object-fit:cover;}
+.main-banner .left-content .inner-content{z-index:2!important;left:70px!important;top:110px!important;max-width:520px;}
+.main-banner .left-content .inner-content .eyebrow{font-size:24px;letter-spacing:4px;text-transform:uppercase;color:#ddd3bf;margin-bottom:14px;display:block;}
+.main-banner .left-content .inner-content h4{font-family:'Cinzel',serif;font-size:72px!important;line-height:1.04!important;letter-spacing:1px;color:#fff!important;text-transform:uppercase;}
+.main-banner .left-content .inner-content h4 .gold{color:var(--gold);} 
+.main-banner .left-content .inner-content span{font-size:22px!important;color:#f3ead9!important;display:block;max-width:500px;line-height:1.6;margin-top:18px;}
+.main-border-button a,.main-dark-button a,.filled-button{background:transparent!important;color:var(--gold)!important;border:1px solid var(--gold)!important;border-radius:0!important;padding:14px 34px!important;font-weight:700;letter-spacing:1px;text-transform:uppercase;}
+.main-border-button a:hover,.main-dark-button a:hover,.filled-button:hover{background:var(--gold)!important;color:#111!important;}
+.main-banner .right-first-image .thumb{position:relative;border:1px solid rgba(255,255,255,.05);}
+.main-banner .right-first-image .thumb img{height:265px;object-fit:cover;filter:brightness(.7);}
+.main-banner .right-first-image .thumb .inner-content{top:28px!important;left:28px!important;right:28px!important;z-index:2;}
+.main-banner .right-first-image .thumb .inner-content h4{font-family:'Cinzel',serif;color:#fff!important;font-size:28px!important;}
+.main-banner .right-first-image .thumb .inner-content span{color:#e7d6ac!important;font-size:16px;}
+.main-banner .right-first-image .thumb .hover-content{background:rgba(0,0,0,.78)!important;}
+.section{background:#080808;}
+.section .section-heading h2,.section-heading h2{font-family:'Cinzel',serif;color:var(--gold)!important;font-size:44px!important;text-transform:uppercase;letter-spacing:1.5px;}
+.section .section-heading span,.section-heading span{color:var(--muted)!important;}
+.item{background:#0b0b0b;border:1px solid rgba(212,175,55,.18)!important;box-shadow:0 12px 35px rgba(0,0,0,.28);}
+.item .thumb{background:#111;}
+.item .thumb img{height:360px;object-fit:cover;filter:saturate(.92) brightness(.92);}
+.item:hover{transform:translateY(-7px);border-color:rgba(212,175,55,.5)!important;box-shadow:0 18px 45px rgba(0,0,0,.42);}
+.item .down-content{padding:22px 20px 24px;}
+.item .down-content h4{color:#fff!important;font-size:23px!important;font-weight:700;min-height:56px;}
+.item .down-content span{color:var(--gold)!important;font-size:26px!important;font-weight:700;display:block;margin-top:8px;}
+.item .down-content p,.item .down-content .category,.item .down-content .subtext{color:var(--muted)!important;}
+.item .down-content ul li i{color:var(--gold)!important;}
+.item .thumb .hover-content ul li a{background:#131313!important;border:1px solid var(--border);color:var(--gold)!important;}
+.item .thumb .hover-content ul li a:hover{background:var(--gold)!important;color:#111!important;}
+.perfume-benefits{background:#070707;border-top:1px solid rgba(255,255,255,.07);border-bottom:1px solid rgba(255,255,255,.07);padding:28px 0;}
+.perfume-benefits .benefit{display:flex;align-items:center;gap:16px;padding:12px 24px;border-right:1px solid rgba(255,255,255,.08);}
+.perfume-benefits .benefit:last-child{border-right:none;}
+.perfume-benefits i{font-size:34px;color:var(--gold);width:42px;text-align:center;}
+.perfume-benefits h6{margin:0;color:#fff;text-transform:uppercase;letter-spacing:.8px;font-weight:700;}
+.perfume-benefits p{margin:2px 0 0;color:var(--muted);font-size:15px;}
+.perfume-mini-grid .mini-card{position:relative;min-height:180px;border:1px solid rgba(212,175,55,.18);background:#111;overflow:hidden;}
+.perfume-mini-grid .mini-card img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;filter:brightness(.56);}
+.perfume-mini-grid .mini-card .content{position:relative;z-index:1;padding:28px;}
+.perfume-mini-grid .mini-card h5{font-family:'Cinzel',serif;font-size:30px;color:#fff;}
+.perfume-mini-grid .mini-card p{color:#e7d8b4;}
+.perfume-mini-grid .mini-card a{color:var(--gold);font-weight:700;text-transform:uppercase;letter-spacing:1px;}
+.subscribe,.section#explore{background:#090909!important;}
+.subscribe .inner-content h2,.explore .section-heading h2{color:var(--gold)!important;font-family:'Cinzel',serif;}
+.subscribe form input{background:#111!important;border:1px solid rgba(255,255,255,.12)!important;color:#fff!important;border-radius:0!important;height:56px!important;}
+.subscribe form button{background:var(--gold)!important;color:#111!important;border-radius:0!important;height:56px;width:100%;font-weight:700;border:none;}
+footer{background:#050505!important;border-top:1px solid rgba(212,175,55,.18);}
+footer h4,footer .logo{color:var(--gold)!important;font-family:'Cinzel',serif;}
+footer ul li a,footer ul li{color:#d7d0c2!important;}
+footer ul li a:hover{color:var(--gold)!important;}
+footer .under-footer p,footer .under-footer p a{color:#c9c2b4!important;}
+.page-heading{position:relative;background-color:#090909!important;}
+.page-heading .inner-content h2{font-family:'Cinzel',serif;color:#fff!important;font-size:64px!important;text-transform:uppercase;}
+.page-heading .inner-content span{color:#e4d5ae!important;}
+.about-us,.contact-us,.product-page,.single-product,.services,.our-team{background:#080808!important;color:#fff;}
+.about-us p,.contact-us p,.single-product p,.services p,.our-team p{color:#ccc6b8!important;}
+.single-product .right-content h4,.about-us .right-content h4{font-family:'Cinzel',serif;color:#fff!important;}
+.single-product .price h6,.single-product .total h4,.single-product .quantity-text{color:var(--gold)!important;}
+form input,form textarea{background:#0f0f0f!important;border:1px solid rgba(255,255,255,.12)!important;color:#fff!important;border-radius:0!important;}
+#map iframe{filter:grayscale(1) invert(.9) contrast(.95);}
+@media (max-width: 991px){.topbar-inner{justify-content:center;text-align:center}.logo-text{font-size:28px}.main-banner .left-content .inner-content{left:34px!important;top:70px!important;max-width:90%}.main-banner .left-content .inner-content h4{font-size:50px!important}.perfume-benefits .benefit{border-right:none;border-bottom:1px solid rgba(255,255,255,.08)}.perfume-benefits .benefit:last-child{border-bottom:none}}
