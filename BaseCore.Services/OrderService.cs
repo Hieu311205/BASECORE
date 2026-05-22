@@ -10,72 +10,7 @@
 //{
 //    public class OrderService : IOrderService
 //    {
-//        private readonly MySqlDbContext _context;
-
-//        public OrderService(MySqlDbContext context)
-//        {
-//            _context = context;
-//        }
-
-//        public async Task<Order> CreateOrderAsync(Order order)
-//        {
-//            // Get next ID
-//            var maxOrder = await _context.Orders
-//                .Find(_ => true)
-//                .SortByDescending(o => o.Id)
-//                .FirstOrDefaultAsync();
-//            order.Id = (maxOrder?.Id ?? 0) + 1;
-
-//            order.OrderDate = DateTime.UtcNow;
-//            order.Status = "Pending";
-
-//            _context.Orders.Add(order);
-//            await _context.SaveChangesAsync();
-//            return order;
-//        }
-
-//        public async Task<List<Order>> GetOrdersByUserIdAsync(int userId)
-//        {
-//            var orders = await _context.Orders
-//                .Find(o => o.UserId == userId)
-//                .SortByDescending(o => o.OrderDate)
-//                .ToListAsync();
-
-//            // Load order details and products
-//            foreach (var order in orders)
-//            {
-//                if (order.OrderDetails != null)
-//                {
-//                    foreach (var detail in order.OrderDetails)
-//                    {
-//                        detail.Product = await _context.Products
-//                            .Find(p => p.Id == detail.ProductId)
-//                            .FirstOrDefaultAsync();
-//                    }
-//                }
-//            }
-
-//            return orders;
-//        }
-
-//        public async Task<Order> GetOrderByIdAsync(int id)
-//        {
-//            var order = await _context.Orders
-//                .Find(o => o.Id == id)
-//                .FirstOrDefaultAsync();
-
-//            if (order?.OrderDetails != null)
-//            {
-//                foreach (var detail in order.OrderDetails)
-//                {
-//                    detail.Product = await _context.Products
-//                        .Find(p => p.Id == detail.ProductId)
-//                        .FirstOrDefaultAsync();
-//                }
-//            }
-
-//            return order;
-//        }
+//        ...
 //    }
 //}
 using BaseCore.Entities;
@@ -88,6 +23,7 @@ using System.Threading.Tasks;
 
 namespace BaseCore.Services
 {
+    // Lớp xử lý nghiệp vụ liên quan đến đơn hàng.
     public class OrderService : IOrderService
     {
         private readonly MySqlDbContext _context;
@@ -97,10 +33,12 @@ namespace BaseCore.Services
             _context = context;
         }
 
+        // Tạo đơn hàng mới
+        // Tự động gán ngày đặt hàng (UTC) và trạng thái ban đầu là "Pending"
         public async Task<Order> CreateOrderAsync(Order order)
         {
-            order.OrderDate = DateTime.UtcNow;
-            order.Status = "Pending";
+            order.OrderDate = DateTime.UtcNow; // Lưu theo UTC để tránh lệch timezone
+            order.Status = "Pending";          // Trạng thái mặc định khi mới tạo
 
             _context.Orders.Add(order);
             await _context.SaveChangesAsync();
@@ -108,24 +46,29 @@ namespace BaseCore.Services
             return order;
         }
 
+        // Lấy tất cả đơn hàng của một user
+        // Include + ThenInclude: Load chuỗi quan hệ Orders → OrderDetails → Products
+        // (tương đương JOIN nhiều bảng trong SQL)
         public async Task<List<Order>> GetOrdersByUserIdAsync(int userId)
         {
             var orders = await _context.Orders
                 .Where(o => o.UserId == userId)
-                .OrderByDescending(o => o.OrderDate)
-                .Include(o => o.OrderDetails)
-                    .ThenInclude(d => d.Product)
+                .OrderByDescending(o => o.OrderDate) // Đơn mới nhất lên đầu
+                .Include(o => o.OrderDetails)        // Load chi tiết đơn hàng
+                    .ThenInclude(d => d.Product)     // Trong chi tiết, load luôn thông tin sản phẩm
                 .ToListAsync();
 
             return orders;
         }
 
+        // Lấy chi tiết một đơn hàng theo id
+        // Include + ThenInclude để có đủ thông tin: đơn hàng + từng dòng + sản phẩm trong từng dòng
         public async Task<Order?> GetOrderByIdAsync(int id)
         {
             return await _context.Orders
                 .Where(o => o.Id == id)
-                .Include(o => o.OrderDetails)
-                    .ThenInclude(d => d.Product)
+                .Include(o => o.OrderDetails)    // Lấy danh sách dòng chi tiết
+                    .ThenInclude(d => d.Product) // Trong mỗi dòng, lấy thông tin sản phẩm
                 .FirstOrDefaultAsync();
         }
     }

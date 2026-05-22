@@ -5,10 +5,8 @@ using BaseCore.Repository.EFCore;
 
 namespace BaseCore.APIService.Controllers
 {
-    /// <summary>
-    /// Category API Controller
-    /// Teaching: RESTful API, CRUD Operations (Bài 10)
-    /// </summary>
+    // Controller xử lý các API liên quan đến danh mục sản phẩm.
+    // URL: /api/categories
     [Route("api/[controller]")]
     [ApiController]
     public class CategoriesController : ControllerBase
@@ -20,9 +18,8 @@ namespace BaseCore.APIService.Controllers
             _categoryRepository = categoryRepository;
         }
 
-        /// <summary>
-        /// Get all categories
-        /// </summary>
+        // GET /api/categories
+        // Lấy danh sách tất cả danh mục (không cần đăng nhập)
         [HttpGet]
         public async Task<IActionResult> GetAll()
         {
@@ -30,9 +27,8 @@ namespace BaseCore.APIService.Controllers
             return Ok(categories);
         }
 
-        /// <summary>
-        /// Get category by ID
-        /// </summary>
+        // GET /api/categories/1
+        // Lấy thông tin một danh mục theo id
         [HttpGet("{id}")]
         public async Task<IActionResult> GetById(int id)
         {
@@ -43,13 +39,13 @@ namespace BaseCore.APIService.Controllers
             return Ok(category);
         }
 
-        /// <summary>
-        /// Create new category
-        /// </summary>
+        // POST /api/categories
+        // Tạo danh mục mới (yêu cầu đăng nhập)
         [HttpPost]
         [Authorize]
         public async Task<IActionResult> Create([FromBody] CategoryDto dto)
         {
+            // Kiểm tra tên danh mục chưa bị trùng
             var existing = await _categoryRepository.GetByNameAsync(dto.Name);
             if (existing != null)
                 return BadRequest(new { message = "Category name already exists" });
@@ -64,9 +60,8 @@ namespace BaseCore.APIService.Controllers
             return CreatedAtAction(nameof(GetById), new { id = category.Id }, category);
         }
 
-        /// <summary>
-        /// Update category
-        /// </summary>
+        // PUT /api/categories/1
+        // Cập nhật danh mục (yêu cầu đăng nhập)
         [HttpPut("{id}")]
         [Authorize]
         public async Task<IActionResult> Update(int id, [FromBody] CategoryDto dto)
@@ -75,6 +70,7 @@ namespace BaseCore.APIService.Controllers
             if (category == null)
                 return NotFound(new { message = "Category not found" });
 
+            // Cập nhật chỉ trường nào được gửi (không null)
             category.Name = dto.Name ?? category.Name;
             category.Description = dto.Description ?? category.Description;
 
@@ -82,9 +78,9 @@ namespace BaseCore.APIService.Controllers
             return Ok(category);
         }
 
-        /// <summary>
-        /// Delete category
-        /// </summary>
+        // DELETE /api/categories/1
+        // Xóa danh mục (yêu cầu đăng nhập)
+        // Lưu ý: sẽ bị lỗi nếu danh mục còn sản phẩm (do OnDelete Restrict)
         [HttpDelete("{id}")]
         [Authorize]
         public async Task<IActionResult> Delete(int id)
@@ -98,9 +94,10 @@ namespace BaseCore.APIService.Controllers
         }
     }
 
+    // DTO dùng cho cả tạo mới lẫn cập nhật danh mục
     public class CategoryDto
     {
         public string Name { get; set; } = "";
-        public string? Description { get; set; }
+        public string? Description { get; set; } // Nullable: không bắt buộc phải có mô tả
     }
 }
