@@ -9,7 +9,8 @@ using System.Text.Json.Serialization;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Add services to the container
+// Đăng ký controller và cấu hình JSON để API nhận request không phân biệt hoa/thường,
+// đồng thời tránh vòng lặp khi serialize các entity có quan hệ hai chiều.
 builder.Services.AddControllers()
     .AddJsonOptions(options =>
     {
@@ -19,7 +20,7 @@ builder.Services.AddControllers()
 
 builder.Services.AddEndpointsApiExplorer();
 
-// Swagger Configuration
+// Cấu hình Swagger kèm Bearer token để test các endpoint cần đăng nhập ngay trên UI.
 builder.Services.AddSwaggerGen(c =>
 {
     c.SwaggerDoc("v1", new OpenApiInfo
@@ -49,7 +50,7 @@ builder.Services.AddSwaggerGen(c =>
     });
 });
 
-// CORS
+// Cho phép frontend/dev client gọi API từ mọi origin trong môi trường học tập/phát triển.
 builder.Services.AddCors(options =>
 {
     options.AddPolicy("AllowAll", policy =>
@@ -60,18 +61,19 @@ builder.Services.AddCors(options =>
 
 builder.Services.AddDbContext<MySqlDbContext>(options =>
 {
+    // Dùng chung DbContext EF Core cho các repository trong API Service.
     options.UseSqlServer(builder.Configuration.GetConnectionString("ConnectedDb"));
 });
 
 
-// Repository Registration - Products, Categories, Orders
+// Đăng ký repository theo scope request để mỗi HTTP request dùng một vòng đời DbContext.
 builder.Services.AddScoped<IProductRepositoryEF, ProductRepositoryEF>();
 builder.Services.AddScoped<ICategoryRepositoryEF, CategoryRepositoryEF>();
 builder.Services.AddScoped<IOrderRepositoryEF, OrderRepositoryEF>();
 builder.Services.AddScoped<IOrderDetailRepositoryEF, OrderDetailRepositoryEF>();
 builder.Services.AddScoped<ISupplierRepositoryEF, SupplierRepositoryEF>();
 
-// JWT Authentication
+// Cấu hình xác thực JWT: token hợp lệ mới được truy cập endpoint có [Authorize].
 var key = Encoding.ASCII.GetBytes(builder.Configuration["Jwt:SecretKey"] ?? "YourSecretKeyForAuthenticationShouldBeLongEnough");
 builder.Services.AddAuthentication(x =>
 {
@@ -93,14 +95,14 @@ builder.Services.AddAuthentication(x =>
 
 var app = builder.Build();
 
-// Auto migrate database
+// Tự tạo database/schema khi service khởi động nếu database chưa tồn tại.
 using (var scope = app.Services.CreateScope())
 {
     var db = scope.ServiceProvider.GetRequiredService<MySqlDbContext>();
     db.Database.EnsureCreated();
 }
 
-// Configure the HTTP request pipeline
+// Pipeline xử lý request: Swagger chỉ bật khi Development, sau đó CORS -> Auth -> Controller.
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();

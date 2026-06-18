@@ -14,6 +14,7 @@ namespace BaseCore.Repository.EFCore
 
         public Repository(MySqlDbContext context)
         {
+            // DbSet<T> giúp repository thao tác generic với mọi entity EF Core.
             _context = context;
             _dbSet = context.Set<T>();
         }
@@ -40,6 +41,7 @@ namespace BaseCore.Repository.EFCore
 
         public virtual async Task<T> AddAsync(T entity)
         {
+            // Lưu ngay để caller nhận được khóa chính do database sinh ra.
             await _dbSet.AddAsync(entity);
             await _context.SaveChangesAsync();
             return entity;
@@ -65,6 +67,7 @@ namespace BaseCore.Repository.EFCore
 
         public virtual async Task DeleteByIdAsync(object id)
         {
+            // Xóa theo id chỉ thực hiện khi entity tồn tại để tránh lỗi null.
             var entity = await GetByIdAsync(id);
             if (entity != null)
             {
@@ -81,16 +84,16 @@ namespace BaseCore.Repository.EFCore
         {
             IQueryable<T> query = _dbSet;
 
-            // Apply filter
+            // Filter chạy trước Count để TotalCount phản ánh đúng điều kiện tìm kiếm.
             if (filter != null)
             {
                 query = query.Where(filter);
             }
 
-            // Get total count
+            // Lấy tổng số bản ghi trước khi Skip/Take để frontend tính tổng số trang.
             var totalCount = await query.CountAsync();
 
-            // Apply ordering
+            // Sắp xếp có điều kiện; nếu không truyền orderBy thì giữ thứ tự mặc định từ database.
             if (orderBy != null)
             {
                 query = descending
@@ -98,7 +101,7 @@ namespace BaseCore.Repository.EFCore
                     : query.OrderBy(orderBy);
             }
 
-            // Apply pagination
+            // Phân trang phía database, tránh load toàn bộ dữ liệu vào memory.
             var items = await query
                 .Skip((page - 1) * pageSize)
                 .Take(pageSize)

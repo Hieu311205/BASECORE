@@ -10,7 +10,14 @@ import Products from './pages/Products';
 import Users from './pages/Users';
 import Categories from './pages/Categories';
 import Orders from './pages/Orders';
+import Inventory from './pages/Inventory';
+import Reports from './pages/Reports';
 import Suppliers from './pages/Suppliers'; // ✅ THÊM DÒNG NÀY
+import Discounts from './pages/Discounts';
+import Shipping from './pages/Shipping';
+import Payments from './pages/Payments';
+import Settings from './pages/Settings';
+import AuditLogs from './pages/AuditLogs';
 
 // Wrapper to redirect authenticated users away from login
 const PublicRoute = ({ children }) => {
@@ -20,7 +27,7 @@ const PublicRoute = ({ children }) => {
         return (
             <div className="d-flex justify-content-center align-items-center" style={{ height: '100vh' }}>
                 <div className="spinner-border text-primary" role="status">
-                    <span className="sr-only">Loading...</span>
+                    <span className="sr-only">Đang tải...</span>
                 </div>
             </div>
         );
@@ -106,6 +113,66 @@ function AppRoutes() {
                 }
             />
 
+            {/* INVENTORY */}
+            <Route
+                path="/inventory"
+                element={
+                    <ProtectedRoute adminOnly={true}>
+                        <MainLayout>
+                            <Inventory />
+                        </MainLayout>
+                    </ProtectedRoute>
+                }
+            />
+
+            {/* REPORTS */}
+            <Route
+                path="/reports"
+                element={
+                    <ProtectedRoute adminOnly={true}>
+                        <MainLayout>
+                            <Reports />
+                        </MainLayout>
+                    </ProtectedRoute>
+                }
+            />
+
+            {/* DISCOUNTS */}
+            <Route
+                path="/discounts"
+                element={
+                    <ProtectedRoute adminOnly={true}>
+                        <MainLayout>
+                            <Discounts />
+                        </MainLayout>
+                    </ProtectedRoute>
+                }
+            />
+
+            {/* SHIPPING */}
+            <Route
+                path="/shipping"
+                element={
+                    <ProtectedRoute adminOnly={true}>
+                        <MainLayout>
+                            <Shipping />
+                        </MainLayout>
+                    </ProtectedRoute>
+                }
+            />
+
+            {/* PAYMENTS */}
+            <Route
+                path="/payments"
+                element={
+                    <ProtectedRoute adminOnly={true}>
+                        <MainLayout>
+                            <Payments />
+                        </MainLayout>
+                    </ProtectedRoute>
+                }
+            />
+
             {/* ORDERS */}
             <Route
                 path="/orders"
@@ -113,6 +180,30 @@ function AppRoutes() {
                     <ProtectedRoute>
                         <MainLayout>
                             <Orders />
+                        </MainLayout>
+                    </ProtectedRoute>
+                }
+            />
+
+            {/* SETTINGS */}
+            <Route
+                path="/settings"
+                element={
+                    <ProtectedRoute adminOnly={true}>
+                        <MainLayout>
+                            <Settings />
+                        </MainLayout>
+                    </ProtectedRoute>
+                }
+            />
+
+            {/* AUDIT LOGS */}
+            <Route
+                path="/audit-logs"
+                element={
+                    <ProtectedRoute adminOnly={true}>
+                        <MainLayout>
+                            <AuditLogs />
                         </MainLayout>
                     </ProtectedRoute>
                 }

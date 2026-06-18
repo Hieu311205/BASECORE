@@ -1,16 +1,3 @@
-﻿//using BaseCore.Entities;
-
-//namespace BaseCore.Repository.EFCore
-//{
-//    public interface ISupplierRepositoryEF
-//    {
-//        Task<(IEnumerable<Supplier> suppliers, int totalCount)> SearchAsync(string? keyword, int page, int pageSize);
-//        Task<Supplier?> GetByIdAsync(int id);
-//        Task AddAsync(Supplier supplier);
-//        Task UpdateAsync(Supplier supplier);
-//        Task DeleteAsync(Supplier supplier);
-//    }
-//}
 using Microsoft.EntityFrameworkCore;
 using BaseCore.Entities;
 
@@ -39,10 +26,12 @@ namespace BaseCore.Repository.EFCore
             int pageSize
         )
         {
-            var query = _dbSet.AsQueryable();
+            // Soft delete: chỉ query supplier chưa bị xóa khỏi nghiệp vụ.
+            var query = _dbSet.Where(s => !s.IsDeleted).AsQueryable();
 
             if (!string.IsNullOrEmpty(keyword))
             {
+                // Keyword tìm trên các thông tin thường dùng khi tra cứu nhà cung cấp.
                 keyword = keyword.ToLower();
 
                 query = query.Where(s =>
@@ -55,9 +44,11 @@ namespace BaseCore.Repository.EFCore
 
             if (isActive.HasValue)
             {
+                // Cho phép frontend lọc nhà cung cấp đang hoạt động hoặc đã tạm ngưng.
                 query = query.Where(s => s.IsActive == isActive.Value);
             }
 
+            // Đếm trước phân trang để trả metadata đầy đủ cho bảng dữ liệu.
             var totalCount = await query.CountAsync();
 
             var suppliers = await query

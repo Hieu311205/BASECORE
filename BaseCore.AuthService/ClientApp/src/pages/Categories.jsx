@@ -4,24 +4,85 @@ import { categoriesApi } from '../services/api';
 const Categories = () => {
   const [categories, setCategories] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [keyword, setKeyword] = useState('');
+  const [page, setPage] = useState(1);
+  const [pageSize] = useState(10);
+  const [totalPages, setTotalPages] = useState(0);
+  const [totalCount, setTotalCount] = useState(0);
   const [showModal, setShowModal] = useState(false);
   const [editingCategory, setEditingCategory] = useState(null);
   const [formData, setFormData] = useState({ name: '', description: '' });
 
+  const normalizeCategoryResponse = (data) => {
+    if (Array.isArray(data)) {
+      const normalizedKeyword = keyword.trim().toLowerCase();
+      const filtered = normalizedKeyword
+        ? data.filter((category) =>
+          category.name?.toLowerCase().includes(normalizedKeyword) ||
+          category.description?.toLowerCase().includes(normalizedKeyword))
+        : data;
+      const startIndex = (page - 1) * pageSize;
+
+      return {
+        items: filtered.slice(startIndex, startIndex + pageSize),
+        totalCount: filtered.length,
+        totalPages: Math.ceil(filtered.length / pageSize) || 1,
+      };
+    }
+
+    return {
+      items: data?.items || data?.data || [],
+      totalCount: data?.totalCount ?? data?.items?.length ?? data?.data?.length ?? 0,
+      totalPages: data?.totalPages ?? (Math.ceil((data?.totalCount ?? 0) / pageSize) || 0),
+    };
+  };
+
   const fetchCategories = async () => {
     setLoading(true);
     try {
-      const response = await categoriesApi.getAll();
-      setCategories(response.data || []);
+      const response = await categoriesApi.getAll({
+        keyword: keyword.trim() || undefined,
+        page,
+        pageSize,
+      });
+      const result = normalizeCategoryResponse(response.data);
+
+      setCategories(result.items);
+      setTotalPages(result.totalPages);
+      setTotalCount(result.totalCount);
     } catch (error) {
       console.error('Failed to fetch categories:', error);
+      setCategories([]);
+      setTotalPages(0);
+      setTotalCount(0);
     }
     setLoading(false);
   };
 
   useEffect(() => {
     fetchCategories();
-  }, []);
+  }, [keyword, page]);
+
+  const handleSearch = (e) => {
+    e.preventDefault();
+    setPage(1);
+  };
+
+  const renderPagination = () => {
+    const pages = [];
+
+    for (let i = 1; i <= totalPages; i++) {
+      pages.push(
+        <li key={i} className={`page-item ${page === i ? 'active' : ''}`}>
+          <button className="page-link" onClick={() => setPage(i)}>
+            {i}
+          </button>
+        </li>
+      );
+    }
+
+    return pages;
+  };
 
   const handleAdd = () => {
     setEditingCategory(null);
@@ -77,9 +138,30 @@ const Categories = () => {
         <div className="container-fluid">
           <div className="card">
             <div className="card-header">
-              <button className="btn btn-primary" onClick={handleAdd}>
-                <i className="fas fa-plus"></i> Add Category
-              </button>
+              <div className="row">
+                <div className="col-md-6">
+                  <form onSubmit={handleSearch} className="form-inline">
+                    <input
+                      type="text"
+                      className="form-control mr-2"
+                      placeholder="Search..."
+                      value={keyword}
+                      onChange={(e) => {
+                        setKeyword(e.target.value);
+                        setPage(1);
+                      }}
+                    />
+                    <button type="submit" className="btn btn-primary">
+                      <i className="fas fa-search"></i> Search
+                    </button>
+                  </form>
+                </div>
+                <div className="col-md-6 text-right">
+                  <button className="btn btn-primary" onClick={handleAdd}>
+                    <i className="fas fa-plus"></i> Add Category
+                  </button>
+                </div>
+              </div>
             </div>
             <div className="card-body table-responsive p-0">
               {loading ? (
@@ -113,6 +195,28 @@ const Categories = () => {
                   </tbody>
                 </table>
               )}
+            </div>
+            <div className="card-footer d-flex justify-content-between align-items-center">
+              <span>Total: {totalCount} categories</span>
+              <nav>
+                <ul className="pagination pagination-sm m-0">
+                  <li className={`page-item ${page === 1 ? 'disabled' : ''}`}>
+                    <button className="page-link" disabled={page === 1} onClick={() => setPage(page - 1)}>
+                      Previous
+                    </button>
+                  </li>
+                  {renderPagination()}
+                  <li className={`page-item ${page === totalPages || totalPages === 0 ? 'disabled' : ''}`}>
+                    <button
+                      className="page-link"
+                      disabled={page === totalPages || totalPages === 0}
+                      onClick={() => setPage(page + 1)}
+                    >
+                      Next
+                    </button>
+                  </li>
+                </ul>
+              </nav>
             </div>
           </div>
         </div>

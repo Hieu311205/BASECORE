@@ -1,4 +1,4 @@
-﻿//using BaseCore.Common;
+//using BaseCore.Common;
 //using BaseCore.Entities;
 //using BaseCore.Repository.Authen;
 //using System;
@@ -128,7 +128,7 @@ namespace BaseCore.Services.Authen
         Task<User> Create(User user, string password);
         Task Update(User user, string? password = null);
         Task Delete(int id);
-        Task<(List<User> Users, int TotalCount)> Search(string keyword, int page, int pageSize);
+        Task<(List<User> Users, int TotalCount)> Search(string keyword, int page, int pageSize, bool? isActive = true, int? excludeUserType = null);
     }
 
     public class UserService : IUserService
@@ -143,6 +143,7 @@ namespace BaseCore.Services.Authen
         // 🔥 LOGIN
         public async Task<User?> Authenticate(string username, string password)
         {
+            // Không xác thực nếu thiếu thông tin bắt buộc.
             if (string.IsNullOrEmpty(username) || string.IsNullOrEmpty(password))
                 return null;
 
@@ -155,10 +156,12 @@ namespace BaseCore.Services.Authen
 
             if (user.Salt != null && user.Salt.Length > 0)
             {
+                // Tài khoản mới dùng password hash kèm salt.
                 isValidPassword = TokenHelper.IsValidPassword(password, user.Salt, user.Password);
             }
             else
             {
+                // Nhánh tương thích dữ liệu cũ/seed đang lưu plain text.
                 isValidPassword = (user.Password == password);
             }
 
@@ -184,6 +187,7 @@ namespace BaseCore.Services.Authen
         // 🔥 CREATE
         public async Task<User> Create(User user, string password)
         {
+            // Mật khẩu không lưu plain text; service hash và gán salt trước khi repository insert.
             byte[] salt;
             user.Password = TokenHelper.HashPassword(password, out salt);
             user.Salt = salt;
@@ -199,6 +203,7 @@ namespace BaseCore.Services.Authen
         {
             if (!string.IsNullOrEmpty(password))
             {
+                // Chỉ đổi mật khẩu khi caller truyền password mới.
                 byte[] salt;
                 user.Password = TokenHelper.HashPassword(password, out salt);
                 user.Salt = salt;
@@ -214,9 +219,9 @@ namespace BaseCore.Services.Authen
         }
 
         // 🔥 SEARCH
-        public async Task<(List<User> Users, int TotalCount)> Search(string keyword, int page, int pageSize)
+        public async Task<(List<User> Users, int TotalCount)> Search(string keyword, int page, int pageSize, bool? isActive = true, int? excludeUserType = null)
         {
-            return await _userRepository.SearchAsync(keyword, page, pageSize);
+            return await _userRepository.SearchAsync(keyword, page, pageSize, isActive, excludeUserType);
         }
     }
 }

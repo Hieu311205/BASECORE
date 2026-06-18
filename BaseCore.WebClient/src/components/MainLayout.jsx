@@ -25,7 +25,7 @@ const MainLayout = ({ children }) => {
                         </a>
                     </li>
                     <li className="nav-item d-none d-sm-inline-block">
-                        <Link to="/" className="nav-link">Home</Link>
+                        <Link to="/" className="nav-link">Trang chủ</Link>
                     </li>
                 </ul>
 
@@ -40,7 +40,7 @@ const MainLayout = ({ children }) => {
                             </span>
                             <div className="dropdown-divider"></div>
                             <button className="dropdown-item" onClick={handleLogout}>
-                                <i className="fas fa-sign-out-alt mr-2"></i> Logout
+                                <i className="fas fa-sign-out-alt mr-2"></i> Đăng xuất
                             </button>
                         </div>
                     </li>
@@ -51,7 +51,7 @@ const MainLayout = ({ children }) => {
             <aside className="main-sidebar sidebar-dark-primary elevation-4">
                 <Link to="/" className="brand-link">
                     <span className="brand-text font-weight-light ml-3">
-                        <b>Store</b> Sales
+                        <b>Quản lý</b> bán hàng
                     </span>
                 </Link>
 
@@ -70,41 +70,97 @@ const MainLayout = ({ children }) => {
                             <li className="nav-item">
                                 <Link to="/" className={`nav-link ${isActive('/')}`}>
                                     <i className="nav-icon fas fa-tachometer-alt"></i>
-                                    <p>Dashboard</p>
+                                    <p>Tổng quan</p>
                                 </Link>
                             </li>
                             <li className="nav-item">
                                 <Link to="/products" className={`nav-link ${isActive('/products')}`}>
                                     <i className="nav-icon fas fa-box"></i>
-                                    <p>Products</p>
+                                    <p>Sản phẩm</p>
                                 </Link>
                             </li>
                             <li className="nav-item">
                                 <Link to="/categories" className={`nav-link ${isActive('/categories')}`}>
                                     <i className="nav-icon fas fa-tags"></i>
-                                    <p>Categories</p>
+                                    <p>Danh mục</p>
                                 </Link>
                             </li>
                             <li className="nav-item">
                                 <Link to="/suppliers" className={`nav-link ${isActive('/suppliers')}`}>
                                     <i className="nav-icon fas fa-truck"></i>
-                                    <p>Suppliers</p>
+                                    <p>Nhà cung cấp</p>
                                 </Link>
                             </li>
                             {isAdmin() && (
                                 <li className="nav-item">
                                     <Link to="/users" className={`nav-link ${isActive('/users')}`}>
                                         <i className="nav-icon fas fa-users"></i>
-                                        <p>Users</p>
+                                        <p>Người dùng</p>
+                                    </Link>
+                                </li>
+                            )}
+                            {isAdmin() && (
+                                <li className="nav-item">
+                                    <Link to="/inventory" className={`nav-link ${isActive('/inventory')}`}>
+                                        <i className="nav-icon fas fa-warehouse"></i>
+                                        <p>Tồn kho</p>
                                     </Link>
                                 </li>
                             )}
                             <li className="nav-item">
                                 <Link to="/orders" className={`nav-link ${isActive('/orders')}`}>
                                     <i className="nav-icon fas fa-shopping-cart"></i>
-                                    <p>Orders</p>
+                                    <p>Đơn hàng</p>
                                 </Link>
                             </li>
+                            {isAdmin() && (
+                                <li className="nav-item">
+                                    <Link to="/payments" className={`nav-link ${isActive('/payments')}`}>
+                                        <i className="nav-icon fas fa-credit-card"></i>
+                                        <p>Thanh toán</p>
+                                    </Link>
+                                </li>
+                            )}
+                            {isAdmin() && (
+                                <li className="nav-item">
+                                    <Link to="/shipping" className={`nav-link ${isActive('/shipping')}`}>
+                                        <i className="nav-icon fas fa-shipping-fast"></i>
+                                        <p>Vận chuyển</p>
+                                    </Link>
+                                </li>
+                            )}
+                            {isAdmin() && (
+                                <li className="nav-item">
+                                    <Link to="/discounts" className={`nav-link ${isActive('/discounts')}`}>
+                                        <i className="nav-icon fas fa-percent"></i>
+                                        <p>Mã giảm giá</p>
+                                    </Link>
+                                </li>
+                            )}
+                            {isAdmin() && (
+                                <li className="nav-item">
+                                    <Link to="/reports" className={`nav-link ${isActive('/reports')}`}>
+                                        <i className="nav-icon fas fa-chart-line"></i>
+                                        <p>Báo cáo</p>
+                                    </Link>
+                                </li>
+                            )}
+                            {isAdmin() && (
+                                <li className="nav-item">
+                                    <Link to="/audit-logs" className={`nav-link ${isActive('/audit-logs')}`}>
+                                        <i className="nav-icon fas fa-history"></i>
+                                        <p>Nhật ký hệ thống</p>
+                                    </Link>
+                                </li>
+                            )}
+                            {isAdmin() && (
+                                <li className="nav-item">
+                                    <Link to="/settings" className={`nav-link ${isActive('/settings')}`}>
+                                        <i className="nav-icon fas fa-cog"></i>
+                                        <p>Cài đặt</p>
+                                    </Link>
+                                </li>
+                            )}
                         </ul>
                     </nav>
                 </div>
@@ -115,9 +171,9 @@ const MainLayout = ({ children }) => {
 
             {/* Footer */}
             <footer className="main-footer">
-                <strong>Copyright &copy; 2024 <a href="#">BaseCore Sales</a>.</strong>
+                <strong>Bản quyền &copy; 2024 <a href="#">BaseCore Sales</a>.</strong>
                 <div className="float-right d-none d-sm-inline-block">
-                    <b>Version</b> 1.0.0
+                    <b>Phiên bản</b> 1.0.0
                 </div>
             </footer>
         </div>

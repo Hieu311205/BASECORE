@@ -42,7 +42,7 @@ export const AuthProvider = ({ children }) => {
                 localStorage.removeItem('token');
                 localStorage.removeItem('user');
                 setUser(null);
-                return { success: false, message: 'Admin site only allows Admin accounts.' };
+                return { success: false, message: 'Trang quản trị chỉ cho phép tài khoản Admin đăng nhập.' };
             }
 
             localStorage.setItem('token', userData.token);
@@ -51,7 +51,7 @@ export const AuthProvider = ({ children }) => {
 
             return { success: true };
         } catch (error) {
-            const message = error.response?.data?.message || 'Login failed';
+            const message = error.response?.data?.message || 'Đăng nhập thất bại';
             return { success: false, message };
         }
     };

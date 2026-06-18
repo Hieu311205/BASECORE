@@ -64,7 +64,7 @@ namespace BaseCore.Repository.EFCore
         Task CreateAsync(User user);
         Task UpdateAsync(User user);
         Task DeleteAsync(int id);
-        Task<(List<User> Users, int TotalCount)> SearchAsync(string? keyword, int page, int pageSize);
+        Task<(List<User> Users, int TotalCount)> SearchAsync(string? keyword, int page, int pageSize, bool? isActive = true, int? excludeUserType = null);
     }
 
     public class UserRepositoryEF : Repository<User>, IUserRepositoryEF
@@ -78,6 +78,7 @@ namespace BaseCore.Repository.EFCore
 
         public async Task<User?> GetByUsernameAsync(string username)
         {
+            // Chỉ cho phép đăng nhập với tài khoản đang active.
             return await _dbSet.FirstOrDefaultAsync(u => u.UserName == username && u.IsActive);
         }
 
@@ -88,6 +89,7 @@ namespace BaseCore.Repository.EFCore
 
         public async Task<List<User>> GetAllAsync()
         {
+            // Danh sách quản trị bỏ qua các tài khoản đã bị vô hiệu hóa/xóa.
             return await _dbSet.Where(u => u.IsActive).ToListAsync();
         }
 
@@ -108,19 +110,31 @@ namespace BaseCore.Repository.EFCore
             var user = await _dbSet.FindAsync(id);
             if (user != null)
             {
-                _dbSet.Remove(user);
+                // Hiện tại là xóa vật lý; nếu cần giữ lịch sử nên đổi sang IsActive = false.
+                user.IsActive = false;
+                _dbSet.Update(user);
                 await _context.SaveChangesAsync();
             }
         }
 
-        public async Task<(List<User> Users, int TotalCount)> SearchAsync(string? keyword, int page, int pageSize)
+        public async Task<(List<User> Users, int TotalCount)> SearchAsync(string? keyword, int page, int pageSize, bool? isActive = true, int? excludeUserType = null)
         {
             var query = _dbSet.AsQueryable();
 
-            query = query.Where(u => u.IsActive);
+            // Search user chỉ áp dụng trên tài khoản active.
+            if (isActive.HasValue)
+            {
+                query = query.Where(u => u.IsActive == isActive.Value);
+            }
+
+            if (excludeUserType.HasValue)
+            {
+                query = query.Where(u => u.UserType != excludeUserType.Value);
+            }
 
             if (!string.IsNullOrEmpty(keyword))
             {
+                // Tìm theo thông tin định danh và liên hệ thường dùng trên màn hình quản trị user.
                 keyword = keyword.ToLower();
                 query = query.Where(u =>
                     u.UserName.ToLower().Contains(keyword) ||
@@ -130,6 +144,7 @@ namespace BaseCore.Repository.EFCore
                 );
             }
 
+            // Đếm tổng sau khi lọc keyword để frontend phân trang đúng.
             var totalCount = await query.CountAsync();
 
             var users = await query

@@ -80,7 +80,7 @@ const Suppliers = () => {
                 page,
                 pageSize
             });
-            console.log('SUPPLIERS RESPONSE:', response.data);
+            console.log('DỮ LIỆU NHÀ CUNG CẤP:', response.data);
 
             const list = getArrayData(response.data);
             setSuppliers(filterSuppliers(list, {
@@ -90,7 +90,7 @@ const Suppliers = () => {
             setTotalPages(response.data.totalPages || 0);
             setTotalCount(response.data.totalCount || list.length);
         } catch (error) {
-            console.error('Failed to load suppliers:', error);
+            console.error('Không thể tải nhà cung cấp:', error);
             setSuppliers([]);
             setTotalPages(0);
             setTotalCount(0);
@@ -177,18 +177,18 @@ const Suppliers = () => {
             closeModal();
             loadSuppliers();
         } catch (error) {
-            setError(error.response?.data?.message || 'Operation failed');
+            setError(error.response?.data?.message || 'Thao tác thất bại');
         }
     };
 
     const handleDelete = async (id) => {
-        if (!window.confirm('Are you sure you want to delete this supplier?')) return;
+        if (!window.confirm('Bạn có chắc muốn xóa nhà cung cấp này?')) return;
 
         try {
             await suppliersApi.delete(id);
             loadSuppliers();
         } catch (error) {
-            alert('Failed to delete supplier');
+            alert('Không thể xóa nhà cung cấp');
         }
     };
 
@@ -198,7 +198,7 @@ const Suppliers = () => {
                 <div className="container-fluid">
                     <div className="row mb-2">
                         <div className="col-sm-6">
-                            <h1 className="m-0">Suppliers Management</h1>
+                            <h1 className="m-0">Quản lý nhà cung cấp</h1>
                         </div>
                     </div>
                 </div>
@@ -214,7 +214,7 @@ const Suppliers = () => {
                                         <input
                                             type="text"
                                             className="form-control mr-2"
-                                            placeholder="Search supplier..."
+                                            placeholder="Tìm nhà cung cấp..."
                                             value={keyword}
                                             onChange={(e) => setKeyword(e.target.value)}
                                         />
@@ -223,12 +223,12 @@ const Suppliers = () => {
                                             value={statusFilter}
                                             onChange={handleStatusChange}
                                         >
-                                            <option value="">All Status</option>
-                                            <option value="true">Active</option>
-                                            <option value="false">Inactive</option>
+                                            <option value="">Tất cả trạng thái</option>
+                                            <option value="true">Đang hoạt động</option>
+                                            <option value="false">Ngừng hoạt động</option>
                                         </select>
                                         <button type="submit" className="btn btn-primary mr-2">
-                                            <i className="fas fa-search"></i> Search
+                                            <i className="fas fa-search"></i> Tìm kiếm
                                         </button>
                                         <button
                                             type="button"
@@ -239,7 +239,7 @@ const Suppliers = () => {
                                                 setPage(1);
                                             }}
                                         >
-                                            Reset
+                                            Đặt lại
                                         </button>
                                     </form>
                                 </div>
@@ -247,7 +247,7 @@ const Suppliers = () => {
                                 <div className="col-md-6 text-right">
                                     {isAdmin() && (
                                         <button className="btn btn-success" onClick={() => openModal()}>
-                                            <i className="fas fa-plus"></i> Add Supplier
+                                            <i className="fas fa-plus"></i> Thêm nhà cung cấp
                                         </button>
                                     )}
                                 </div>
@@ -265,13 +265,13 @@ const Suppliers = () => {
                                         <thead>
                                             <tr>
                                                 <th>ID</th>
-                                                <th>Name</th>
-                                                <th>Contact Name</th>
+                                                <th>Tên</th>
+                                                <th>Người liên hệ</th>
                                                 <th>Email</th>
-                                                <th>Phone</th>
-                                                <th>Address</th>
-                                                <th>Status</th>
-                                                {isAdmin() && <th>Actions</th>}
+                                                <th>Điện thoại</th>
+                                                <th>Địa chỉ</th>
+                                                <th>Trạng thái</th>
+                                                {isAdmin() && <th>Thao tác</th>}
                                             </tr>
                                         </thead>
 
@@ -279,7 +279,7 @@ const Suppliers = () => {
                                             {suppliers.length === 0 ? (
                                                 <tr>
                                                     <td colSpan={isAdmin() ? 8 : 7} className="text-center">
-                                                        No suppliers found
+                                                        Không tìm thấy nhà cung cấp
                                                     </td>
                                                 </tr>
                                             ) : (
@@ -287,15 +287,15 @@ const Suppliers = () => {
                                                     <tr key={supplier.id}>
                                                         <td>{supplier.id}</td>
                                                         <td>{supplier.name}</td>
-                                                        <td>{supplier.contactName || 'N/A'}</td>
+                                                        <td>{supplier.contactName || 'Không có'}</td>
                                                         <td>{supplier.email}</td>
                                                         <td>{supplier.phone}</td>
                                                         <td>{supplier.address}</td>
                                                         <td>
                                                             {getSupplierIsActive(supplier) ? (
-                                                                <span className="badge badge-success">Active</span>
+                                                                <span className="badge badge-success">Đang hoạt động</span>
                                                             ) : (
-                                                                <span className="badge badge-danger">Inactive</span>
+                                                                <span className="badge badge-danger">Ngừng hoạt động</span>
                                                             )}
                                                         </td>
 
@@ -323,7 +323,7 @@ const Suppliers = () => {
                                     </table>
 
                                     <div className="d-flex justify-content-between align-items-center">
-                                        <span>Showing: {suppliers.length} of {totalCount} suppliers</span>
+                                        <span>Hiển thị: {suppliers.length} / {totalCount} nhà cung cấp</span>
                                         <nav>
                                             <ul className="pagination mb-0">
                                                 <li className={`page-item ${page === 1 ? 'disabled' : ''}`}>
@@ -332,7 +332,7 @@ const Suppliers = () => {
                                                         onClick={() => setPage(page - 1)}
                                                         disabled={page === 1}
                                                     >
-                                                        Previous
+                                                        Trước
                                                     </button>
                                                 </li>
                                                 {renderPagination()}
@@ -342,7 +342,7 @@ const Suppliers = () => {
                                                         onClick={() => setPage(page + 1)}
                                                         disabled={page === totalPages || totalPages === 0}
                                                     >
-                                                        Next
+                                                        Sau
                                                     </button>
                                                 </li>
                                             </ul>
@@ -361,7 +361,7 @@ const Suppliers = () => {
                         <div className="modal-content">
                             <div className="modal-header">
                                 <h5 className="modal-title">
-                                    {editingSupplier ? 'Edit Supplier' : 'Add Supplier'}
+                                    {editingSupplier ? 'Sửa nhà cung cấp' : 'Thêm nhà cung cấp'}
                                 </h5>
                                 <button type="button" className="close" onClick={closeModal}>
                                     <span>&times;</span>
@@ -373,7 +373,7 @@ const Suppliers = () => {
                                     {error && <div className="alert alert-danger">{error}</div>}
 
                                     <div className="form-group">
-                                        <label>Name</label>
+                                        <label>Tên</label>
                                         <input
                                             type="text"
                                             className="form-control"
@@ -384,7 +384,7 @@ const Suppliers = () => {
                                     </div>
 
                                     <div className="form-group">
-                                        <label>Contact Name</label>
+                                        <label>Người liên hệ</label>
                                         <input
                                             type="text"
                                             className="form-control"
@@ -404,7 +404,7 @@ const Suppliers = () => {
                                     </div>
 
                                     <div className="form-group">
-                                        <label>Phone</label>
+                                        <label>Điện thoại</label>
                                         <input
                                             type="text"
                                             className="form-control"
@@ -414,7 +414,7 @@ const Suppliers = () => {
                                     </div>
 
                                     <div className="form-group">
-                                        <label>Address</label>
+                                        <label>Địa chỉ</label>
                                         <textarea
                                             className="form-control"
                                             value={formData.address}
@@ -424,7 +424,7 @@ const Suppliers = () => {
                                     </div>
 
                                     <div className="form-group">
-                                        <label>Status</label>
+                                        <label>Trạng thái</label>
                                         <select
                                             className="form-control"
                                             value={String(formData.isActive)}
@@ -435,18 +435,18 @@ const Suppliers = () => {
                                                 })
                                             }
                                         >
-                                            <option value="true">Active</option>
-                                            <option value="false">Inactive</option>
+                                            <option value="true">Đang hoạt động</option>
+                                            <option value="false">Ngừng hoạt động</option>
                                         </select>
                                     </div>
                                 </div>
 
                                 <div className="modal-footer">
                                     <button type="button" className="btn btn-secondary" onClick={closeModal}>
-                                        Cancel
+                                        Hủy
                                     </button>
                                     <button type="submit" className="btn btn-primary">
-                                        {editingSupplier ? 'Update' : 'Create'}
+                                        {editingSupplier ? 'Cập nhật' : 'Tạo mới'}
                                     </button>
                                 </div>
                             </form>

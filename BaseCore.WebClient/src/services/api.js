@@ -62,7 +62,7 @@ export const productApi = {
 
 // Category API
 export const categoryApi = {
-    getAll: () => api.get('/categories'),
+    getAll: (params) => api.get('/categories', { params }),
     getById: (id) => api.get(`/categories/${id}`),
     create: (data) => api.post('/categories', data),
     update: (id, data) => api.put(`/categories/${id}`, data),
@@ -74,7 +74,10 @@ export const orderApi = {
     getAll: (params) => api.get('/orders/all', { params }),
     create: (data) => api.post('/orders', data),
     getById: (id) => api.get(`/orders/${id}`),
-    update: (id, data) => api.put(`/orders/${id}/status`, { status: data.status }),
+    update: (id, data) => api.put(`/orders/${id}/status`, {
+        status: data.status,
+        paymentStatus: data.paymentStatus,
+    }),
     delete: (id) => api.put(`/orders/${id}/cancel`),
     getMyOrders: () => api.get('/orders'),
 };
@@ -86,4 +89,29 @@ export const suppliersApi = {
     update: (id, data) => api.put(`/suppliers/${id}`, data),
     delete: (id) => api.delete(`/suppliers/${id}`),
 };
+
+export const promotionsApi = {
+    getAll: (params) => api.get('/promotions', { params }),
+    getById: (id) => api.get(`/promotions/${id}`),
+    create: (data) => api.post('/promotions', data),
+    update: (id, data) => api.put(`/promotions/${id}`, data),
+    delete: (id) => api.delete(`/promotions/${id}`),
+};
+
+export const settingsApi = {
+    get: (scope) => api.get(`/settings/${scope}`),
+    save: (scope, data) => api.put(`/settings/${scope}`, data),
+};
+
+export const rolesApi = {
+    getAll: () => api.get('/roles'),
+    getById: (id) => api.get(`/roles/${id}`),
+    getPermissions: (id) => api.get(`/roles/${id}/permissions`),
+    getByUserType: (userType) => api.get(`/roles/by-usertype/${userType}`),
+};
+
+export const auditLogApi = {
+    getAll: () => api.get('/auditLog'),
+};
+
 export default api;

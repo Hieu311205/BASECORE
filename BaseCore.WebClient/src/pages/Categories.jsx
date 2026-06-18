@@ -230,7 +230,6 @@ import { categoryApi } from '../services/api';
 import { useAuth } from '../contexts/AuthContext';
 
 const Categories = () => {
-    const [allCategories, setAllCategories] = useState([]);
     const [categories, setCategories] = useState([]);
     const [loading, setLoading] = useState(true);
 
@@ -250,49 +249,60 @@ const Categories = () => {
     const [error, setError] = useState('');
     const { isAdmin } = useAuth();
 
-    useEffect(() => {
-        loadCategories();
-    }, []);
+    const normalizeCategoryResponse = (data) => {
+        if (Array.isArray(data)) {
+            const normalizedKeyword = keyword.trim().toLowerCase();
+            const filtered = normalizedKeyword
+                ? data.filter((category) =>
+                    category.name?.toLowerCase().includes(normalizedKeyword) ||
+                    category.description?.toLowerCase().includes(normalizedKeyword))
+                : data;
+            const startIndex = (page - 1) * pageSize;
+
+            return {
+                items: filtered.slice(startIndex, startIndex + pageSize),
+                totalCount: filtered.length,
+                totalPages: Math.ceil(filtered.length / pageSize) || 1,
+            };
+        }
+
+        return {
+            items: data?.items || data?.data || [],
+            totalCount: data?.totalCount ?? data?.items?.length ?? data?.data?.length ?? 0,
+            totalPages: data?.totalPages ?? (Math.ceil((data?.totalCount ?? 0) / pageSize) || 0),
+        };
+    };
 
     useEffect(() => {
-        applyFilterAndPagination();
-    }, [allCategories, keyword, page]);
+        loadCategories();
+    }, [keyword, page]);
 
     const loadCategories = async () => {
         setLoading(true);
         try {
-            const response = await categoryApi.getAll();
-            setAllCategories(response.data || []);
+            const response = await categoryApi.getAll({
+                keyword: keyword.trim() || undefined,
+                page,
+                pageSize,
+            });
+            const result = normalizeCategoryResponse(response.data);
+
+            setCategories(result.items);
+            setTotalPages(result.totalPages);
+            setTotalCount(result.totalCount);
         } catch (error) {
-            console.error('Failed to load categories:', error);
+            console.error('Không thể tải danh mục:', error);
+            setCategories([]);
+            setTotalPages(0);
+            setTotalCount(0);
         } finally {
             setLoading(false);
         }
     };
 
-    const applyFilterAndPagination = () => {
-        const filtered = allCategories.filter((category) =>
-            category.name?.toLowerCase().includes(keyword.toLowerCase()) ||
-            category.description?.toLowerCase().includes(keyword.toLowerCase())
-        );
-
-        const total = filtered.length;
-        const pages = Math.ceil(total / pageSize) || 1;
-
-        setTotalCount(total);
-        setTotalPages(pages);
-
-        const currentPage = page > pages ? pages : page;
-        const startIndex = (currentPage - 1) * pageSize;
-        const endIndex = startIndex + pageSize;
-
-        setCategories(filtered.slice(startIndex, endIndex));
-    };
-
     const handleSearch = (e) => {
         e.preventDefault();
         setPage(1);
-        applyFilterAndPagination();
     };
 
     const renderPagination = () => {
@@ -354,19 +364,19 @@ const Categories = () => {
             setPage(1);
             loadCategories();
         } catch (error) {
-            setError(error.response?.data?.message || 'Operation failed');
+            setError(error.response?.data?.message || 'Thao tác thất bại');
         }
     };
 
     const handleDelete = async (id) => {
-        if (!window.confirm('Are you sure you want to delete this category?')) return;
+        if (!window.confirm('Bạn có chắc muốn xóa danh mục này?')) return;
 
         try {
             await categoryApi.delete(id);
             setPage(1);
             loadCategories();
         } catch (error) {
-            alert('Failed to delete category. It may have associated products.');
+            alert('Không thể xóa danh mục. Có thể danh mục đang có sản phẩm liên quan.');
         }
     };
 
@@ -376,7 +386,7 @@ const Categories = () => {
                 <div className="container-fluid">
                     <div className="row mb-2">
                         <div className="col-sm-6">
-                            <h1 className="m-0">Categories Management</h1>
+                            <h1 className="m-0">Quản lý danh mục</h1>
                         </div>
                     </div>
                 </div>
@@ -392,7 +402,7 @@ const Categories = () => {
                                         <input
                                             type="text"
                                             className="form-control mr-2"
-                                            placeholder="Search..."
+                                            placeholder="Tìm kiếm..."
                                             value={keyword}
                                             onChange={(e) => {
                                                 setKeyword(e.target.value);
@@ -401,7 +411,7 @@ const Categories = () => {
                                         />
 
                                         <button type="submit" className="btn btn-primary">
-                                            <i className="fas fa-search"></i> Search
+                                            <i className="fas fa-search"></i> Tìm kiếm
                                         </button>
                                     </form>
                                 </div>
@@ -409,7 +419,7 @@ const Categories = () => {
                                 <div className="col-md-6 text-right">
                                     {isAdmin() && (
                                         <button className="btn btn-success" onClick={() => openModal()}>
-                                            <i className="fas fa-plus"></i> Add Category
+                                            <i className="fas fa-plus"></i> Thêm danh mục
                                         </button>
                                     )}
                                 </div>
@@ -427,9 +437,9 @@ const Categories = () => {
                                         <thead>
                                             <tr>
                                                 <th style={{ width: '80px' }}>ID</th>
-                                                <th>Name</th>
-                                                <th>Description</th>
-                                                {isAdmin() && <th style={{ width: '150px' }}>Actions</th>}
+                                                <th>Tên</th>
+                                                <th>Mô tả</th>
+                                                {isAdmin() && <th style={{ width: '150px' }}>Thao tác</th>}
                                             </tr>
                                         </thead>
 
@@ -437,7 +447,7 @@ const Categories = () => {
                                             {categories.length === 0 ? (
                                                 <tr>
                                                     <td colSpan={isAdmin() ? 4 : 3} className="text-center">
-                                                        No categories found
+                                                        Không tìm thấy danh mục
                                                     </td>
                                                 </tr>
                                             ) : (
@@ -471,7 +481,7 @@ const Categories = () => {
                                     </table>
 
                                     <div className="d-flex justify-content-between align-items-center">
-                                        <span>Total: {totalCount} categories</span>
+                                        <span>Tổng: {totalCount} danh mục</span>
 
                                         <nav>
                                             <ul className="pagination mb-0">
@@ -481,7 +491,7 @@ const Categories = () => {
                                                         disabled={page === 1}
                                                         onClick={() => setPage(page - 1)}
                                                     >
-                                                        Previous
+                                                        Trước
                                                     </button>
                                                 </li>
 
@@ -490,10 +500,10 @@ const Categories = () => {
                                                 <li className={`page-item ${page === totalPages ? 'disabled' : ''}`}>
                                                     <button
                                                         className="page-link"
-                                                        disabled={page === totalPages}
+                                                        disabled={page === totalPages || totalPages === 0}
                                                         onClick={() => setPage(page + 1)}
                                                     >
-                                                        Next
+                                                        Sau
                                                     </button>
                                                 </li>
                                             </ul>
@@ -512,7 +522,7 @@ const Categories = () => {
                         <div className="modal-content">
                             <div className="modal-header">
                                 <h5 className="modal-title">
-                                    {editingCategory ? 'Edit Category' : 'Add Category'}
+                                    {editingCategory ? 'Sửa danh mục' : 'Thêm danh mục'}
                                 </h5>
 
                                 <button type="button" className="close" onClick={closeModal}>
@@ -525,7 +535,7 @@ const Categories = () => {
                                     {error && <div className="alert alert-danger">{error}</div>}
 
                                     <div className="form-group">
-                                        <label>Name</label>
+                                        <label>Tên</label>
                                         <input
                                             type="text"
                                             className="form-control"
@@ -536,7 +546,7 @@ const Categories = () => {
                                     </div>
 
                                     <div className="form-group">
-                                        <label>Description</label>
+                                        <label>Mô tả</label>
                                         <textarea
                                             className="form-control"
                                             value={formData.description}
@@ -548,11 +558,11 @@ const Categories = () => {
 
                                 <div className="modal-footer">
                                     <button type="button" className="btn btn-secondary" onClick={closeModal}>
-                                        Cancel
+                                        Hủy
                                     </button>
 
                                     <button type="submit" className="btn btn-primary">
-                                        {editingCategory ? 'Update' : 'Create'}
+                                        {editingCategory ? 'Cập nhật' : 'Tạo mới'}
                                     </button>
                                 </div>
                             </form>

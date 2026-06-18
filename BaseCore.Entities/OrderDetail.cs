@@ -1,4 +1,4 @@
-﻿//using MongoDB.Bson.Serialization.Attributes;
+//using MongoDB.Bson.Serialization.Attributes;
 
 //namespace BaseCore.Entities
 //{
@@ -34,14 +34,17 @@ namespace BaseCore.Entities
 
         public int ProductId { get; set; }
 
+        // Số lượng sản phẩm trong dòng đơn hàng.
         public int Quantity { get; set; }
 
+        // Giá tại thời điểm đặt hàng, giúp lịch sử đơn không đổi khi Product.Price thay đổi.
         public decimal UnitPrice { get; set; }
 
-        // 🔥 FIX QUAN TRỌNG
+        // Navigation tới Order theo khóa ngoại OrderId.
         [ForeignKey("OrderId")]
         public Order? Order { get; set; }
 
+        // Navigation tới Product theo khóa ngoại ProductId.
         [ForeignKey("ProductId")]
         public Product? Product { get; set; }
     }

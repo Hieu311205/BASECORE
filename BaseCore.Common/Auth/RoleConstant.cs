@@ -1,4 +1,4 @@
-﻿namespace BaseCore.Common
+namespace BaseCore.Common
 {
     public static class RoleConstant
     {

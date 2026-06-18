@@ -1,4 +1,4 @@
-﻿using BaseCore.Common;
+using BaseCore.Common;
 using BaseCore.Entities.Audit;
 using System;
 using System.Collections.Generic;

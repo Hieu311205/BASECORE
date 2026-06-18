@@ -1,4 +1,4 @@
-﻿using Microsoft.AspNetCore.Cryptography.KeyDerivation;
+using Microsoft.AspNetCore.Cryptography.KeyDerivation;
 using Microsoft.IdentityModel.Tokens;
 using System;
 using System.IdentityModel.Tokens.Jwt;
@@ -13,6 +13,7 @@ namespace BaseCore.Common
     {
         public static bool ValidateToken(string secretKey, string authToken)
         {
+            // Dùng cùng bộ TokenValidationParameters với API để kiểm tra chữ ký và hạn token.
             var tokenHandler = new JwtSecurityTokenHandler();
             var validationParameters = GetValidationParameters(secretKey);
 
@@ -30,12 +31,14 @@ namespace BaseCore.Common
 
         public static string HashPassword(string password, out byte[] salt)
         {
+            // Salt ngẫu nhiên giúp hai mật khẩu giống nhau vẫn có hash khác nhau.
             salt = new byte[128 / 8];
             using (var rng = RandomNumberGenerator.Create())
             {
                 rng.GetBytes(salt);
             }
             string hashed = Convert.ToBase64String(KeyDerivation.Pbkdf2(
+                // PBKDF2 kéo dài thời gian brute force so với hash một lần.
                 password: password,
                 salt: salt,
                 prf: KeyDerivationPrf.HMACSHA1,
@@ -47,6 +50,7 @@ namespace BaseCore.Common
 
         public static bool IsValidPassword(string password, byte[] salt, string hashedParam)
         {
+            // Hash lại password nhập vào với salt đã lưu rồi so sánh với hash trong database.
             var hashed = Convert.ToBase64String(KeyDerivation.Pbkdf2(
                 password: password,
                 salt: salt,
@@ -59,6 +63,7 @@ namespace BaseCore.Common
 
         public static string GenerateToken(string secretKey, int minuteExpireTime, string userId, string userName, string roles)
         {
+            // Claim là dữ liệu các service đọc lại từ JWT để phân quyền và xác định user hiện tại.
             var tokenHandler = new JwtSecurityTokenHandler();
             var key = Encoding.ASCII.GetBytes(secretKey);
 
@@ -80,6 +85,7 @@ namespace BaseCore.Common
 
         private static TokenValidationParameters GetValidationParameters(string secretKey)
         {
+            // Demo project không validate issuer/audience, nhưng vẫn validate chữ ký và thời hạn token.
             return new TokenValidationParameters
             {
                 ValidateIssuerSigningKey = true,

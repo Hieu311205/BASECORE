@@ -1,4 +1,4 @@
-﻿using Microsoft.AspNetCore.Builder;
+using Microsoft.AspNetCore.Builder;
 using BaseCore.LogService.Middleware;
 
 namespace BaseCore.LogService.Extensions

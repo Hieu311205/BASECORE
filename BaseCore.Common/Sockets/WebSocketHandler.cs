@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Net.WebSockets;
@@ -19,11 +19,13 @@ namespace BaseCore.Common.Sockets
 
         public virtual async Task OnConnected(WebSocket socket)
         {
+            // Lưu socket mới vào connection manager để có thể gửi tin theo id hoặc broadcast.
             this.WebSocketConnectionManager.AddSocket(socket);
         }
 
         public virtual async Task OnDisconnected(WebSocket socket)
         {
+            // Khi client ngắt kết nối, xóa socket khỏi danh sách để tránh gửi vào connection đã đóng.
             var id = this.WebSocketConnectionManager.GetSocketId(socket);
             await this.WebSocketConnectionManager.RemoveSocket(id);
         }
@@ -31,6 +33,7 @@ namespace BaseCore.Common.Sockets
         public async Task SendMessageAsync(WebSocket socket, string message)
         {
             Debug.Print(message);
+            // Chỉ gửi khi socket còn mở; trạng thái khác sẽ gây exception khi SendAsync.
             if (socket.State != WebSocketState.Open) { return; }
             var bytes = Encoding.UTF8.GetBytes(message);
             var buffer = new ArraySegment<byte>(bytes, 0, bytes.Length);
@@ -45,6 +48,7 @@ namespace BaseCore.Common.Sockets
 
         public async Task SendMessageToAllAsync(string message)
         {
+            // Broadcast tuần tự tới mọi socket đang mở.
             foreach (var socket in WebSocketConnectionManager.GetAllSockets())
             {
                 if (socket.Value.State == WebSocketState.Open)

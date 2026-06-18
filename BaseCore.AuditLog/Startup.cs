@@ -1,14 +1,13 @@
-﻿using Microsoft.AspNetCore.Builder;
+using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Hosting;
 using BaseCore.Common;
-using BaseCore.Libs;
-using BaseCore.Libs.Repository;
 using BaseCore.LogService;
 using BaseCore.LogService.Extensions;
+using BaseCore.LogService.Repository;
 
 namespace BaseCore.AuditLog
 {
@@ -31,15 +30,11 @@ namespace BaseCore.AuditLog
                 options.MinimumSameSitePolicy = SameSiteMode.None;
             });
 
-            services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_2);
+            services.AddControllers();
 
             // configure strongly typed settings objects
             var appSettingSection = Configuration.GetSection("AppSettings");
             services.Configure<AppSettings>(appSettingSection);
-
-            services.InitAuthenticate(Configuration);
-            services.InitMongoDb(Configuration);
-            services.InitSwagger(Configuration);
 
             services.AddTransient<IDbContext, DbContext>();
 
@@ -48,7 +43,7 @@ namespace BaseCore.AuditLog
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
-        public void Configure(IApplicationBuilder app, IHostingEnvironment env)
+        public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
         {
             if (env.IsDevelopment())
             {
@@ -59,22 +54,14 @@ namespace BaseCore.AuditLog
                 app.UseExceptionHandler("/Home/Error");
             }
 
-            app.UseSwagger();
-            app.UseSwaggerUI(c =>
-            {
-                c.SwaggerEndpoint("/swagger/v1/swagger.json", "Test Service API V1");
-            });
-
-            app.UseAuthentication();
             app.ConfigureCustomExceptionMiddleware();
             app.UseStaticFiles();
             app.UseCookiePolicy();
+            app.UseRouting();
 
-            app.UseMvc(routes =>
+            app.UseEndpoints(endpoints =>
             {
-                routes.MapRoute(
-                    name: "default",
-                    template: "{controller=Home}/{action=Index}/{id?}");
+                endpoints.MapControllers();
             });
         }
     }

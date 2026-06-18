@@ -1,4 +1,4 @@
-﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using BaseCore.Entities;
 using BaseCore.Repository.EFCore;
@@ -7,7 +7,6 @@ namespace BaseCore.APIService.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    [AllowAnonymous]
     public class SuppliersController : ControllerBase
     {
         private readonly ISupplierRepositoryEF _supplierRepository;
@@ -24,6 +23,7 @@ namespace BaseCore.APIService.Controllers
             [FromQuery] int page = 1,
             [FromQuery] int pageSize = 10)
         {
+            // Repository xử lý tìm kiếm, lọc trạng thái và phân trang cho danh sách nhà cung cấp.
             var (suppliers, totalCount) = await _supplierRepository.SearchAsync(keyword, isActive, page, pageSize);
 
             return Ok(new
@@ -48,9 +48,10 @@ namespace BaseCore.APIService.Controllers
         }
 
         [HttpPost]
-        [Authorize]
+        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> Create([FromBody] SupplierCreateDto dto)
         {
+            // Chỉ map các trường được client phép nhập, các metadata như CreatedAt do server gán.
             var supplier = new Supplier
             {
                 Name = dto.Name,
@@ -68,7 +69,7 @@ namespace BaseCore.APIService.Controllers
         }
 
         [HttpPut("{id}")]
-        [Authorize]
+        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> Update(int id, [FromBody] SupplierUpdateDto dto)
         {
             var supplier = await _supplierRepository.GetByIdAsync(id);
@@ -76,12 +77,14 @@ namespace BaseCore.APIService.Controllers
             if (supplier == null)
                 return NotFound(new { message = "Supplier not found" });
 
+            // Update dạng partial để client có thể sửa từng trường riêng lẻ.
             supplier.Name = dto.Name ?? supplier.Name;
             supplier.ContactName = dto.ContactName ?? supplier.ContactName;
             supplier.Email = dto.Email ?? supplier.Email;
             supplier.Phone = dto.Phone ?? supplier.Phone;
             supplier.Address = dto.Address ?? supplier.Address;
             supplier.IsActive = dto.IsActive ?? supplier.IsActive;
+            supplier.UpdatedAt = DateTime.Now;
 
             await _supplierRepository.UpdateAsync(supplier);
 
@@ -89,7 +92,7 @@ namespace BaseCore.APIService.Controllers
         }
 
         [HttpDelete("{id}")]
-        [Authorize]
+        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> Delete(int id)
         {
             var supplier = await _supplierRepository.GetByIdAsync(id);
@@ -97,7 +100,11 @@ namespace BaseCore.APIService.Controllers
             if (supplier == null)
                 return NotFound(new { message = "Supplier not found" });
 
-            await _supplierRepository.DeleteAsync(supplier);
+            // Soft delete và tắt active để supplier không còn xuất hiện trong danh sách sử dụng.
+            supplier.IsDeleted = true;
+            supplier.IsActive = false;
+            supplier.UpdatedAt = DateTime.Now;
+            await _supplierRepository.UpdateAsync(supplier);
 
             return Ok(new { message = "Supplier deleted successfully" });
         }

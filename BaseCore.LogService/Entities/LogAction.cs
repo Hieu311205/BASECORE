@@ -1,4 +1,4 @@
-﻿
+
 using BaseCore.Common;
 
 namespace BaseCore.LogService.Entities

@@ -1,4 +1,4 @@
-﻿namespace BaseCore.Entities.Audit
+namespace BaseCore.Entities.Audit
 {
     public interface IVersionable
     {

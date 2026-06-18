@@ -13,8 +13,8 @@ namespace BaseCore.AuthService.Controllers
     [Authorize(Roles = "Admin")]
     public class RolesController : ControllerBase
     {
-        // Static list of available roles
-        // In production, this would be stored in database
+        // Danh sách role tĩnh dùng cho demo/phân quyền cơ bản.
+        // Khi chạy production nên chuyển phần này sang database để quản trị động.
         private static readonly List<RoleDto> _roles = new()
         {
             new RoleDto { Id = 1, Name = "Admin", Description = "Administrator with full access", UserType = 1 },
@@ -28,6 +28,7 @@ namespace BaseCore.AuthService.Controllers
         [HttpGet]
         public IActionResult GetAll()
         {
+            // Trả toàn bộ role để màn hình quản trị có thể hiển thị danh sách quyền.
             return Ok(_roles);
         }
 
@@ -37,6 +38,7 @@ namespace BaseCore.AuthService.Controllers
         [HttpGet("{id}")]
         public IActionResult GetById(int id)
         {
+            // Tìm role theo Id nội bộ của danh sách role tĩnh.
             var role = _roles.Find(r => r.Id == id);
             if (role == null)
                 return NotFound(new { message = "Role not found" });
@@ -50,6 +52,7 @@ namespace BaseCore.AuthService.Controllers
         [HttpGet("by-usertype/{userType}")]
         public IActionResult GetByUserType(int userType)
         {
+            // UserType trong bảng User được map sang role để phát JWT và phân quyền.
             var role = _roles.Find(r => r.UserType == userType);
             if (role == null)
                 return NotFound(new { message = "Role not found for this UserType" });
@@ -63,11 +66,12 @@ namespace BaseCore.AuthService.Controllers
         [HttpGet("{id}/permissions")]
         public IActionResult GetPermissions(int id)
         {
+            // Kiểm tra role tồn tại trước khi trả danh sách permission.
             var role = _roles.Find(r => r.Id == id);
             if (role == null)
                 return NotFound(new { message = "Role not found" });
 
-            // Define permissions based on role
+            // Permission được hard-code theo UserType: Admin đầy đủ, Manager giới hạn, User chỉ đọc.
             var permissions = role.UserType switch
             {
                 1 => new[] { "users.read", "users.write", "users.delete", "products.read", "products.write", "products.delete", "orders.read", "orders.write", "orders.delete", "categories.read", "categories.write", "categories.delete", "roles.read", "roles.write" },
@@ -85,9 +89,13 @@ namespace BaseCore.AuthService.Controllers
 
     public class RoleDto
     {
+        // Id dùng trong API roles.
         public int Id { get; set; }
+        // Name là tên role sẽ hiển thị và có thể map với claim Role trong JWT.
         public string Name { get; set; } = "";
+        // Description giải thích ngắn quyền hạn của role.
         public string Description { get; set; } = "";
+        // UserType liên kết với field User.UserType trong database.
         public int UserType { get; set; }
     }
 }

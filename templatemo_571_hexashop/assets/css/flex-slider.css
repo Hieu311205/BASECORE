@@ -99,7 +99,7 @@ html[xmlns] .flexslider .slides {
   margin-right: 5px;
 }
 .flex-direction-nav {
-  *height: 0;
+  *height: 0px;
 }
 .flex-direction-nav a {
   text-decoration: none;

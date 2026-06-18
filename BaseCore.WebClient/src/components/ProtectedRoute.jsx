@@ -9,7 +9,7 @@ const ProtectedRoute = ({ children, adminOnly = true }) => {
         return (
             <div className="d-flex justify-content-center align-items-center" style={{ height: '100vh' }}>
                 <div className="spinner-border text-primary" role="status">
-                    <span className="sr-only">Loading...</span>
+                    <span className="sr-only">Đang tải...</span>
                 </div>
             </div>
         );

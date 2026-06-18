@@ -1,4 +1,4 @@
-﻿using MongoDB.Bson;
+using MongoDB.Bson;
 using BaseCore.Common;
 using BaseCore.Entities.Audit;
 using System;

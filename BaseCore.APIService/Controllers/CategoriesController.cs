@@ -20,14 +20,26 @@ namespace BaseCore.APIService.Controllers
             _categoryRepository = categoryRepository;
         }
 
-        /// <summary>
-        /// Get all categories
-        /// </summary>
         [HttpGet]
-        public async Task<IActionResult> GetAll()
+        public async Task<IActionResult> GetAll(
+            [FromQuery] string? keyword,
+            [FromQuery] int page = 1,
+            [FromQuery] int pageSize = 10)
         {
-            var categories = await _categoryRepository.GetAllAsync();
-            return Ok(categories);
+            // Chuẩn hóa phân trang để repository luôn nhận giá trị hợp lệ.
+            page = page < 1 ? 1 : page;
+            pageSize = pageSize < 1 ? 10 : pageSize;
+
+            var (categories, totalCount) = await _categoryRepository.SearchAsync(keyword, page, pageSize);
+
+            return Ok(new
+            {
+                items = categories,
+                totalCount,
+                page,
+                pageSize,
+                totalPages = (int)Math.Ceiling((double)totalCount / pageSize)
+            });
         }
 
         /// <summary>
@@ -47,9 +59,10 @@ namespace BaseCore.APIService.Controllers
         /// Create new category
         /// </summary>
         [HttpPost]
-        [Authorize]
+        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> Create([FromBody] CategoryDto dto)
         {
+            // Tên danh mục là khóa nghiệp vụ, tránh tạo trùng gây khó lọc sản phẩm.
             var existing = await _categoryRepository.GetByNameAsync(dto.Name);
             if (existing != null)
                 return BadRequest(new { message = "Category name already exists" });
@@ -57,7 +70,8 @@ namespace BaseCore.APIService.Controllers
             var category = new Category
             {
                 Name = dto.Name,
-                Description = dto.Description ?? ""
+                Description = dto.Description ?? "",
+                CreatedAt = DateTime.Now
             };
 
             await _categoryRepository.AddAsync(category);
@@ -68,15 +82,17 @@ namespace BaseCore.APIService.Controllers
         /// Update category
         /// </summary>
         [HttpPut("{id}")]
-        [Authorize]
+        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> Update(int id, [FromBody] CategoryDto dto)
         {
             var category = await _categoryRepository.GetByIdAsync(id);
             if (category == null)
                 return NotFound(new { message = "Category not found" });
 
+            // Update dạng partial: field null thì giữ nguyên dữ liệu cũ.
             category.Name = dto.Name ?? category.Name;
             category.Description = dto.Description ?? category.Description;
+            category.UpdatedAt = DateTime.Now;
 
             await _categoryRepository.UpdateAsync(category);
             return Ok(category);
@@ -86,14 +102,17 @@ namespace BaseCore.APIService.Controllers
         /// Delete category
         /// </summary>
         [HttpDelete("{id}")]
-        [Authorize]
+        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> Delete(int id)
         {
             var category = await _categoryRepository.GetByIdAsync(id);
             if (category == null)
                 return NotFound(new { message = "Category not found" });
 
-            await _categoryRepository.DeleteAsync(category);
+            // Soft delete để sản phẩm cũ vẫn còn tham chiếu được danh mục trong lịch sử.
+            category.IsDeleted = true;
+            category.UpdatedAt = DateTime.Now;
+            await _categoryRepository.UpdateAsync(category);
             return Ok(new { message = "Category deleted successfully" });
         }
     }

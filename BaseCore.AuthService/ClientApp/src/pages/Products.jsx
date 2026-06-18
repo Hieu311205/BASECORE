@@ -38,8 +38,8 @@ const Products = () => {
 
   const fetchCategories = async () => {
     try {
-      const response = await categoriesApi.getAll();
-      setCategories(response.data || []);
+      const response = await categoriesApi.getAll({ page: 1, pageSize: 1000 });
+      setCategories(response.data.items || response.data || []);
     } catch (error) {
       console.error('Failed to fetch categories:', error);
     }
@@ -108,6 +108,54 @@ const Products = () => {
     }
   };
 
+  const getProductImageValue = (product) => product.imageUrl || product.ImageUrl || product.image || product.Image || '';
+
+  const getPlaceholderImage = (product) => {
+    const label = String(product.name || 'Product')
+      .slice(0, 18)
+      .replace(/[&<>]/g, '');
+
+    return `data:image/svg+xml;charset=UTF-8,${encodeURIComponent(`
+      <svg xmlns="http://www.w3.org/2000/svg" width="96" height="96" viewBox="0 0 96 96">
+        <rect width="96" height="96" fill="#f4f6f9"/>
+        <rect x="10" y="10" width="76" height="76" rx="8" fill="#ffffff" stroke="#d6dbe1"/>
+        <text x="48" y="44" text-anchor="middle" font-family="Arial, sans-serif" font-size="11" fill="#6c757d">No image</text>
+        <text x="48" y="60" text-anchor="middle" font-family="Arial, sans-serif" font-size="9" fill="#adb5bd">${label}</text>
+      </svg>
+    `)}`;
+  };
+
+  const getProductImageSrc = (product) => {
+    const imageUrl = String(getProductImageValue(product)).trim();
+
+    if (!imageUrl) return getPlaceholderImage(product);
+    if (/^(https?:)?\/\//i.test(imageUrl) || imageUrl.startsWith('data:') || imageUrl.startsWith('blob:')) return imageUrl;
+    if (imageUrl.startsWith('/')) return imageUrl;
+    if (imageUrl.startsWith('assets/')) return `/${imageUrl}`;
+
+    return `/assets/images/${imageUrl}`;
+  };
+
+  const renderProductImage = (product) => {
+    return (
+      <img
+        src={getProductImageSrc(product)}
+        alt={product.name || 'Product image'}
+        style={{
+          width: '64px',
+          height: '64px',
+          objectFit: 'cover',
+          borderRadius: '4px',
+          border: '1px solid #dee2e6',
+        }}
+        onError={(e) => {
+          e.currentTarget.onerror = null;
+          e.currentTarget.src = getPlaceholderImage(product);
+        }}
+      />
+    );
+  };
+
   return (
     <>
       <div className="content-header">
@@ -158,6 +206,7 @@ const Products = () => {
                   <thead>
                     <tr>
                       <th>ID</th>
+                      <th>Image</th>
                       <th>Name</th>
                       <th>Price</th>
                       <th>Stock</th>
@@ -169,6 +218,9 @@ const Products = () => {
                     {products.map((product) => (
                       <tr key={product.id}>
                         <td>{product.id}</td>
+                        <td>
+                          {renderProductImage(product)}
+                        </td>
                         <td>{product.name}</td>
                         <td>${product.price.toFixed(2)}</td>
                         <td>{product.stock}</td>

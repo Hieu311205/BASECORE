@@ -5,6 +5,7 @@
     const TOKEN_KEY = "token";
 
     function parseJson(value) {
+        // localStorage có thể chứa dữ liệu lỗi, nên parse fail thì trả null thay vì làm hỏng trang.
         try {
             return JSON.parse(value);
         } catch {
@@ -13,15 +14,18 @@
     }
 
     function getCurrentUser() {
+        // Lấy user hiện tại đã lưu sau khi đăng nhập.
         return parseJson(localStorage.getItem(USER_KEY) || "");
     }
 
     function getUserName(user) {
+        // Hỗ trợ nhiều kiểu casing vì API/frontend có thể trả Name/name/UserName khác nhau.
         if (!user) return "";
         return user.name || user.Name || user.username || user.Username || user.userName || user.UserName || "Tai khoan";
     }
 
     function injectStyles() {
+        // Chỉ inject CSS một lần để tránh tạo nhiều thẻ style khi render lại widget.
         if (document.getElementById("auth-widget-style")) return;
 
         const style = document.createElement("style");
@@ -104,6 +108,7 @@
     }
 
     function logout() {
+        // Xóa mọi key token/user phổ biến rồi reload để UI quay về trạng thái chưa đăng nhập.
         localStorage.removeItem(USER_KEY);
         localStorage.removeItem(TOKEN_KEY);
         localStorage.removeItem("accessToken");
@@ -111,6 +116,7 @@
     }
 
     function renderAuthWidget() {
+        // Render nút đăng nhập/tài khoản dạng floating để dùng chung trên các trang HTML.
         injectStyles();
 
         const existingWidget = document.getElementById("auth-floating-widget");
@@ -122,6 +128,7 @@
         widget.className = "auth-floating-widget";
 
         if (user) {
+            // Đã đăng nhập: hiển thị tên user, link checkout và nút đăng xuất.
             widget.innerHTML = `
                 <button type="button" class="auth-floating-main" id="auth-floating-toggle">
                     <i class="fa fa-user-circle"></i>
@@ -133,6 +140,7 @@
                 </div>
             `;
         } else {
+            // Chưa đăng nhập: hiển thị menu đăng nhập/đăng ký.
             widget.innerHTML = `
                 <button type="button" class="auth-floating-main" id="auth-floating-toggle">
                     <i class="fa fa-user"></i>
@@ -152,6 +160,7 @@
         const logoutButton = document.getElementById("auth-logout-btn");
 
         if (toggle && menu) {
+            // Toggle menu khi click vào nút chính.
             toggle.addEventListener("click", function (event) {
                 event.preventDefault();
                 event.stopPropagation();
@@ -159,6 +168,7 @@
             });
 
             document.addEventListener("click", function (event) {
+                // Click ra ngoài widget thì đóng menu.
                 if (!widget.contains(event.target)) {
                     menu.classList.remove("show");
                 }
@@ -166,11 +176,13 @@
         }
 
         if (logoutButton) {
+            // Gắn sự kiện logout khi nút tồn tại trong trạng thái đã đăng nhập.
             logoutButton.addEventListener("click", logout);
         }
     }
 
     function bindNewsletterRegister() {
+        // Form newsletter chuyển người dùng sang trang đăng ký, kèm email nhập sẵn qua query string.
         const form = document.getElementById("newsletter-register-form");
         if (!form) return;
 
@@ -188,9 +200,11 @@
     }
 
     window.getCustomerUser = getCurrentUser;
+    // Expose hàm render để trang khác có thể gọi lại sau khi login/logout bằng AJAX.
     window.renderAuthWidget = renderAuthWidget;
 
     document.addEventListener("DOMContentLoaded", function () {
+        // Khởi tạo widget và form newsletter sau khi DOM sẵn sàng.
         renderAuthWidget();
         bindNewsletterRegister();
     });

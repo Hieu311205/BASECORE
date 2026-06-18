@@ -1,4 +1,4 @@
-﻿//using MongoDB.Bson;
+//using MongoDB.Bson;
 //using MongoDB.Bson.Serialization.Attributes;
 //using System;
 //using System.Collections.Generic;
@@ -34,21 +34,35 @@ namespace BaseCore.Entities
     {
         public int Id { get; set; }
 
+        // UserId liên kết đơn hàng với tài khoản đặt hàng.
         public int UserId { get; set; }
 
-        // 🔥 THÊM DÒNG NÀY (QUAN TRỌNG)
+        // Navigation property để EF Core có thể load thông tin user khi cần.
         [ForeignKey("UserId")]
         public User? User { get; set; }
 
         public DateTime OrderDate { get; set; } = DateTime.UtcNow;
 
+        // Tổng tiền được tính từ các OrderDetail tại thời điểm tạo đơn.
         public decimal TotalAmount { get; set; }
 
+        // Trạng thái nghiệp vụ: Pending, Completed, Cancelled...
         public string Status { get; set; } = "";
 
         public string ShippingAddress { get; set; } = "";
 
-        // 🔥 Quan hệ 1-n
+        public string? RecipientName { get; set; }
+
+        public string? RecipientPhone { get; set; }
+
+        public string PaymentMethod { get; set; } = "COD";
+
+        // Trạng thái thanh toán tách riêng trạng thái xử lý đơn.
+        public string PaymentStatus { get; set; } = "Unpaid";
+
+        public DateTime? UpdatedAt { get; set; }
+
+        // Quan hệ 1-n: một đơn hàng có nhiều dòng chi tiết sản phẩm.
         public List<OrderDetail> OrderDetails { get; set; } = new();
     }
 }

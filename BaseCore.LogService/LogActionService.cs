@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Threading.Tasks;
@@ -6,8 +6,8 @@ using Microsoft.AspNetCore.Http;
 
 using MongoDB.Bson;
 using MongoDB.Driver;
-using BaseCore.Libs.Repository;
 using BaseCore.LogService.Entities;
+using BaseCore.LogService.Repository;
 
 namespace BaseCore.LogService
 {
@@ -28,7 +28,7 @@ namespace BaseCore.LogService
 
         public async Task<ICollection<LogAction>> GetAllListAsync()
         {
-            FilterDefinition<LogAction> filter = Builders<LogAction>.Filter.Where(m => m.Id != BsonObjectId.Empty);
+            FilterDefinition<LogAction> filter = Builders<LogAction>.Filter.Where(m => !string.IsNullOrWhiteSpace(m.Id));
             return await GetAllAsync(filter);
         }
 

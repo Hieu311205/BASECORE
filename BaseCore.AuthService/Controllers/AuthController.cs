@@ -21,6 +21,7 @@ namespace BaseCore.AuthService.Controllers
         [HttpPost("login")]
         public async Task<IActionResult> Login([FromBody] LoginRequest request)
         {
+            // Validate input sớm để tránh gọi service khi thiếu username/password.
             if (request == null || string.IsNullOrEmpty(request.Username) || string.IsNullOrEmpty(request.Password))
             {
                 return BadRequest(new { message = "Username and password are required" });
@@ -30,10 +31,11 @@ namespace BaseCore.AuthService.Controllers
 
             if (user == null)
             {
+                // Không tiết lộ username hay password sai để giảm rò rỉ thông tin đăng nhập.
                 return Unauthorized(new { message = "Invalid username or password" });
             }
 
-            // Generate JWT token
+            // Sinh JWT chứa userId, username và role để các service khác xác thực bằng [Authorize].
             var token = TokenHelper.GenerateToken(
                 SecretKey,
                 TokenExpirationMinutes,
@@ -57,6 +59,7 @@ namespace BaseCore.AuthService.Controllers
         [HttpPost("register")]
         public async Task<IActionResult> Register([FromBody] RegisterRequest request)
         {
+            // Register kiểm tra dữ liệu tối thiểu trước khi tạo entity user.
             if (request == null)
             {
                 return BadRequest(new { message = "Invalid request" });
@@ -76,6 +79,7 @@ namespace BaseCore.AuthService.Controllers
             {
                 var user = new BaseCore.Entities.User
                 {
+                    // UserType = 2 là tài khoản thường; quyền admin không được cấp từ API register public.
                     UserName = request.Username,
                     Name = request.Name ?? request.Username,
                     Email = request.Email,  

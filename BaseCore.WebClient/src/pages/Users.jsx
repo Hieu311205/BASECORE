@@ -1,10 +1,16 @@
 import React, { useState, useEffect } from 'react';
-import { userApi } from '../services/api';
+import { rolesApi, userApi } from '../services/api';
 
 const Users = () => {
     const [users, setUsers] = useState([]);
+    const [roles, setRoles] = useState([
+        { id: 2, name: 'Người dùng', userType: 0, description: 'Người dùng thông thường' },
+        { id: 1, name: 'Quản trị viên', userType: 1, description: 'Quản trị viên toàn quyền' },
+    ]);
+    const [permissionsByUserType, setPermissionsByUserType] = useState({});
     const [loading, setLoading] = useState(true);
     const [keyword, setKeyword] = useState('');
+    const [statusFilter, setStatusFilter] = useState('');
     const [page, setPage] = useState(1);
     const [pageSize] = useState(10);
     const [totalPages, setTotalPages] = useState(0);
@@ -18,24 +24,65 @@ const Users = () => {
         email: '',
         phone: '',
         position: '',
+        image: '',
         userType: 0,
         isActive: true,
     });
     const [error, setError] = useState('');
 
     useEffect(() => {
+        loadRoles();
+    }, []);
+
+    useEffect(() => {
         loadUsers();
-    }, [page, keyword]);
+    }, [page, keyword, statusFilter]);
+
+    const loadRoles = async () => {
+        try {
+            const response = await rolesApi.getAll();
+            const assignableRoles = (Array.isArray(response.data) ? response.data : [])
+                .filter((role) => role.userType === 0 || role.userType === 1)
+                .sort((a, b) => a.userType - b.userType);
+
+            if (assignableRoles.length > 0) {
+                setRoles(assignableRoles);
+            }
+
+            const permissionEntries = await Promise.all(
+                assignableRoles.map(async (role) => {
+                    try {
+                        const permissionsResponse = await rolesApi.getPermissions(role.id);
+                        return [role.userType, permissionsResponse.data?.permissions || []];
+                    } catch {
+                        return [role.userType, []];
+                    }
+                })
+            );
+
+            setPermissionsByUserType(Object.fromEntries(permissionEntries));
+        } catch {
+            setPermissionsByUserType({
+                0: ['products.read', 'orders.read', 'categories.read'],
+                1: ['users.read', 'users.write', 'products.write', 'orders.write', 'categories.write'],
+            });
+        }
+    };
 
     const loadUsers = async () => {
         setLoading(true);
         try {
-            const response = await userApi.getAll({ keyword, page, pageSize });
+            const response = await userApi.getAll({
+                keyword,
+                page,
+                pageSize,
+                isActive: statusFilter === '' ? undefined : statusFilter,
+            });
             setUsers(response.data.data || []);
             setTotalPages(response.data.totalPages || 0);
             setTotalCount(response.data.totalCount || 0);
         } catch (error) {
-            console.error('Failed to load users:', error);
+            console.error('Không thể tải người dùng:', error);
         } finally {
             setLoading(false);
         }
@@ -57,6 +104,7 @@ const Users = () => {
                 email: user.email || '',
                 phone: user.phone || '',
                 position: user.position || '',
+                image: user.image || '',
                 userType: user.userType || 0,
                 isActive: user.isActive,
             });
@@ -69,6 +117,7 @@ const Users = () => {
                 email: '',
                 phone: '',
                 position: '',
+                image: '',
                 userType: 0,
                 isActive: true,
             });
@@ -94,6 +143,7 @@ const Users = () => {
                     email: formData.email,
                     phone: formData.phone,
                     position: formData.position,
+                    image: formData.image,
                     userType: parseInt(formData.userType),
                     isActive: formData.isActive,
                 };
@@ -103,7 +153,7 @@ const Users = () => {
                 await userApi.update(editingUser.id, updateData);
             } else {
                 if (!formData.password) {
-                    setError('Password is required for new user');
+                    setError('Mật khẩu là bắt buộc khi tạo người dùng mới');
                     return;
                 }
                 await userApi.create({
@@ -113,6 +163,7 @@ const Users = () => {
                     email: formData.email,
                     phone: formData.phone,
                     position: formData.position,
+                    image: formData.image,
                     userType: parseInt(formData.userType),
                 });
             }
@@ -120,18 +171,23 @@ const Users = () => {
             closeModal();
             loadUsers();
         } catch (error) {
-            setError(error.response?.data?.message || 'Operation failed');
+            const data = error.response?.data;
+            const validationErrors = data?.errors
+                ? Object.values(data.errors).flat().join(' ')
+                : '';
+
+            setError(data?.message || validationErrors || 'Thao tác thất bại');
         }
     };
 
     const handleDelete = async (id) => {
-        if (!window.confirm('Are you sure you want to delete this user?')) return;
+        if (!window.confirm('Bạn có chắc muốn xóa người dùng này?')) return;
 
         try {
             await userApi.delete(id);
             loadUsers();
         } catch (error) {
-            alert('Failed to delete user');
+            alert('Không thể xóa người dùng');
         }
     };
 
@@ -147,13 +203,91 @@ const Users = () => {
         return pages;
     };
 
+    const getRoleName = (userType) => {
+        const roleName = roles.find((role) => role.userType === userType)?.name;
+        if (roleName === 'Admin') return 'Quản trị viên';
+        if (roleName === 'User') return 'Người dùng';
+        return roleName || (userType === 1 ? 'Quản trị viên' : 'Người dùng');
+    };
+
+    const getRoleBadgeClass = (userType) => {
+        return userType === 1 ? 'badge-danger' : 'badge-info';
+    };
+
+    const selectedPermissions = permissionsByUserType[Number(formData.userType)] || [];
+
+    const getUserImageSrc = (user) => {
+        const defaultImages = {
+            admin2: '/assets/images/admin.jpg',
+            customer: '/assets/images/users1.jpg',
+            customer4: '/assets/images/users1.jpg',
+        };
+        const username = String(user.username || '').trim().toLowerCase();
+        const image = String(user.image || defaultImages[username] || '').trim();
+
+        if (!image) return '';
+        if (/^(https?:)?\/\//i.test(image) || image.startsWith('data:') || image.startsWith('blob:')) return image;
+        if (image.startsWith('/')) return image;
+        if (image.startsWith('assets/')) return `/${image}`;
+
+        return `/assets/images/${image}`;
+    };
+
+    const renderUserAvatar = (user) => {
+        const imageSrc = getUserImageSrc(user);
+        const initial = String(user.name || user.username || '?').trim().charAt(0).toUpperCase() || '?';
+        const fallbackAvatar = (
+            <span
+                className="bg-primary text-white"
+                style={{
+                    width: '40px',
+                    height: '40px',
+                    borderRadius: '50%',
+                    display: 'inline-flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    fontWeight: 700,
+                }}
+            >
+                {initial}
+            </span>
+        );
+
+        if (imageSrc) {
+            return (
+                <>
+                    <img
+                        src={imageSrc}
+                        alt={user.name || user.username || 'Ảnh đại diện'}
+                        style={{
+                            width: '40px',
+                            height: '40px',
+                            objectFit: 'cover',
+                            borderRadius: '50%',
+                            border: '1px solid #dee2e6',
+                        }}
+                        onError={(e) => {
+                            e.currentTarget.style.display = 'none';
+                            e.currentTarget.nextSibling.style.display = 'inline-flex';
+                        }}
+                    />
+                    <span style={{ display: 'none', width: '40px', height: '40px' }}>
+                        {fallbackAvatar}
+                    </span>
+                </>
+            );
+        }
+
+        return fallbackAvatar;
+    };
+
     return (
         <div className="content-wrapper">
             <div className="content-header">
                 <div className="container-fluid">
                     <div className="row mb-2">
                         <div className="col-sm-6">
-                            <h1 className="m-0">Users Management</h1>
+                            <h1 className="m-0">Quản lý người dùng</h1>
                         </div>
                     </div>
                 </div>
@@ -169,18 +303,30 @@ const Users = () => {
                                         <input
                                             type="text"
                                             className="form-control mr-2"
-                                            placeholder="Search by name, email, phone..."
+                                            placeholder="Tìm theo tên, email, số điện thoại..."
                                             value={keyword}
                                             onChange={(e) => setKeyword(e.target.value)}
                                         />
+                                        <select
+                                            className="form-control mr-2"
+                                            value={statusFilter}
+                                            onChange={(e) => {
+                                                setStatusFilter(e.target.value);
+                                                setPage(1);
+                                            }}
+                                        >
+                                            <option value="">Tất cả trạng thái</option>
+                                            <option value="true">Đang hoạt động</option>
+                                            <option value="false">Ngừng hoạt động</option>
+                                        </select>
                                         <button type="submit" className="btn btn-primary">
-                                            <i className="fas fa-search"></i> Search
+                                            <i className="fas fa-search"></i> Tìm kiếm
                                         </button>
                                     </form>
                                 </div>
                                 <div className="col-md-6 text-right">
                                     <button className="btn btn-success" onClick={() => openModal()}>
-                                        <i className="fas fa-plus"></i> Add User
+                                        <i className="fas fa-plus"></i> Thêm người dùng
                                     </button>
                                 </div>
                             </div>
@@ -195,37 +341,39 @@ const Users = () => {
                                     <table className="table table-bordered table-striped">
                                         <thead>
                                             <tr>
-                                                <th>Username</th>
-                                                <th>Name</th>
+                                                <th>Ảnh</th>
+                                                <th>Tên đăng nhập</th>
+                                                <th>Họ tên</th>
                                                 <th>Email</th>
-                                                <th>Phone</th>
-                                                <th>Role</th>
-                                                <th>Status</th>
-                                                <th>Actions</th>
+                                                <th>Điện thoại</th>
+                                                <th>Vai trò</th>
+                                                <th>Trạng thái</th>
+                                                <th>Thao tác</th>
                                             </tr>
                                         </thead>
                                         <tbody>
                                             {users.length === 0 ? (
                                                 <tr>
-                                                    <td colSpan="7" className="text-center">
-                                                        No users found
+                                                    <td colSpan="8" className="text-center">
+                                                        Không tìm thấy người dùng
                                                     </td>
                                                 </tr>
                                             ) : (
                                                 users.map(user => (
                                                     <tr key={user.id}>
+                                                        <td>{renderUserAvatar(user)}</td>
                                                         <td>{user.username}</td>
                                                         <td>{user.name}</td>
                                                         <td>{user.email}</td>
                                                         <td>{user.phone}</td>
                                                         <td>
-                                                            <span className={`badge ${user.userType === 1 ? 'badge-danger' : 'badge-info'}`}>
-                                                                {user.userType === 1 ? 'Admin' : 'User'}
+                                                            <span className={`badge ${getRoleBadgeClass(user.userType)}`}>
+                                                                {getRoleName(user.userType)}
                                                             </span>
                                                         </td>
                                                         <td>
                                                             <span className={`badge ${user.isActive ? 'badge-success' : 'badge-secondary'}`}>
-                                                                {user.isActive ? 'Active' : 'Inactive'}
+                                                                {user.isActive ? 'Đang hoạt động' : 'Ngừng hoạt động'}
                                                             </span>
                                                         </td>
                                                         <td>
@@ -249,18 +397,18 @@ const Users = () => {
                                     </table>
 
                                     <div className="d-flex justify-content-between align-items-center">
-                                        <span>Total: {totalCount} users</span>
+                                        <span>Tổng: {totalCount} người dùng</span>
                                         <nav>
                                             <ul className="pagination mb-0">
                                                 <li className={`page-item ${page === 1 ? 'disabled' : ''}`}>
                                                     <button className="page-link" onClick={() => setPage(page - 1)}>
-                                                        Previous
+                                                        Trước
                                                     </button>
                                                 </li>
                                                 {renderPagination()}
                                                 <li className={`page-item ${page === totalPages ? 'disabled' : ''}`}>
                                                     <button className="page-link" onClick={() => setPage(page + 1)}>
-                                                        Next
+                                                        Sau
                                                     </button>
                                                 </li>
                                             </ul>
@@ -276,21 +424,21 @@ const Users = () => {
             {/* Modal */}
             {showModal && (
                 <div className="modal fade show" style={{ display: 'block' }} tabIndex="-1">
-                    <div className="modal-dialog">
-                        <div className="modal-content">
+                    <div className="modal-dialog" style={{ maxHeight: 'calc(100vh - 3.5rem)' }}>
+                        <div className="modal-content" style={{ display: 'flex', flexDirection: 'column', maxHeight: 'calc(100vh - 3.5rem)' }}>
                             <div className="modal-header">
                                 <h5 className="modal-title">
-                                    {editingUser ? 'Edit User' : 'Add User'}
+                                    {editingUser ? 'Sửa người dùng' : 'Thêm người dùng'}
                                 </h5>
                                 <button type="button" className="close" onClick={closeModal}>
                                     <span>&times;</span>
                                 </button>
                             </div>
-                            <form onSubmit={handleSubmit}>
-                                <div className="modal-body">
+                            <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', minHeight: 0, flex: 1 }}>
+                                <div className="modal-body" style={{ overflowY: 'auto', minHeight: 0 }}>
                                     {error && <div className="alert alert-danger">{error}</div>}
                                     <div className="form-group">
-                                        <label>Username</label>
+                                        <label>Tên đăng nhập</label>
                                         <input
                                             type="text"
                                             className="form-control"
@@ -301,7 +449,7 @@ const Users = () => {
                                         />
                                     </div>
                                     <div className="form-group">
-                                        <label>Password {editingUser && '(leave blank to keep current)'}</label>
+                                        <label>Mật khẩu {editingUser && '(để trống nếu không đổi)'}</label>
                                         <input
                                             type="password"
                                             className="form-control"
@@ -311,7 +459,7 @@ const Users = () => {
                                         />
                                     </div>
                                     <div className="form-group">
-                                        <label>Name</label>
+                                        <label>Họ tên</label>
                                         <input
                                             type="text"
                                             className="form-control"
@@ -329,7 +477,7 @@ const Users = () => {
                                         />
                                     </div>
                                     <div className="form-group">
-                                        <label>Phone</label>
+                                        <label>Điện thoại</label>
                                         <input
                                             type="text"
                                             className="form-control"
@@ -338,7 +486,7 @@ const Users = () => {
                                         />
                                     </div>
                                     <div className="form-group">
-                                        <label>Position</label>
+                                        <label>Chức vụ</label>
                                         <input
                                             type="text"
                                             className="form-control"
@@ -347,15 +495,42 @@ const Users = () => {
                                         />
                                     </div>
                                     <div className="form-group">
-                                        <label>Role</label>
+                                        <label>Đường dẫn ảnh</label>
+                                        <input
+                                            type="text"
+                                            className="form-control"
+                                            value={formData.image}
+                                            onChange={(e) => setFormData({ ...formData, image: e.target.value })}
+                                            placeholder="/assets/images/avatar.jpg"
+                                        />
+                                    </div>
+                                    <div className="form-group">
+                                        <label>Vai trò</label>
                                         <select
                                             className="form-control"
                                             value={formData.userType}
                                             onChange={(e) => setFormData({ ...formData, userType: e.target.value })}
                                         >
-                                            <option value="0">User</option>
-                                            <option value="1">Admin</option>
+                                            {roles.map((role) => (
+                                                <option key={role.id} value={role.userType}>
+                                                    {role.name === 'Admin' ? 'Quản trị viên' : role.name === 'User' ? 'Người dùng' : role.name}
+                                                </option>
+                                            ))}
                                         </select>
+                                    </div>
+                                    <div className="form-group">
+                                        <label>Quyền</label>
+                                        <div className="border rounded p-2">
+                                            {selectedPermissions.length === 0 ? (
+                                                <span className="text-muted">Chưa cấu hình quyền cho vai trò này.</span>
+                                            ) : (
+                                                selectedPermissions.map((permission) => (
+                                                    <span key={permission} className="badge badge-light border mr-1 mb-1">
+                                                        {permission}
+                                                    </span>
+                                                ))
+                                            )}
+                                        </div>
                                     </div>
                                     {editingUser && (
                                         <div className="form-group">
@@ -367,17 +542,17 @@ const Users = () => {
                                                     checked={formData.isActive}
                                                     onChange={(e) => setFormData({ ...formData, isActive: e.target.checked })}
                                                 />
-                                                <label className="custom-control-label" htmlFor="isActive">Active</label>
+                                                <label className="custom-control-label" htmlFor="isActive">Đang hoạt động</label>
                                             </div>
                                         </div>
                                     )}
                                 </div>
                                 <div className="modal-footer">
                                     <button type="button" className="btn btn-secondary" onClick={closeModal}>
-                                        Cancel
+                                        Hủy
                                     </button>
                                     <button type="submit" className="btn btn-primary">
-                                        {editingUser ? 'Update' : 'Create'}
+                                        {editingUser ? 'Cập nhật' : 'Tạo mới'}
                                     </button>
                                 </div>
                             </form>

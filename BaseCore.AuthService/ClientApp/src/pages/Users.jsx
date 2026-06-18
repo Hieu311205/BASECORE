@@ -72,6 +72,7 @@ const Users = () => {
       email: user.email || '',
       phone: user.phone || '',
       position: user.position || '',
+      image: user.image || '',
       isActive: user.isActive,
       userType: user.userType,
     });
@@ -104,6 +105,69 @@ const Users = () => {
     } catch (error) {
       alert('Failed to save user');
     }
+  };
+
+  const getUserImageSrc = (user) => {
+    const username = String(user.username || user.userName || '').trim().toLowerCase();
+    const defaultImages = {
+      admin2: '/assets/images/admin.jpg',
+      customer: '/assets/images/users1.jpg',
+      customer4: '/assets/images/users1.jpg',
+    };
+    const image = String(user.image || defaultImages[username] || '').trim();
+
+    if (!image) return '';
+    if (/^(https?:)?\/\//i.test(image) || image.startsWith('data:') || image.startsWith('blob:')) return image;
+    if (image.startsWith('/')) return image;
+    if (image.startsWith('assets/')) return `/${image}`;
+
+    return `/assets/images/${image}`;
+  };
+
+  const renderUserAvatar = (user) => {
+    const imageSrc = getUserImageSrc(user);
+    const initial = String(user.name || user.username || user.userName || '?').trim().charAt(0).toUpperCase() || '?';
+    const fallbackAvatar = (
+      <span
+        className="bg-primary text-white"
+        style={{
+          width: '40px',
+          height: '40px',
+          borderRadius: '50%',
+          display: 'inline-flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          fontWeight: 700,
+        }}
+      >
+        {initial}
+      </span>
+    );
+
+    if (!imageSrc) return fallbackAvatar;
+
+    return (
+      <>
+        <img
+          src={imageSrc}
+          alt={user.name || user.username || user.userName || 'User avatar'}
+          style={{
+            width: '40px',
+            height: '40px',
+            objectFit: 'cover',
+            borderRadius: '50%',
+            border: '1px solid #dee2e6',
+          }}
+          onError={(e) => {
+            e.currentTarget.style.display = 'none';
+            e.currentTarget.nextSibling.style.display = 'inline-flex';
+          }}
+        />
+        <span style={{ display: 'none', width: '40px', height: '40px' }}>
+          {fallbackAvatar}
+        </span>
+      </>
+    );
   };
 
   return (
@@ -155,6 +219,7 @@ const Users = () => {
                 <table className="table table-hover text-nowrap">
                   <thead>
                     <tr>
+                      <th>Avatar</th>
                       <th>Name</th>
                       <th>Username</th>
                       <th>Email</th>
@@ -166,6 +231,7 @@ const Users = () => {
                   <tbody>
                     {users.map((user) => (
                       <tr key={user.guid}>
+                        <td>{renderUserAvatar(user)}</td>
                         <td>{user.name}</td>
                         <td>{user.userName}</td>
                         <td>{user.email}</td>

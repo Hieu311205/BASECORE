@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { productApi, userApi, categoryApi, orderApi, suppliersApi } from '../services/api';
+import { productApi, userApi, categoryApi, orderApi, suppliersApi, promotionsApi } from '../services/api';
 import { useAuth } from '../contexts/AuthContext';
 
 const Dashboard = () => {
@@ -9,6 +9,7 @@ const Dashboard = () => {
         users: 0,
         orders: 0,
         suppliers: 0,
+        promotions: 0,
     });
 
     const [loading, setLoading] = useState(true);
@@ -24,11 +25,12 @@ const Dashboard = () => {
 
     const loadStats = async () => {
         try {
-            const [productsRes, categoriesRes, ordersRes, suppliersRes] = await Promise.all([
+            const [productsRes, categoriesRes, ordersRes, suppliersRes, promotionsRes] = await Promise.all([
                 productApi.getAll(),
                 categoryApi.getAll(),
                 orderApi.getAll(),
                 suppliersApi.getAll(),
+                promotionsApi.getAll(),
             ]);
 
             let usersCount = 0;
@@ -38,7 +40,7 @@ const Dashboard = () => {
                     const usersRes = await userApi.getAll({ page: 1, pageSize: 1 });
                     usersCount = getCount(usersRes.data);
                 } catch (e) {
-                    console.log('Cannot fetch users count');
+                    console.log('Không thể tải số lượng người dùng');
                 }
             }
 
@@ -48,9 +50,10 @@ const Dashboard = () => {
                 users: usersCount,
                 orders: getCount(ordersRes.data),
                 suppliers: getCount(suppliersRes.data),
+                promotions: getCount(promotionsRes.data),
             });
         } catch (error) {
-            console.error('Failed to load stats:', error);
+            console.error('Không thể tải thống kê:', error);
         } finally {
             setLoading(false);
         }
@@ -62,7 +65,7 @@ const Dashboard = () => {
                 <div className="container-fluid">
                     <div className="row mb-2">
                         <div className="col-sm-6">
-                            <h1 className="m-0">Dashboard</h1>
+                            <h1 className="m-0">Tổng quan</h1>
                         </div>
                     </div>
                 </div>
@@ -73,7 +76,7 @@ const Dashboard = () => {
                     {loading ? (
                         <div className="text-center py-5">
                             <div className="spinner-border text-primary" role="status">
-                                <span className="sr-only">Loading...</span>
+                                <span className="sr-only">Đang tải...</span>
                             </div>
                         </div>
                     ) : (
@@ -82,13 +85,13 @@ const Dashboard = () => {
                                 <div className="small-box bg-info">
                                     <div className="inner">
                                         <h3>{stats.products}</h3>
-                                        <p>Products</p>
+                                        <p>Sản phẩm</p>
                                     </div>
                                     <div className="icon">
                                         <i className="fas fa-box"></i>
                                     </div>
                                     <a href="/products" className="small-box-footer">
-                                        More info <i className="fas fa-arrow-circle-right"></i>
+                                        Xem chi tiết <i className="fas fa-arrow-circle-right"></i>
                                     </a>
                                 </div>
                             </div>
@@ -97,13 +100,13 @@ const Dashboard = () => {
                                 <div className="small-box bg-success">
                                     <div className="inner">
                                         <h3>{stats.categories}</h3>
-                                        <p>Categories</p>
+                                        <p>Danh mục</p>
                                     </div>
                                     <div className="icon">
                                         <i className="fas fa-tags"></i>
                                     </div>
                                     <a href="/categories" className="small-box-footer">
-                                        More info <i className="fas fa-arrow-circle-right"></i>
+                                        Xem chi tiết <i className="fas fa-arrow-circle-right"></i>
                                     </a>
                                 </div>
                             </div>
@@ -112,13 +115,13 @@ const Dashboard = () => {
                                 <div className="small-box bg-primary">
                                     <div className="inner">
                                         <h3>{stats.suppliers}</h3>
-                                        <p>Suppliers</p>
+                                        <p>Nhà cung cấp</p>
                                     </div>
                                     <div className="icon">
                                         <i className="fas fa-truck"></i>
                                     </div>
                                     <a href="/suppliers" className="small-box-footer">
-                                        More info <i className="fas fa-arrow-circle-right"></i>
+                                        Xem chi tiết <i className="fas fa-arrow-circle-right"></i>
                                     </a>
                                 </div>
                             </div>
@@ -127,13 +130,13 @@ const Dashboard = () => {
                                 <div className="small-box bg-danger">
                                     <div className="inner">
                                         <h3>{stats.orders}</h3>
-                                        <p>Orders</p>
+                                        <p>Đơn hàng</p>
                                     </div>
                                     <div className="icon">
                                         <i className="fas fa-shopping-bag"></i>
                                     </div>
                                     <a href="/orders" className="small-box-footer">
-                                        More info <i className="fas fa-arrow-circle-right"></i>
+                                        Xem chi tiết <i className="fas fa-arrow-circle-right"></i>
                                     </a>
                                 </div>
                             </div>
@@ -143,13 +146,30 @@ const Dashboard = () => {
                                     <div className="small-box bg-warning">
                                         <div className="inner">
                                             <h3>{stats.users}</h3>
-                                            <p>Users</p>
+                                            <p>Người dùng</p>
                                         </div>
                                         <div className="icon">
                                             <i className="fas fa-users"></i>
                                         </div>
                                         <a href="/users" className="small-box-footer">
-                                            More info <i className="fas fa-arrow-circle-right"></i>
+                                            Xem chi tiết <i className="fas fa-arrow-circle-right"></i>
+                                        </a>
+                                    </div>
+                                </div>
+                            )}
+
+                            {isAdmin() && (
+                                <div className="col-lg-3 col-6">
+                                    <div className="small-box bg-purple">
+                                        <div className="inner">
+                                            <h3>{stats.promotions}</h3>
+                                            <p>Mã giảm giá</p>
+                                        </div>
+                                        <div className="icon">
+                                            <i className="fas fa-percent"></i>
+                                        </div>
+                                        <a href="/discounts" className="small-box-footer">
+                                            Xem chi tiết <i className="fas fa-arrow-circle-right"></i>
                                         </a>
                                     </div>
                                 </div>
@@ -161,25 +181,25 @@ const Dashboard = () => {
                         <div className="col-12">
                             <div className="card">
                                 <div className="card-header">
-                                    <h3 className="card-title">Welcome to BaseCore Sales System</h3>
+                                    <h3 className="card-title">Chào mừng đến hệ thống bán hàng BaseCore</h3>
                                 </div>
                                 <div className="card-body">
-                                    <p>This is a teaching framework for web development using:</p>
+                                    <p>Đây là hệ thống mẫu dùng cho phát triển web với:</p>
                                     <ul>
-                                        <li><strong>Backend:</strong> .NET Core 8.0 with Entity Framework Core</li>
-                                        <li><strong>Frontend:</strong> React 18 with React Router</li>
-                                        <li><strong>UI:</strong> AdminLTE 3 with Bootstrap 4</li>
-                                        <li><strong>Authentication:</strong> JWT Bearer Token</li>
+                                        <li><strong>Backend:</strong> .NET Core 8.0 với Entity Framework Core</li>
+                                        <li><strong>Frontend:</strong> React 18 với React Router</li>
+                                        <li><strong>Giao diện:</strong> AdminLTE 3 với Bootstrap 4</li>
+                                        <li><strong>Xác thực:</strong> JWT Bearer Token</li>
                                     </ul>
 
-                                    <p>Features include:</p>
+                                    <p>Chức năng gồm:</p>
                                     <ul>
-                                        <li>User Authentication (Login/Logout)</li>
-                                        <li>Product Management (CRUD with Search & Pagination)</li>
-                                        <li>Category Management</li>
-                                        <li>Supplier Management</li>
-                                        <li>User Management (Admin only)</li>
-                                        <li>Order Management</li>
+                                        <li>Xác thực người dùng (đăng nhập/đăng xuất)</li>
+                                        <li>Quản lý sản phẩm (thêm, sửa, xóa, tìm kiếm và phân trang)</li>
+                                        <li>Quản lý danh mục</li>
+                                        <li>Quản lý nhà cung cấp</li>
+                                        <li>Quản lý người dùng (chỉ admin)</li>
+                                        <li>Quản lý đơn hàng</li>
                                     </ul>
                                 </div>
                             </div>
