@@ -423,9 +423,9 @@ const Users = () => {
 
             {/* Modal */}
             {showModal && (
-                <div className="modal fade show" style={{ display: 'block' }} tabIndex="-1">
-                    <div className="modal-dialog" style={{ maxHeight: 'calc(100vh - 3.5rem)' }}>
-                        <div className="modal-content" style={{ display: 'flex', flexDirection: 'column', maxHeight: 'calc(100vh - 3.5rem)' }}>
+                <div className="modal fade show admin-modal" style={{ display: 'block' }} tabIndex="-1">
+                    <div className="modal-dialog">
+                        <div className="modal-content">
                             <div className="modal-header">
                                 <h5 className="modal-title">
                                     {editingUser ? 'Sửa người dùng' : 'Thêm người dùng'}
@@ -434,8 +434,8 @@ const Users = () => {
                                     <span>&times;</span>
                                 </button>
                             </div>
-                            <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', minHeight: 0, flex: 1 }}>
-                                <div className="modal-body" style={{ overflowY: 'auto', minHeight: 0 }}>
+                            <form onSubmit={handleSubmit}>
+                                <div className="modal-body">
                                     {error && <div className="alert alert-danger">{error}</div>}
                                     <div className="form-group">
                                         <label>Tên đăng nhập</label>

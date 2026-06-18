@@ -10,6 +10,8 @@ const Dashboard = () => {
         orders: 0,
         suppliers: 0,
         promotions: 0,
+        payments: 0,
+        inventory: 0,
     });
 
     const [loading, setLoading] = useState(true);
@@ -30,7 +32,7 @@ const Dashboard = () => {
                 categoryApi.getAll(),
                 orderApi.getAll(),
                 suppliersApi.getAll(),
-                promotionsApi.getAll(),
+                promotionsApi.getAll(), 
             ]);
 
             let usersCount = 0;
@@ -51,6 +53,8 @@ const Dashboard = () => {
                 orders: getCount(ordersRes.data),
                 suppliers: getCount(suppliersRes.data),
                 promotions: getCount(promotionsRes.data),
+                payments: getCount(ordersRes.data),
+                inventory: getCount(productsRes.data),
             });
         } catch (error) {
             console.error('Không thể tải thống kê:', error);
@@ -174,6 +178,34 @@ const Dashboard = () => {
                                     </div>
                                 </div>
                             )}
+                             <div className="col-lg-3 col-6">
+                                <div className="small-box bg-indigo">
+                                    <div className="inner">
+                                        <h3>{stats.payments}</h3>
+                                        <p>Thanh toán</p>
+                                    </div>
+                                    <div className="icon">
+                                        <i className="fas fa-money-bill"></i>
+                                    </div>
+                                    <a href="/payments" className="small-box-footer">
+                                        Xem chi tiết <i className="fas fa-arrow-circle-right"></i>
+                                    </a>
+                                </div>
+                            </div>
+                            <div className="col-lg-3 col-6">
+                                <div className="small-box bg-teal">
+                                    <div className="inner">
+                                        <h3>{stats.inventory}</h3>
+                                        <p>Tồn kho</p>
+                                    </div>
+                                    <div className="icon">
+                                        <i className="fas fa-tags"></i>
+                                    </div>
+                                    <a href="/inventory" className="small-box-footer">
+                                        Xem chi tiết <i className="fas fa-arrow-circle-right"></i>
+                                    </a>
+                                </div>
+                            </div>
                         </div>
                     )}
 
@@ -199,7 +231,12 @@ const Dashboard = () => {
                                         <li>Quản lý danh mục</li>
                                         <li>Quản lý nhà cung cấp</li>
                                         <li>Quản lý người dùng (chỉ admin)</li>
+                                        <li>Quản lý tồn kho</li>
                                         <li>Quản lý đơn hàng</li>
+                                        <li>Quản lý thanh toán</li>
+                                        <li>Cài đặt vận chuyển</li>
+                                        <li>Quản lý mã giảm giá (chỉ admin)</li>
+                                        <li>Cài đặt hệ thống</li>
                                     </ul>
                                 </div>
                             </div>

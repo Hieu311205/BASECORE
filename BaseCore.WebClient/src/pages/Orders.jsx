@@ -619,7 +619,7 @@ const Orders = () => {
             </section>
 
             {showDetailModal && (
-                <div className="modal fade show" style={{ display: 'block' }}>
+                <div className="modal fade show admin-modal" style={{ display: 'block' }}>
                     <div className="modal-dialog modal-lg">
                         <div className="modal-content">
                             <div className="modal-header">
@@ -697,7 +697,7 @@ const Orders = () => {
             )}
 
             {showModal && (
-                <div className="modal fade show" style={{ display: 'block' }}>
+                <div className="modal fade show admin-modal" style={{ display: 'block' }}>
                     <div className="modal-dialog">
                         <div className="modal-content">
                             <div className="modal-header">

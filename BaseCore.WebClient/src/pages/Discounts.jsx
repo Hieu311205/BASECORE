@@ -301,7 +301,7 @@ const Discounts = () => {
             </section>
 
             {showModal && (
-                <div className="modal fade show" style={{ display: 'block' }} tabIndex="-1">
+                <div className="modal fade show admin-modal" style={{ display: 'block' }} tabIndex="-1">
                     <div className="modal-dialog">
                         <div className="modal-content">
                             <div className="modal-header">

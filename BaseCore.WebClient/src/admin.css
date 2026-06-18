@@ -1,0 +1,29 @@
+.admin-modal {
+  padding: 1.75rem 0;
+}
+
+.admin-modal .modal-dialog {
+  max-height: calc(100vh - 3.5rem);
+}
+
+.admin-modal .modal-content {
+  display: flex;
+  flex-direction: column;
+  max-height: calc(100vh - 3.5rem);
+}
+
+.admin-modal .modal-content > form {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  min-height: 0;
+}
+
+.admin-modal .modal-body {
+  min-height: 0;
+  overflow-y: auto;
+}
+
+.admin-modal .modal-footer {
+  flex-shrink: 0;
+}

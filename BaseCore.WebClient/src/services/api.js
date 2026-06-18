@@ -98,6 +98,14 @@ export const promotionsApi = {
     delete: (id) => api.delete(`/promotions/${id}`),
 };
 
+export const paymentsApi = {
+    getAll: (params) => api.get('/payments', { params }),
+    getById: (id) => api.get(`/payments/${id}`),
+    create: (data) => api.post('/payments', data),
+    update: (id, data) => api.put(`/payments/${id}`, data),
+    delete: (id) => api.delete(`/payments/${id}`),
+};
+
 export const settingsApi = {
     get: (scope) => api.get(`/settings/${scope}`),
     save: (scope, data) => api.put(`/settings/${scope}`, data),
@@ -108,6 +116,12 @@ export const rolesApi = {
     getById: (id) => api.get(`/roles/${id}`),
     getPermissions: (id) => api.get(`/roles/${id}/permissions`),
     getByUserType: (userType) => api.get(`/roles/by-usertype/${userType}`),
+};
+
+export const inventoryApi = {
+    getAll: (params) => api.get('/inventory', { params }),
+    getById: (id) => api.get(`/inventory/${id}`),
+    update: (id, data) => api.put(`/inventory/${id}`, data),
 };
 
 export const auditLogApi = {
