@@ -127,5 +127,11 @@ export const inventoryApi = {
 export const auditLogApi = {
     getAll: () => api.get('/auditLog'),
 };
-
+// export const brandsApi = {
+//     getAll: () => api.get('/brands'),
+//     getById: (id) => api.get(`/brands/${id}`),
+//     create: (data) => api.post('/brands', data),
+//     update: (id, data) => api.put(`/brands/${id}`, data),
+//     delete: (id) => api.delete(`/brands/${id}`),
+// };
 export default api;

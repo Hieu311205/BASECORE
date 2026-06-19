@@ -72,7 +72,7 @@ builder.Services.AddScoped<ICategoryRepositoryEF, CategoryRepositoryEF>();
 builder.Services.AddScoped<IOrderRepositoryEF, OrderRepositoryEF>();
 builder.Services.AddScoped<IOrderDetailRepositoryEF, OrderDetailRepositoryEF>();
 builder.Services.AddScoped<ISupplierRepositoryEF, SupplierRepositoryEF>();
-
+//builder.Services.AddScoped<IBrandRepositoryEF, BrandRepositoryEF>();
 // Cấu hình xác thực JWT: token hợp lệ mới được truy cập endpoint có [Authorize].
 var key = Encoding.ASCII.GetBytes(builder.Configuration["Jwt:SecretKey"] ?? "YourSecretKeyForAuthenticationShouldBeLongEnough");
 builder.Services.AddAuthentication(x =>

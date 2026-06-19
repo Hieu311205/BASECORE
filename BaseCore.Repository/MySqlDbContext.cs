@@ -29,7 +29,7 @@ namespace BaseCore.Repository
         public DbSet<PromotionProduct> PromotionProducts { get; set; }
         public DbSet<PromotionCategory> PromotionCategories { get; set; }
         public DbSet<AdminSetting> AdminSettings { get; set; }
-
+        //public DbSet<Brand> Brands { get; set; }
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);
@@ -263,23 +263,15 @@ namespace BaseCore.Repository
                 entity.Property(e => e.UpdatedAt).HasDefaultValueSql("GETDATE()");
                 entity.HasIndex(e => e.Scope).IsUnique();
             });
-            // Configure OrderDetail entity
-            //modelBuilder.Entity<OrderDetail>(entity =>
-            //{
-            //    entity.HasKey(e => e.Id);
-            //    entity.Property(e => e.UnitPrice).HasPrecision(18, 2);
-
-            //    // Relationships
-            //    entity.HasOne(e => e.Order)
-            //          .WithMany()
-            //          .HasForeignKey(e => e.OrderId)
-            //          .OnDelete(DeleteBehavior.Cascade);
-
-            //    entity.HasOne(e => e.Product)
-            //          .WithMany()
-            //          .HasForeignKey(e => e.ProductId)
-            //          .OnDelete(DeleteBehavior.Restrict);
-            //});
+//             modelBuilder.Entity<Brand>(entity =>
+//          {
+//              entity.HasKey(e => e.Id);
+//              entity.Property(e => e.Name).HasMaxLength(100).IsRequired();
+//              entity.Property(e => e.Description).HasMaxLength(500);
+//              entity.Property(e => e.IsActive).HasDefaultValue(true);
+//              entity.Property(e => e.CreatedAt).HasDefaultValueSql("GETDATE()");
+//              entity.Property(e => e.IsDeleted).HasDefaultValue(false);
+//          });
 
             // Seed dữ liệu mẫu để project có danh mục/sản phẩm ngay sau khi tạo database.
             SeedData(modelBuilder);
