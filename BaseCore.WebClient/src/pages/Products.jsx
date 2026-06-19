@@ -10,8 +10,10 @@ const Products = () => {
     const [keyword, setKeyword] = useState('');
     const [categoryId, setCategoryId] = useState('');
     const [statusFilter, setStatusFilter] = useState('all');
-    const [minPrice, setMinPrice] = useState('');
-    const [maxPrice, setMaxPrice] = useState('');
+    // Tạm comment chức năng tìm kiếm theo khoảng giá trong admin.
+    // Khi muốn bật lại, mở 2 state này và các đoạn minPrice/maxPrice bên dưới.
+    // const [minPrice, setMinPrice] = useState('');
+    // const [maxPrice, setMaxPrice] = useState('');
     const [page, setPage] = useState(1);
     const [pageSize] = useState(10);
     const [totalPages, setTotalPages] = useState(0);
@@ -40,7 +42,7 @@ const Products = () => {
 
     useEffect(() => {
         loadProducts();
-    }, [page, keyword, categoryId, statusFilter, minPrice, maxPrice]);
+    }, [page, keyword, categoryId, statusFilter]);
 
     const loadCategories = async () => {
         try {
@@ -73,8 +75,9 @@ const Products = () => {
                 keyword,
                 categoryId: categoryId || undefined,
                 isActive: statusParam,
-                minPrice: minPrice || undefined,
-                maxPrice: maxPrice || undefined,
+                // Tạm comment tìm kiếm theo khoảng giá:
+                // minPrice: minPrice || undefined,
+                // maxPrice: maxPrice || undefined,
                 page,
                 pageSize,
             });
@@ -88,16 +91,18 @@ const Products = () => {
         }
     };
 
-    const filteredProducts = products.filter((product) => {
-        const price = Number(product.price || 0);
-        const min = minPrice === '' ? null : Number(minPrice);
-        const max = maxPrice === '' ? null : Number(maxPrice);
-
-        if (min !== null && price < min) return false;
-        if (max !== null && price > max) return false;
-
-        return true;
-    });
+    // Tạm comment tìm kiếm theo khoảng giá ở frontend.
+    // const filteredProducts = products.filter((product) => {
+    //     const price = Number(product.price || 0);
+    //     const min = minPrice === '' ? null : Number(minPrice);
+    //     const max = maxPrice === '' ? null : Number(maxPrice);
+    //
+    //     if (min !== null && price < min) return false;
+    //     if (max !== null && price > max) return false;
+    //
+    //     return true;
+    // });
+    const filteredProducts = products;
 
     const handleSearch = (e) => {
         e.preventDefault();
@@ -159,6 +164,9 @@ const Products = () => {
                 stock: parseInt(formData.stock),
                 categoryId: parseInt(formData.categoryId),
                 supplierId: formData.supplierId ? parseInt(formData.supplierId) : null,
+                sku: String(formData.sku || '').trim() || null,
+                slug: String(formData.slug || '').trim() || null,
+                imageUrl: String(formData.imageUrl || '').trim(),
                 isActive: Boolean(formData.isActive),
             };
 
@@ -171,7 +179,11 @@ const Products = () => {
             closeModal();
             loadProducts();
         } catch (error) {
-            setError(error.response?.data?.message || 'Thao tác thất bại');
+            console.error('Không thể lưu sản phẩm:', error.response?.data || error);
+            const status = error.response?.status;
+            const serverMessage = error.response?.data?.message || error.response?.data?.title;
+            const statusMessage = status ? `HTTP ${status}` : 'Không có phản hồi từ API';
+            setError(`${statusMessage}: ${serverMessage || 'Không thể lưu sản phẩm. Kiểm tra quyền admin hoặc dữ liệu nhập.'}`);
         }
     };
 
@@ -298,6 +310,9 @@ const Products = () => {
                                             <option value="active">Đang hoạt động</option>
                                             <option value="inactive">Ngừng hoạt động</option>
                                         </select>
+                                        {/*
+                                        Tạm comment tìm kiếm theo khoảng giá trong admin.
+                                        Khi muốn bật lại, bỏ comment 2 input Giá từ/Giá đến này.
                                         <input
                                             type="number"
                                             className="form-control"
@@ -306,6 +321,7 @@ const Products = () => {
                                             min="0"
                                             value={minPrice}
                                             onChange={(e) => {
+                                                // Nhập mốc bắt đầu của khoảng giá, sau đó quay về trang 1.
                                                 setMinPrice(e.target.value);
                                                 setPage(1);
                                             }}
@@ -318,10 +334,12 @@ const Products = () => {
                                             min="0"
                                             value={maxPrice}
                                             onChange={(e) => {
+                                                // Nhập mốc kết thúc của khoảng giá, sau đó quay về trang 1.
                                                 setMaxPrice(e.target.value);
                                                 setPage(1);
                                             }}
                                         />
+                                        */}
                                         <button type="submit" className="btn btn-primary">
                                             <i className="fas fa-search"></i> Tìm kiếm
                                         </button>
@@ -527,6 +545,24 @@ const Products = () => {
                                             value={formData.imageUrl}
                                             onChange={(e) => setFormData({ ...formData, imageUrl: e.target.value })}
                                         />
+                                        <div className="mt-2 d-flex align-items-center">
+                                            <img
+                                                src={getProductImageSrc({ imageUrl: formData.imageUrl, name: formData.name })}
+                                                alt={formData.name || 'Ảnh sản phẩm'}
+                                                style={{
+                                                    width: '96px',
+                                                    height: '96px',
+                                                    objectFit: 'cover',
+                                                    borderRadius: '6px',
+                                                    border: '1px solid #dee2e6',
+                                                    backgroundColor: '#f8f9fa',
+                                                }}
+                                                onError={(e) => {
+                                                    e.currentTarget.onerror = null;
+                                                    e.currentTarget.src = getPlaceholderImage({ name: formData.name });
+                                                }}
+                                            />
+                                        </div>
                                     </div>
                                     <div className="form-group">
                                         <label>Mô tả</label>
@@ -549,6 +585,7 @@ const Products = () => {
                                         </select>
                                     </div>
                                 </div>
+                                {error && <div className="alert alert-danger mx-3 mb-0">{error}</div>}
                                 <div className="modal-footer">
                                     <button type="button" className="btn btn-secondary" onClick={closeModal}>
                                         Hủy

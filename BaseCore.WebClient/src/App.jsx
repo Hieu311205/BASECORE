@@ -12,7 +12,7 @@ import Categories from './pages/Categories';
 import Orders from './pages/Orders';
 import Inventory from './pages/Inventory';
 import Reports from './pages/Reports';
-import Suppliers from './pages/Suppliers'; // ✅ THÊM DÒNG NÀY
+import Suppliers from './pages/Suppliers'; // THÊM DÒNG NÀY
 import Discounts from './pages/Discounts';
 import Shipping from './pages/Shipping';
 import Payments from './pages/Payments';
@@ -89,7 +89,7 @@ function AppRoutes() {
                 }
             />
 
-            {/* SUPPLIERS ✅ FIX Ở ĐÂY */}
+            {/* SUPPLIERS FIX Ở ĐÂY */}
             <Route
                 path="/suppliers"
                 element={

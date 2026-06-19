@@ -27,6 +27,11 @@ namespace BaseCore.APIService.Controllers
             _supplierRepository = supplierRepository;
         }
 
+        private static string? NormalizeOptionalText(string? value)
+        {
+            return string.IsNullOrWhiteSpace(value) ? null : value.Trim();
+        }
+
         /// <summary>
         /// Get all products with pagination and search
         /// </summary>
@@ -96,8 +101,8 @@ namespace BaseCore.APIService.Controllers
                 Stock = dto.Stock,
                 CategoryId = dto.CategoryId,
                 SupplierId = dto.SupplierId,
-                Sku = dto.Sku,
-                Slug = dto.Slug,
+                Sku = NormalizeOptionalText(dto.Sku),
+                Slug = NormalizeOptionalText(dto.Slug),
                 Description = dto.Description,
                 ImageUrl = dto.ImageUrl ?? "",
                 IsActive = dto.IsActive ?? true,
@@ -125,8 +130,8 @@ namespace BaseCore.APIService.Controllers
             product.Stock = dto.Stock ?? product.Stock;
             product.CategoryId = dto.CategoryId ?? product.CategoryId;
             product.SupplierId = dto.SupplierId ?? product.SupplierId;
-            product.Sku = dto.Sku ?? product.Sku;
-            product.Slug = dto.Slug ?? product.Slug;
+            product.Sku = dto.Sku == null ? product.Sku : NormalizeOptionalText(dto.Sku);
+            product.Slug = dto.Slug == null ? product.Slug : NormalizeOptionalText(dto.Slug);
             product.Description = dto.Description ?? product.Description;
             product.ImageUrl = dto.ImageUrl ?? product.ImageUrl;
             product.IsActive = dto.IsActive ?? product.IsActive;

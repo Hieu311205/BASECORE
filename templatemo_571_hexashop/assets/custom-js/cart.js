@@ -93,6 +93,7 @@
     function getDisplayImageUrl(imageUrl) {
         if (!imageUrl) return DEFAULT_IMAGE;
         if (String(imageUrl).startsWith("http")) return imageUrl;
+        if (String(imageUrl).startsWith("/assets/")) return String(imageUrl).slice(1);
         if (String(imageUrl).startsWith("assets/")) return imageUrl;
         return `assets/images/${imageUrl}`;
     }

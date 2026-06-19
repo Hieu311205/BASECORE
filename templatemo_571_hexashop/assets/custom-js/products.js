@@ -9,6 +9,7 @@ function getImageUrl(imageUrl) {
     // Dùng ảnh mặc định nếu API không trả ảnh; URL tuyệt đối và assets local được giữ nguyên.
     if (!imageUrl) return "assets/images/default.jpg";
     if (imageUrl.startsWith("http")) return imageUrl;
+    if (imageUrl.startsWith("/assets/")) return imageUrl.slice(1);
     if (imageUrl.startsWith("assets/")) return imageUrl;
     return "assets/images/" + imageUrl;
 }
