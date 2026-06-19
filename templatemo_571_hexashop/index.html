@@ -11,6 +11,7 @@
     <link href="assets/css/owl-carousel.css" rel="stylesheet">
     <link href="assets/css/lightbox.css" rel="stylesheet">
     <link href="assets/css/perfume-luxury-v2.css" rel="stylesheet">
+    <link href="assets/css/perfume-pro.css" rel="stylesheet">
 
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -46,28 +47,36 @@
             border-radius: 8px;
             min-width: 180px;
             padding: 10px 0;
+            margin-top: 8px;
             z-index: 1000;
             list-style: none;
             display: none;
         }
+        /* Bridge gap: giữ hover state khi chuột di chuyển từ toggle xuống menu */
+        .dropdown::after {
+            content: '';
+            position: absolute;
+            top: 100%;
+            left: 0;
+            right: 0;
+            height: 8px;
+            z-index: 999;
+        }
         .dropdown:hover .dropdown-menu,
-.dropdown-menu.show {
-    display: block;
-}
-        /* .dropdown-menu.show {
+        .dropdown-menu.show {
             display: block;
-        } */
+        }
         .dropdown-menu li a {
             display: block;
             padding: 8px 20px;
-            color: #fff;
+            color: #fff !important;
             transition: 0.3s;
             text-decoration: none;
             cursor: pointer;
         }
         .dropdown-menu li a:hover {
-            background: #d4af37;
-            color: #000;
+            background: #d4af37 !important;
+            color: #000 !important;
         }
         .dropdown-toggle i {
             margin-left: 5px;
@@ -116,7 +125,7 @@
                     <ul class="nav">
                         <li><a class="active" href="index.html">Trang chủ</a></li>
                         <li class="dropdown">
-                            <a href="javascript:void(0)" class="dropdown-toggle">Sản phẩm <i class="fa fa-angle-down"></i></a>
+                            <a href="products.html" class="dropdown-toggle">Sản phẩm <i class="fa fa-angle-down"></i></a>
                             <ul class="dropdown-menu">
                                 <li><a class="filter-cat-link" data-category-id="8">Nước hoa nam</a></li>
                                 <li><a class="filter-cat-link" data-category-id="9">Nước hoa nữ</a></li>
@@ -273,19 +282,57 @@
 <footer class="footer">
     <div class="container">
         <div class="row">
-            <div class="col-lg-4">
+            <div class="col-lg-4 mb-4">
                 <div class="first-item">
-                    <div class="logo"><span class="logo-text">LUMIÈRE <em>PERFUME</em></span></div>
-                    <ul><li><a href="#">Hà Nội, Việt Nam</a></li><li><a href="#">lumiereperfume@gmail.com</a></li><li><a href="#">0123 456 789</a></li></ul>
+                    <div class="logo" style="margin-bottom:18px;"><span class="logo-text">LUMIÈRE <em>PERFUME</em></span></div>
+                    <p style="font-size:13px;color:#5a5452;line-height:1.9;margin-bottom:16px;">Thương hiệu nước hoa cao cấp với sứ mệnh mang lại những trải nghiệm hương thơm đẳng cấp.</p>
+                    <ul>
+                        <li><a href="#"><i class="fa fa-map-marker" style="width:16px;color:rgba(212,175,55,0.5)"></i> Hà Nội, Việt Nam</a></li>
+                        <li><a href="#"><i class="fa fa-envelope-o" style="width:16px;color:rgba(212,175,55,0.5)"></i> lumiereperfume@gmail.com</a></li>
+                        <li><a href="#"><i class="fa fa-phone" style="width:16px;color:rgba(212,175,55,0.5)"></i> 0123 456 789</a></li>
+                    </ul>
+                    <div class="footer-social">
+                        <a href="#" title="Facebook"><i class="fa fa-facebook"></i></a>
+                        <a href="#" title="Instagram"><i class="fa fa-instagram"></i></a>
+                        <a href="#" title="YouTube"><i class="fa fa-youtube-play"></i></a>
+                        <a href="#" title="TikTok"><i class="fa fa-music"></i></a>
+                    </div>
                 </div>
             </div>
-            <div class="col-lg-2"><h4>Danh mục</h4><ul><li><a href="products.html?categoryId=8">Nước hoa nam</a></li><li><a href="products.html?categoryId=9">Nước hoa nữ</a></li><li><a href="products.html?categoryId=10">Unisex</a></li><li><a href="products.html?categoryId=11">Gift set</a></li></ul></div>
-            <div class="col-lg-2"><h4>Hỗ trợ</h4><ul><li><a href="about.html">Về chúng tôi</a></li><li><a href="contact.html">Liên hệ</a></li><li><a href="products.html">Sản phẩm</a></li><li><a href="single-product.html">Chi tiết</a></li></ul></div>
-            <div class="col-lg-4"><h4>Về Lumière</h4><p>Lumière Perfume mang đến các dòng nước hoa chính hãng với phong cách sang trọng, tinh tế và dịch vụ chăm sóc khách hàng tận tâm.</p></div>
-            <div class="col-lg-12"><div class="under-footer"><p>© 2026 Lumière Perfume. All Rights Reserved.</p></div></div>
+            <div class="col-lg-2 mb-4">
+                <h4>Danh mục</h4>
+                <ul>
+                    <li><a href="products.html?categoryId=8">Nước hoa nam</a></li>
+                    <li><a href="products.html?categoryId=9">Nước hoa nữ</a></li>
+                    <li><a href="products.html?categoryId=10">Unisex</a></li>
+                    <li><a href="products.html?categoryId=11">Gift set</a></li>
+                </ul>
+            </div>
+            <div class="col-lg-2 mb-4">
+                <h4>Hỗ trợ</h4>
+                <ul>
+                    <li><a href="about.html">Về chúng tôi</a></li>
+                    <li><a href="contact.html">Liên hệ</a></li>
+                    <li><a href="cart.html">Giỏ hàng</a></li>
+                    <li><a href="login.html">Đăng nhập</a></li>
+                </ul>
+            </div>
+            <div class="col-lg-4 mb-4">
+                <h4>Về Lumière</h4>
+                <p style="font-size:13px;color:#5a5452;line-height:1.9;margin-bottom:16px;">Lumière Perfume mang đến các dòng nước hoa chính hãng với phong cách sang trọng, tinh tế và dịch vụ chăm sóc khách hàng tận tâm.</p>
+                <p style="font-size:12px;color:#3a3836;border-top:1px solid rgba(212,175,55,0.08);padding-top:14px;line-height:1.8;">Giao hàng toàn quốc &nbsp;·&nbsp; Đổi trả 30 ngày &nbsp;·&nbsp; Hàng chính hãng 100%</p>
+            </div>
+            <div class="col-lg-12">
+                <div class="under-footer">
+                    <p>© 2026 Lumière Perfume. All Rights Reserved.</p>
+                    <p style="color:#3a3836 !important;">Thiết kế bởi Lumière Team</p>
+                </div>
+            </div>
         </div>
     </div>
 </footer>
+
+<button id="scroll-top" aria-label="Lên đầu trang"><i class="fa fa-chevron-up"></i></button>
 
 <script src="assets/js/jquery-2.1.0.min.js"></script>
 <script src="assets/js/bootstrap.min.js"></script>
@@ -300,35 +347,25 @@
 <script src="assets/custom-js/products.js"></script>
 
 <script>
-    // Xử lý dropdown toggle khi click
-   document.addEventListener('DOMContentLoaded', function() {
-    // Dropdown toggle
-    const dropdownToggle = document.querySelector('.dropdown-toggle');
-    const dropdownMenu = document.querySelector('.dropdown-menu');
-    if (dropdownToggle && dropdownMenu) {
-        dropdownToggle.addEventListener('click', function(e) {
-            e.preventDefault();
-            e.stopPropagation();
-            dropdownMenu.classList.toggle('show');
+    // Scroll to top
+    (function() {
+        const btn = document.getElementById('scroll-top');
+        if (!btn) return;
+        window.addEventListener('scroll', function() {
+            btn.classList.toggle('show', window.scrollY > 450);
         });
-        document.addEventListener('click', function(e) {
-            if (!dropdownToggle.contains(e.target) && !dropdownMenu.contains(e.target)) {
-                dropdownMenu.classList.remove('show');
-            }
+        btn.addEventListener('click', function() {
+            window.scrollTo({ top: 0, behavior: 'smooth' });
         });
-    }
+    })();
 
-    // Xử lý click vào các danh mục: chuyển hướng sang products.html với categoryId
-    const filterLinks = document.querySelectorAll('.filter-cat-link');
-    filterLinks.forEach(link => {
+    document.addEventListener('DOMContentLoaded', function() {
+    // Chuyển hướng danh mục từ dropdown
+    document.querySelectorAll('.filter-cat-link').forEach(function(link) {
         link.addEventListener('click', function(e) {
             e.preventDefault();
-            const catId = this.getAttribute('data-category-id');
-            if (catId) {
-                window.location.href = `products.html?categoryId=${catId}`;
-            } else {
-                window.location.href = 'products.html';
-            }
+            var catId = this.getAttribute('data-category-id');
+            window.location.href = catId ? 'products.html?categoryId=' + catId : 'products.html';
         });
     });
 });

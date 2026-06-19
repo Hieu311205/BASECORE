@@ -11,7 +11,7 @@ async function loadProductDetail() {
 
     let product = null;
     try {
-        const response = await fetch(`http://localhost:5000/api/products/${id}`);
+        const response = await fetch(`${window.API_BASE_URL || "http://localhost:5000/api"}/products/${id}`);
         if (response.ok) {
             product = await response.json();
         } else {

@@ -334,19 +334,32 @@
         window.location.href = "checkout.html";
     }
 
-    async function placeOrder(shippingAddress) {
+    // placeOrder nhận object đầy đủ thông tin đơn (hoặc chuỗi địa chỉ - tương thích ngược).
+    // Trả về { success, order, message } để bên gọi tự hiển thị UI xác nhận.
+    async function placeOrder(orderInfo) {
         const cart = getCart();
 
         if (cart.length === 0) {
-            alert("Giỏ hàng đang trống.");
-            return false;
+            return { success: false, message: "Giỏ hàng đang trống." };
         }
 
-        if (!shippingAddress || !shippingAddress.trim()) return;
+        // Tương thích ngược: nếu truyền vào là chuỗi thì coi như shippingAddress.
+        const info = typeof orderInfo === "string"
+            ? { shippingAddress: orderInfo }
+            : (orderInfo || {});
+
+        const shippingAddress = String(info.shippingAddress || "").trim();
+        if (!shippingAddress) {
+            return { success: false, message: "Vui lòng nhập địa chỉ giao hàng." };
+        }
 
         const orderData = {
             userId: getCheckoutUserId(),
-            shippingAddress: shippingAddress.trim(),
+            shippingAddress,
+            recipientName: info.recipientName || null,
+            recipientPhone: info.recipientPhone || null,
+            paymentMethod: info.paymentMethod || "COD",
+            paymentStatus: info.paymentStatus || "Unpaid",
             items: cart.map(item => ({
                 productId: item.id,
                 quantity: item.quantity
@@ -356,36 +369,41 @@
         try {
             const response = await fetch(ORDER_API_URL, {
                 method: "POST",
-                headers: {
-                    "Content-Type": "application/json"
-                },
+                headers: { "Content-Type": "application/json" },
                 body: JSON.stringify(orderData)
             });
 
             if (response.status === 401) {
-                alert("API đặt hàng vẫn đang yêu cầu đăng nhập. Hãy chạy lại backend sau khi cập nhật OrdersController.");
-                return;
+                return { success: false, message: "Máy chủ yêu cầu đăng nhập. Vui lòng khởi động lại backend (APIService) sau khi cập nhật." };
             }
 
             if (!response.ok) {
-                alert(await getErrorMessage(response));
-                return;
+                return { success: false, message: await getErrorMessage(response) };
             }
 
+            const result = await response.json().catch(() => null);
             clearCart();
-            alert("Đặt hàng thành công!");
-            window.location.href = "index.html";
-            return true;
+            return {
+                success: true,
+                order: result && result.data ? result.data.order : null,
+                message: "Đặt hàng thành công!"
+            };
         } catch (error) {
             console.error("Checkout failed:", error);
-            alert("Không thể kết nối server thanh toán.");
-            return false;
+            return { success: false, message: "Không thể kết nối server thanh toán." };
         }
     }
 
     async function checkout() {
         const shippingAddress = prompt("Nhập địa chỉ giao hàng:", "Khách mua online");
-        return await placeOrder(shippingAddress);
+        const result = await placeOrder(shippingAddress);
+        if (result.success) {
+            alert(result.message);
+            window.location.href = "index.html";
+        } else if (result.message) {
+            alert(result.message);
+        }
+        return result.success;
     }
 
     window.getCart = getCart;
@@ -399,6 +417,7 @@
     window.getCartTotal = getCartTotal;
     window.placeOrder = placeOrder;
     window.checkout = checkout;
+    window.getCheckoutUserId = getCheckoutUserId;
 
     document.addEventListener("DOMContentLoaded", function () {
         updateCartCount();

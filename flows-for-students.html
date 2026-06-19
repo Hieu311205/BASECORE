@@ -1,0 +1,1021 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>BaseCore — Giải thích luồng cho sinh viên</title>
+<style>
+  :root {
+    --blue: #1d4ed8; --blue-bg: #eff6ff; --blue-border: #bfdbfe;
+    --green: #15803d; --green-bg: #f0fdf4; --green-border: #bbf7d0;
+    --orange: #b45309; --orange-bg: #fffbeb; --orange-border: #fde68a;
+    --red: #b91c1c; --red-bg: #fff1f2; --red-border: #fecdd3;
+    --purple: #7c3aed; --purple-bg: #f5f3ff; --purple-border: #ddd6fe;
+    --gray: #374151; --light: #f9fafb; --border: #e5e7eb;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: #f3f4f6; color: #1f2937; line-height: 1.7; }
+
+  /* HERO */
+  .hero { background: linear-gradient(135deg,#0f172a 0%,#1d4ed8 70%,#7c3aed 100%); color: #fff; padding: 52px 24px 44px; text-align: center; }
+  .hero-tag { display: inline-block; background: rgba(255,255,255,.15); border: 1px solid rgba(255,255,255,.3); padding: 4px 16px; border-radius: 20px; font-size: 11px; letter-spacing: 2px; text-transform: uppercase; margin-bottom: 18px; }
+  .hero h1 { font-size: clamp(22px,4vw,40px); font-weight: 900; margin-bottom: 10px; }
+  .hero p { opacity: .8; max-width: 560px; margin: 0 auto; font-size: 15px; }
+
+  /* LAYOUT */
+  .wrap { max-width: 960px; margin: 0 auto; padding: 36px 16px 72px; }
+
+  /* CHAPTER */
+  .chapter { margin-bottom: 56px; }
+  .chapter-num { font-size: 11px; font-weight: 700; letter-spacing: 2px; text-transform: uppercase; color: #9ca3af; margin-bottom: 6px; }
+  .chapter-title { font-size: 22px; font-weight: 800; color: #111827; margin-bottom: 6px; }
+  .chapter-sub { font-size: 14px; color: #6b7280; margin-bottom: 24px; }
+
+  /* ANALOGY BOX */
+  .analogy { background: #fefce8; border: 1px solid #fde68a; border-left: 4px solid #f59e0b; border-radius: 10px; padding: 16px 20px; margin-bottom: 24px; }
+  .analogy-label { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; color: #b45309; margin-bottom: 6px; }
+  .analogy p { font-size: 14px; color: #78350f; }
+
+  /* CONCEPT CARDS */
+  .concepts { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px,1fr)); gap: 12px; margin-bottom: 24px; }
+  .concept { background: #fff; border: 1px solid var(--border); border-radius: 10px; padding: 16px; }
+  .concept-icon { font-size: 24px; margin-bottom: 8px; }
+  .concept h4 { font-size: 13px; font-weight: 700; margin-bottom: 4px; }
+  .concept p { font-size: 12px; color: #6b7280; }
+  .concept .port { font-size: 11px; font-weight: 600; padding: 2px 8px; border-radius: 10px; display: inline-block; margin-bottom: 6px; }
+  .pb { background: var(--blue-bg); color: var(--blue); }
+  .pg { background: var(--green-bg); color: var(--green); }
+  .po { background: var(--orange-bg); color: var(--orange); }
+  .pp { background: var(--purple-bg); color: var(--purple); }
+
+  /* FLOW STEPS — vertical numbered */
+  .flow-card { background: #fff; border: 1px solid var(--border); border-radius: 12px; overflow: hidden; margin-bottom: 16px; }
+  .flow-header { padding: 14px 20px; font-weight: 700; font-size: 15px; display: flex; align-items: center; gap: 10px; }
+  .flow-header.blue { background: var(--blue-bg); border-bottom: 1px solid var(--blue-border); color: var(--blue); }
+  .flow-header.green { background: var(--green-bg); border-bottom: 1px solid var(--green-border); color: var(--green); }
+  .flow-header.orange { background: var(--orange-bg); border-bottom: 1px solid var(--orange-border); color: var(--orange); }
+  .flow-header.purple { background: var(--purple-bg); border-bottom: 1px solid var(--purple-border); color: var(--purple); }
+  .flow-header.red { background: var(--red-bg); border-bottom: 1px solid var(--red-border); color: var(--red); }
+  .flow-body { padding: 20px; }
+  .step-row { display: flex; gap: 16px; margin-bottom: 4px; }
+  .step-row:last-child { margin-bottom: 0; }
+  .step-left { display: flex; flex-direction: column; align-items: center; }
+  .step-num { width: 28px; height: 28px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: 800; flex-shrink: 0; }
+  .sn-blue { background: var(--blue); color: #fff; }
+  .sn-green { background: var(--green); color: #fff; }
+  .sn-orange { background: var(--orange); color: #fff; }
+  .sn-purple { background: var(--purple); color: #fff; }
+  .sn-red { background: var(--red); color: #fff; }
+  .sn-gray { background: #6b7280; color: #fff; }
+  .step-line { width: 2px; background: #e5e7eb; flex: 1; min-height: 24px; margin: 4px 0; }
+  .step-content { padding-bottom: 20px; flex: 1; }
+  .step-row:last-child .step-content { padding-bottom: 0; }
+  .step-title { font-weight: 700; font-size: 14px; color: #111827; margin-bottom: 4px; }
+  .step-desc { font-size: 13px; color: #6b7280; line-height: 1.6; }
+  .step-code { background: #1e293b; color: #e2e8f0; border-radius: 8px; padding: 12px 16px; font-family: 'Consolas', monospace; font-size: 12px; margin-top: 8px; line-height: 1.7; overflow-x: auto; }
+  .step-code .c { color: #94a3b8; }
+  .step-code .k { color: #93c5fd; }
+  .step-code .s { color: #86efac; }
+  .step-code .v { color: #fde68a; }
+  .step-note { background: var(--blue-bg); border-left: 3px solid var(--blue); padding: 8px 12px; border-radius: 0 6px 6px 0; font-size: 12px; color: var(--blue); margin-top: 8px; }
+  .step-warn { background: var(--red-bg); border-left: 3px solid var(--red); padding: 8px 12px; border-radius: 0 6px 6px 0; font-size: 12px; color: var(--red); margin-top: 8px; }
+  .step-ok { background: var(--green-bg); border-left: 3px solid var(--green); padding: 8px 12px; border-radius: 0 6px 6px 0; font-size: 12px; color: var(--green); margin-top: 8px; }
+
+  /* MINI DIAGRAM */
+  .mini-diagram { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; padding: 16px; background: var(--light); border-radius: 8px; margin-bottom: 16px; }
+  .mbox { border: 2px solid; border-radius: 8px; padding: 8px 14px; font-size: 12px; font-weight: 700; text-align: center; min-width: 90px; }
+  .mbox.blue { border-color: var(--blue); background: var(--blue-bg); color: var(--blue); }
+  .mbox.green { border-color: var(--green); background: var(--green-bg); color: var(--green); }
+  .mbox.orange { border-color: var(--orange); background: var(--orange-bg); color: var(--orange); }
+  .mbox.purple { border-color: var(--purple); background: var(--purple-bg); color: var(--purple); }
+  .mbox.gray { border-color: #9ca3af; background: #f3f4f6; color: #374151; }
+  .mbox.red { border-color: var(--red); background: var(--red-bg); color: var(--red); }
+  .marr { color: #9ca3af; font-size: 20px; }
+  .marr-label { font-size: 10px; color: #9ca3af; text-align: center; }
+  .marr-col { display: flex; flex-direction: column; align-items: center; }
+
+  /* COMPARE TABLE */
+  table { width: 100%; border-collapse: collapse; font-size: 13px; background: #fff; border-radius: 10px; overflow: hidden; border: 1px solid var(--border); }
+  th { background: #1e3a5f; color: #fff; padding: 12px 16px; text-align: left; font-size: 12px; }
+  td { padding: 11px 16px; border-bottom: 1px solid var(--border); }
+  tr:last-child td { border: none; }
+  tr:hover td { background: var(--light); }
+
+  /* KEY INSIGHT */
+  .insight { background: linear-gradient(135deg, #1e3a5f, #1d4ed8); color: #fff; border-radius: 12px; padding: 20px 24px; margin-bottom: 16px; }
+  .insight-label { font-size: 11px; font-weight: 700; letter-spacing: 2px; text-transform: uppercase; opacity: .7; margin-bottom: 6px; }
+  .insight h4 { font-size: 16px; font-weight: 800; margin-bottom: 8px; }
+  .insight p { font-size: 13px; opacity: .85; }
+
+  /* TWO COL */
+  .two { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+  @media (max-width: 640px) { .two { grid-template-columns: 1fr; } }
+
+  /* TAG */
+  .tag { display: inline-block; padding: 2px 8px; border-radius: 10px; font-size: 11px; font-weight: 700; }
+  .tg { background: var(--green-bg); color: var(--green); }
+  .tr { background: var(--red-bg); color: var(--red); }
+  .tb { background: var(--blue-bg); color: var(--blue); }
+  .to { background: var(--orange-bg); color: var(--orange); }
+
+  /* SUMMARY STAT */
+  .stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(120px,1fr)); gap: 12px; margin-bottom: 40px; }
+  .stat { background: #fff; border: 1px solid var(--border); border-radius: 10px; padding: 16px; text-align: center; }
+  .stat-num { font-size: 28px; font-weight: 900; color: var(--blue); }
+  .stat-label { font-size: 11px; color: #9ca3af; margin-top: 2px; }
+
+  code { font-family: 'Consolas','Monaco',monospace; background: #f3f4f6; padding: 2px 6px; border-radius: 4px; font-size: 12px; color: #b91c1c; }
+
+  hr.divider { border: none; border-top: 2px dashed #e5e7eb; margin: 40px 0; }
+</style>
+</head>
+<body>
+
+<div class="hero">
+  <div class="hero-tag">Tài liệu dành cho sinh viên</div>
+  <h1>BaseCore — Đọc hiểu luồng hệ thống</h1>
+  <p>Giải thích từng bước từ khi người dùng click nút đến khi dữ liệu trả về màn hình</p>
+</div>
+
+<div class="wrap">
+
+  <!-- THỐNG KÊ -->
+  <div class="stats">
+    <div class="stat"><div class="stat-num">6</div><div class="stat-label">Services chạy</div></div>
+    <div class="stat"><div class="stat-num">3</div><div class="stat-label">Cách đăng nhập</div></div>
+    <div class="stat"><div class="stat-num">JWT</div><div class="stat-label">Xác thực token</div></div>
+    <div class="stat"><div class="stat-num">SQL</div><div class="stat-label">Transaction an toàn</div></div>
+    <div class="stat"><div class="stat-num">RBAC</div><div class="stat-label">Phân quyền role</div></div>
+    <div class="stat"><div class="stat-num">SPA</div><div class="stat-label">React frontend</div></div>
+  </div>
+
+  <!-- ======= LUỒNG 0: HỆ THỐNG TỔNG QUAN ======= -->
+  <div class="chapter">
+    <div class="chapter-num">Luồng 0</div>
+    <div class="chapter-title">Hệ thống trông như thế nào?</div>
+    <div class="chapter-sub">Trước khi đi vào chi tiết, cần hiểu các mảnh ghép lại với nhau ra sao</div>
+
+    <div class="analogy">
+      <div class="analogy-label">Ví dụ thực tế</div>
+      <p>Hãy tưởng tượng <strong>một tòa nhà thương mại</strong>. Bạn (khách hàng) không được vào thẳng từng phòng — bạn phải qua <strong>quầy lễ tân (API Gateway)</strong>. Lễ tân sẽ hỏi bạn cần gặp ai rồi dẫn bạn đến đúng phòng: phòng bảo vệ (AuthService), phòng kho hàng (APIService), hay phòng kiểm soát (AuditLog).</p>
+    </div>
+
+    <div class="mini-diagram" style="justify-content:center;">
+      <div class="mbox gray">🖥️ Trình duyệt<br><small>React / HTML</small></div>
+      <div class="marr-col"><div class="marr">→</div><div class="marr-label">HTTP Request</div></div>
+      <div class="mbox blue">🔀 Gateway<br><small>:5000</small></div>
+      <div class="marr-col"><div class="marr">→</div><div class="marr-label">Route tới</div></div>
+      <div style="display:flex;flex-direction:column;gap:8px;">
+        <div class="mbox orange">🔐 Auth<br><small>:5002</small></div>
+        <div class="mbox green">📦 API<br><small>:5001</small></div>
+        <div class="mbox purple">📋 Log<br><small>:5004</small></div>
+      </div>
+      <div class="marr-col"><div class="marr">→</div><div class="marr-label">Truy vấn</div></div>
+      <div class="mbox gray">🗄️ SQL Server<br><small>Database</small></div>
+    </div>
+
+    <div class="concepts">
+      <div class="concept">
+        <div class="concept-icon">🔀</div>
+        <div class="port pb">:5000</div>
+        <h4>API Gateway</h4>
+        <p>Người gác cổng. Nhận tất cả request, kiểm tra, rồi chuyển đến đúng service.</p>
+      </div>
+      <div class="concept">
+        <div class="concept-icon">🔐</div>
+        <div class="port po">:5002</div>
+        <h4>AuthService</h4>
+        <p>Chuyên về đăng nhập, đăng ký, cấp thẻ JWT, xác minh Google, gửi OTP.</p>
+      </div>
+      <div class="concept">
+        <div class="concept-icon">📦</div>
+        <div class="port pg">:5001</div>
+        <h4>APIService</h4>
+        <p>Xử lý mọi nghiệp vụ: sản phẩm, đơn hàng, danh mục, nhà cung cấp.</p>
+      </div>
+      <div class="concept">
+        <div class="concept-icon">📋</div>
+        <div class="port pp">:5004</div>
+        <h4>AuditLog</h4>
+        <p>Camera giám sát — ghi lại lỗi và hoạt động bất thường trong hệ thống.</p>
+      </div>
+    </div>
+
+    <div class="insight">
+      <div class="insight-label">Tại sao chia nhỏ ra vậy?</div>
+      <h4>Kiến trúc Microservices</h4>
+      <p>Nếu AuthService bị lỗi, APIService vẫn chạy bình thường. Mỗi service có thể nâng cấp, deploy, scale độc lập mà không ảnh hưởng nhau. Đây là xu hướng của các hệ thống lớn hiện đại (Netflix, Amazon...).</p>
+    </div>
+  </div>
+
+  <hr class="divider">
+
+  <!-- ======= LUỒNG 1: ĐĂNG NHẬP ======= -->
+  <div class="chapter">
+    <div class="chapter-num">Luồng 1</div>
+    <div class="chapter-title">Đăng nhập bằng Username + Password</div>
+    <div class="chapter-sub">Luồng phổ biến nhất — xảy ra mỗi khi user gõ tài khoản mật khẩu và nhấn "Đăng nhập"</div>
+
+    <div class="analogy">
+      <div class="analogy-label">Ví dụ thực tế</div>
+      <p>Giống như bạn rút tiền ATM: bạn cắm thẻ (username), nhập PIN (password), máy ATM kiểm tra thẻ thật không, PIN đúng không, rồi mới cho bạn rút tiền. Hệ thống này làm tương tự nhưng thay vì thẻ ATM là <strong>JWT Token</strong> — một chuỗi ký tự mà bạn mang theo mỗi lần gọi API.</p>
+    </div>
+
+    <div class="flow-card">
+      <div class="flow-header blue">📋 Từng bước chi tiết — Đăng nhập thường</div>
+      <div class="flow-body">
+
+        <div class="step-row">
+          <div class="step-left"><div class="step-num sn-blue">1</div><div class="step-line"></div></div>
+          <div class="step-content">
+            <div class="step-title">User nhập username + password và nhấn "Đăng nhập"</div>
+            <div class="step-desc">Trình duyệt chuẩn bị một request POST. Dữ liệu được gửi dưới dạng JSON trong phần body.</div>
+            <div class="step-code"><span class="c">// Dữ liệu gửi đi (request body)</span>
+POST <span class="s">/api/auth/login</span>
+{
+  <span class="v">"username"</span>: <span class="s">"nguyenvan"</span>,
+  <span class="v">"password"</span>: <span class="s">"Abc@1234"</span>
+}</div>
+          </div>
+        </div>
+
+        <div class="step-row">
+          <div class="step-left"><div class="step-num sn-blue">2</div><div class="step-line"></div></div>
+          <div class="step-content">
+            <div class="step-title">API Gateway nhận request, kiểm tra route</div>
+            <div class="step-desc">Gateway đọc file <code>ocelot.json</code>, thấy <code>/api/auth/login</code> → chuyển tiếp sang AuthService ở port 5002.</div>
+            <div class="step-note">💡 <strong>Tại sao cần Gateway?</strong> Client chỉ cần biết 1 địa chỉ duy nhất (<code>localhost:5000</code>), không cần biết Auth đang chạy ở đâu.</div>
+          </div>
+        </div>
+
+        <div class="step-row">
+          <div class="step-left"><div class="step-num sn-blue">3</div><div class="step-line"></div></div>
+          <div class="step-content">
+            <div class="step-title">AuthService tìm user trong database</div>
+            <div class="step-desc">Truy vấn SQL: <em>"tìm user có username = 'nguyenvan'"</em>. Nếu không có → trả lỗi 401 ngay.</div>
+            <div class="step-code"><span class="c">// EF Core query</span>
+<span class="k">var</span> user = <span class="k">await</span> _userRepo.GetByUsernameAsync(<span class="s">"nguyenvan"</span>);
+<span class="k">if</span> (user == <span class="k">null</span>) <span class="k">return</span> Unauthorized(<span class="s">"Sai tài khoản"</span>);</div>
+          </div>
+        </div>
+
+        <div class="step-row">
+          <div class="step-left"><div class="step-num sn-blue">4</div><div class="step-line"></div></div>
+          <div class="step-content">
+            <div class="step-title">Kiểm tra mật khẩu — PBKDF2 Hashing</div>
+            <div class="step-desc">Đây là bước quan trọng nhất về bảo mật. Database không lưu mật khẩu gốc mà lưu bản mã hóa.</div>
+            <div class="step-code"><span class="c">// Bước 1: Lấy salt từ database</span>
+<span class="k">byte</span>[] salt = user.Salt;  <span class="c">// random bytes lúc đăng ký</span>
+
+<span class="c">// Bước 2: Hash mật khẩu user vừa nhập với salt đó</span>
+<span class="k">string</span> inputHash = HashPassword(<span class="s">"Abc@1234"</span>, salt);
+
+<span class="c">// Bước 3: So sánh với hash lưu trong DB</span>
+<span class="k">if</span> (inputHash != user.Password)
+    <span class="k">return</span> Unauthorized(<span class="s">"Sai mật khẩu"</span>);</div>
+            <div class="step-note">💡 <strong>Tại sao không lưu mật khẩu thẳng?</strong> Nếu hacker lấy được database, họ chỉ thấy chuỗi hash vô nghĩa, không biết mật khẩu thật. PBKDF2 với 100.000 vòng lặp khiến brute-force cực kỳ tốn thời gian.</div>
+          </div>
+        </div>
+
+        <div class="step-row">
+          <div class="step-left"><div class="step-num sn-blue">5</div><div class="step-line"></div></div>
+          <div class="step-content">
+            <div class="step-title">Tạo JWT Token — "Thẻ ra vào"</div>
+            <div class="step-desc">Mật khẩu đúng → tạo token chứa thông tin user, ký bằng khóa bí mật, có hạn sử dụng 480 phút (8 tiếng).</div>
+            <div class="step-code"><span class="c">// Token chứa 3 thông tin (claims)</span>
+{
+  <span class="v">"Name"</span>:           <span class="s">"nguyenvan"</span>,   <span class="c">// username</span>
+  <span class="v">"NameIdentifier"</span>: <span class="s">"42"</span>,          <span class="c">// userId trong DB</span>
+  <span class="v">"Role"</span>:           <span class="s">"Admin"</span>,       <span class="c">// quyền</span>
+  <span class="v">"exp"</span>:            <span class="s">1234567890</span>    <span class="c">// hết hạn lúc nào</span>
+}
+<span class="c">// Ký bằng: HMAC-SHA256 + SecretKey</span></div>
+          </div>
+        </div>
+
+        <div class="step-row">
+          <div class="step-left"><div class="step-num sn-blue">6</div><div class="step-line"></div></div>
+          <div class="step-content">
+            <div class="step-title">Trả token về cho frontend</div>
+            <div class="step-desc">Server gửi lại token + thông tin user.</div>
+            <div class="step-code">{
+  <span class="v">"token"</span>: <span class="s">"eyJhbGciOiJIUzI1NiJ9.eyJ..."</span>,
+  <span class="v">"userId"</span>: <span class="s">42</span>,
+  <span class="v">"username"</span>: <span class="s">"nguyenvan"</span>,
+  <span class="v">"role"</span>: <span class="s">"Admin"</span>
+}</div>
+          </div>
+        </div>
+
+        <div class="step-row">
+          <div class="step-left"><div class="step-num sn-blue">7</div></div>
+          <div class="step-content">
+            <div class="step-title">Frontend lưu token và chuyển trang</div>
+            <div class="step-desc">React lưu vào <code>localStorage</code>, cập nhật AuthContext, rồi chuyển sang <code>/admin</code> (nếu Admin) hoặc <code>/</code> (nếu User thường).</div>
+            <div class="step-code"><span class="c">// Lưu vào localStorage</span>
+localStorage.setItem(<span class="s">'token'</span>, response.token);
+localStorage.setItem(<span class="s">'user'</span>, JSON.stringify(user));
+
+<span class="c">// Chuyển trang</span>
+navigate(user.role === <span class="s">'Admin'</span> ? <span class="s">'/admin'</span> : <span class="s">'/'</span>);</div>
+            <div class="step-ok">✅ Đăng nhập thành công! Từ giờ mọi request sẽ gửi kèm token này.</div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+  <hr class="divider">
+
+  <!-- ======= LUỒNG 2: GOOGLE OAUTH ======= -->
+  <div class="chapter">
+    <div class="chapter-num">Luồng 2</div>
+    <div class="chapter-title">Đăng nhập bằng Google</div>
+    <div class="chapter-sub">OAuth 2.0 — Cho phép Google xác thực thay cho hệ thống</div>
+
+    <div class="analogy">
+      <div class="analogy-label">Ví dụ thực tế</div>
+      <p>Giống như thay vì bạn tự chứng minh "tôi là Nguyễn Văn A" với tòa nhà, bạn nhờ Google làm chứng: <em>"Tôi là Google, xác nhận người này có tài khoản Gmail hợp lệ"</em>. Tòa nhà tin Google, nên cho bạn vào.</p>
+    </div>
+
+    <div class="flow-card">
+      <div class="flow-header orange">📋 Từng bước chi tiết — Google OAuth</div>
+      <div class="flow-body">
+
+        <div class="step-row">
+          <div class="step-left"><div class="step-num sn-orange">1</div><div class="step-line"></div></div>
+          <div class="step-content">
+            <div class="step-title">User click nút "Đăng nhập với Google"</div>
+            <div class="step-desc">Google Sign-In SDK (chạy trong trình duyệt) hiện popup chọn tài khoản Gmail.</div>
+          </div>
+        </div>
+
+        <div class="step-row">
+          <div class="step-left"><div class="step-num sn-orange">2</div><div class="step-line"></div></div>
+          <div class="step-content">
+            <div class="step-title">Google cấp ID Token</div>
+            <div class="step-desc">Sau khi user chọn tài khoản, Google trả về một chuỗi <strong>ID Token</strong> — bằng chứng chứng minh "người này đang đăng nhập vào Gmail hợp lệ".</div>
+            <div class="step-note">💡 ID Token là JWT do Google ký — chứa email, tên, ảnh đại diện của user.</div>
+          </div>
+        </div>
+
+        <div class="step-row">
+          <div class="step-left"><div class="step-num sn-orange">3</div><div class="step-line"></div></div>
+          <div class="step-content">
+            <div class="step-title">Frontend gửi ID Token cho AuthService</div>
+            <div class="step-code">POST <span class="s">/api/auth/google</span>
+{
+  <span class="v">"idToken"</span>: <span class="s">"eyJhbGciOiJSUzI1NiJ9.eyJzdW..."</span>
+}</div>
+          </div>
+        </div>
+
+        <div class="step-row">
+          <div class="step-left"><div class="step-num sn-orange">4</div><div class="step-line"></div></div>
+          <div class="step-content">
+            <div class="step-title">AuthService xác minh token với Google</div>
+            <div class="step-desc">Server gọi API của Google để kiểm tra token có thật không (chống giả mạo).</div>
+            <div class="step-code"><span class="c">// Gọi Google để xác minh</span>
+GET https://oauth2.googleapis.com/tokeninfo
+    ?id_token=eyJhbGci...
+
+<span class="c">// Google trả về thông tin user</span>
+{
+  <span class="v">"sub"</span>: <span class="s">"1234567890"</span>,    <span class="c">// Google user ID (duy nhất)</span>
+  <span class="v">"email"</span>: <span class="s">"user@gmail.com"</span>,
+  <span class="v">"name"</span>: <span class="s">"Nguyen Van A"</span>,
+  <span class="v">"email_verified"</span>: <span class="s">"true"</span>
+}</div>
+          </div>
+        </div>
+
+        <div class="step-row">
+          <div class="step-left"><div class="step-num sn-orange">5</div><div class="step-line"></div></div>
+          <div class="step-content">
+            <div class="step-title">Tìm hoặc tạo tài khoản trong hệ thống</div>
+            <div class="step-desc">AuthService kiểm tra database: user này đã từng đăng nhập Google chưa?</div>
+            <div class="step-code"><span class="c">// Tìm theo GoogleId trước</span>
+<span class="k">var</span> user = FindByGoogleId(<span class="s">"1234567890"</span>);
+
+<span class="c">// Nếu chưa có → tìm theo email</span>
+<span class="k">if</span> (user == <span class="k">null</span>) user = FindByEmail(<span class="s">"user@gmail.com"</span>);
+
+<span class="c">// Vẫn chưa có → tạo tài khoản mới tự động</span>
+<span class="k">if</span> (user == <span class="k">null</span>) {
+    user = CreateUser(username: <span class="s">"gg_user"</span>, googleId: <span class="s">"1234567890"</span>);
+}</div>
+            <div class="step-note">💡 Username tự động có dạng <code>gg_{email_prefix}</code>. User không cần đặt mật khẩu.</div>
+          </div>
+        </div>
+
+        <div class="step-row">
+          <div class="step-left"><div class="step-num sn-orange">6</div></div>
+          <div class="step-content">
+            <div class="step-title">Tạo JWT và trả về giống đăng nhập thường</div>
+            <div class="step-desc">Từ bước này trở đi giống hệt Luồng 1 bước 5–7. Token JWT được dùng cho mọi API tiếp theo.</div>
+            <div class="step-ok">✅ Tài khoản Google được liên kết. Lần sau đăng nhập cũng dùng Google, không cần nhớ mật khẩu.</div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+  <hr class="divider">
+
+  <!-- ======= LUỒNG 3: OTP ======= -->
+  <div class="chapter">
+    <div class="chapter-num">Luồng 3</div>
+    <div class="chapter-title">Xác minh OTP qua Email</div>
+    <div class="chapter-sub">One-Time Password — Mã dùng một lần gửi qua Gmail</div>
+
+    <div class="analogy">
+      <div class="analogy-label">Ví dụ thực tế</div>
+      <p>Giống như ngân hàng gửi SMS OTP khi bạn chuyển khoản. Mã chỉ có giá trị 5 phút, chỉ dùng được 1 lần. Hệ thống này gửi qua <strong>Gmail SMTP</strong> thay vì SMS.</p>
+    </div>
+
+    <div class="flow-card">
+      <div class="flow-header purple">📋 Từng bước chi tiết — OTP</div>
+      <div class="flow-body">
+
+        <div class="step-row">
+          <div class="step-left"><div class="step-num sn-purple">1</div><div class="step-line"></div></div>
+          <div class="step-content">
+            <div class="step-title">Frontend yêu cầu gửi OTP</div>
+            <div class="step-code">POST <span class="s">/api/auth/send-otp</span>
+{ <span class="v">"email"</span>: <span class="s">"user@gmail.com"</span> }</div>
+          </div>
+        </div>
+
+        <div class="step-row">
+          <div class="step-left"><div class="step-num sn-purple">2</div><div class="step-line"></div></div>
+          <div class="step-content">
+            <div class="step-title">Server tạo mã OTP ngẫu nhiên và lưu tạm</div>
+            <div class="step-desc">Tạo mã 6 chữ số ngẫu nhiên, lưu vào bộ nhớ/cache kèm thời gian hết hạn 5 phút.</div>
+            <div class="step-code">otp = Random(100000, 999999)  <span class="c">// VD: 482931</span>
+otpStore[email] = { code: otp, expiry: now + 5min }</div>
+          </div>
+        </div>
+
+        <div class="step-row">
+          <div class="step-left"><div class="step-num sn-purple">3</div><div class="step-line"></div></div>
+          <div class="step-content">
+            <div class="step-title">EmailService gửi email qua Gmail SMTP</div>
+            <div class="step-code"><span class="c">// Cấu hình SMTP trong appsettings.json</span>
+Host: smtp.gmail.com
+Port: 587 (TLS)
+From: noreply@lumiereperfume.com
+
+<span class="c">// Nội dung email</span>
+Subject: <span class="s">"Mã xác nhận OTP"</span>
+Body: <span class="s">"Mã của bạn là: 482931 (hết hạn sau 5 phút)"</span></div>
+          </div>
+        </div>
+
+        <div class="step-row">
+          <div class="step-left"><div class="step-num sn-purple">4</div><div class="step-line"></div></div>
+          <div class="step-content">
+            <div class="step-title">User nhập OTP và gửi lên</div>
+            <div class="step-code">POST <span class="s">/api/auth/verify-otp</span>
+{ <span class="v">"email"</span>: <span class="s">"user@gmail.com"</span>, <span class="v">"otp"</span>: <span class="s">"482931"</span> }</div>
+          </div>
+        </div>
+
+        <div class="step-row">
+          <div class="step-left"><div class="step-num sn-purple">5</div></div>
+          <div class="step-content">
+            <div class="step-title">Server kiểm tra OTP</div>
+            <div class="step-code"><span class="c">// Kiểm tra 3 điều kiện</span>
+1. OTP có trong store không?
+2. OTP có khớp không?
+3. OTP còn trong thời hạn 5 phút không?
+
+<span class="k">if</span> (pass all) → <span class="s">200 OK "Xác minh thành công"</span>
+<span class="k">else</span>           → <span class="s">400 "OTP sai hoặc hết hạn"</span></div>
+            <div class="step-warn">⚠️ Sau khi xác minh xong, OTP bị xóa khỏi store. Không thể dùng lại lần 2.</div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+  <hr class="divider">
+
+  <!-- ======= LUỒNG 4: GỌI API CÓ XÁC THỰC ======= -->
+  <div class="chapter">
+    <div class="chapter-num">Luồng 4</div>
+    <div class="chapter-title">Gọi API khi đã đăng nhập</div>
+    <div class="chapter-sub">Mỗi request sau khi đăng nhập đều phải kèm JWT Token — đây là luồng xảy ra hàng trăm lần khi dùng app</div>
+
+    <div class="analogy">
+      <div class="analogy-label">Ví dụ thực tế</div>
+      <p>Sau khi bảo vệ tòa nhà cấp cho bạn <strong>thẻ từ</strong>, bạn dùng thẻ đó quẹt mỗi khi vào phòng. Nhân viên phòng không hỏi bạn là ai nữa — họ chỉ xem thẻ có hợp lệ không. JWT Token đóng vai trò đó.</p>
+    </div>
+
+    <div class="flow-card">
+      <div class="flow-header blue">📋 Từng bước chi tiết — Lấy danh sách sản phẩm</div>
+      <div class="flow-body">
+
+        <div class="step-row">
+          <div class="step-left"><div class="step-num sn-blue">1</div><div class="step-line"></div></div>
+          <div class="step-content">
+            <div class="step-title">React component gọi API</div>
+            <div class="step-code"><span class="c">// Trong component React</span>
+<span class="k">const</span> products = <span class="k">await</span> productApi.getAll();</div>
+          </div>
+        </div>
+
+        <div class="step-row">
+          <div class="step-left"><div class="step-num sn-blue">2</div><div class="step-line"></div></div>
+          <div class="step-content">
+            <div class="step-title">Axios Interceptor tự động thêm Token</div>
+            <div class="step-desc">Không cần lập trình viên tự thêm tay — interceptor chạy tự động trước mỗi request.</div>
+            <div class="step-code"><span class="c">// Interceptor trong api.js (chạy tự động)</span>
+axiosInstance.interceptors.request.use(config => {
+  <span class="k">const</span> token = localStorage.getItem(<span class="s">'token'</span>);
+  <span class="k">if</span> (token) {
+    config.headers.Authorization = <span class="s">`Bearer ${token}`</span>;
+  }
+  <span class="k">return</span> config;
+});</div>
+          </div>
+        </div>
+
+        <div class="step-row">
+          <div class="step-left"><div class="step-num sn-blue">3</div><div class="step-line"></div></div>
+          <div class="step-content">
+            <div class="step-title">Request được gửi đến API Gateway</div>
+            <div class="step-code">GET /api/products?page=1&limit=10
+Authorization: Bearer eyJhbGciOiJIUzI1NiJ9...</div>
+          </div>
+        </div>
+
+        <div class="step-row">
+          <div class="step-left"><div class="step-num sn-blue">4</div><div class="step-line"></div></div>
+          <div class="step-content">
+            <div class="step-title">Gateway chuyển tiếp sang APIService :5001</div>
+            <div class="step-desc">Ocelot đọc config, thấy <code>/api/products</code> → chuyển sang port 5001, giữ nguyên header Authorization.</div>
+          </div>
+        </div>
+
+        <div class="step-row">
+          <div class="step-left"><div class="step-num sn-blue">5</div><div class="step-line"></div></div>
+          <div class="step-content">
+            <div class="step-title">JWT Middleware kiểm tra token</div>
+            <div class="step-desc">ASP.NET Core tự động xác minh token trước khi vào Controller.</div>
+            <div class="step-code"><span class="c">// Middleware kiểm tra tự động:</span>
+✓ Chữ ký có đúng SecretKey không?
+✓ Token có hết hạn chưa?
+✓ Issuer = "BaseCore"?
+✓ Audience = "BaseCore.Clients"?
+
+<span class="c">// Nếu sai bất kỳ điều nào → 401 Unauthorized</span></div>
+            <div class="step-warn">⚠️ Nếu trả về 401 → Axios Response Interceptor sẽ tự động xóa token khỏi localStorage và chuyển về trang /login</div>
+          </div>
+        </div>
+
+        <div class="step-row">
+          <div class="step-left"><div class="step-num sn-blue">6</div><div class="step-line"></div></div>
+          <div class="step-content">
+            <div class="step-title">Controller → Service → Repository → Database</div>
+            <div class="step-desc">Sau khi xác thực xong, request đi theo luồng nghiệp vụ chuẩn.</div>
+            <div class="step-code">ProductsController.GetAll()
+  → ProductService.GetAllProductsAsync()
+    → ProductRepository.GetAllAsync()
+      → SQL: SELECT * FROM Products
+              WHERE IsDeleted = 0  <span class="c">← soft delete filter tự động</span>
+              ORDER BY Id DESC</div>
+            <div class="step-note">💡 <strong>Global Query Filter</strong>: EF Core tự động thêm <code>WHERE IsDeleted = 0</code> vào mọi query. Lập trình viên không cần tự viết điều kiện này.</div>
+          </div>
+        </div>
+
+        <div class="step-row">
+          <div class="step-left"><div class="step-num sn-blue">7</div></div>
+          <div class="step-content">
+            <div class="step-title">Dữ liệu trả về và React cập nhật giao diện</div>
+            <div class="step-code">200 OK
+[
+  { "id": 1, "name": "iPhone 16", "price": 25000000 },
+  { "id": 2, "name": "Áo thun", "price": 150000 },
+  ...
+]</div>
+            <div class="step-ok">✅ React setState → component re-render → danh sách sản phẩm hiện ra màn hình.</div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- ROLE CHECK -->
+    <div class="flow-card">
+      <div class="flow-header purple">🛡️ Kiểm tra quyền (Role-Based Access Control)</div>
+      <div class="flow-body">
+        <div class="step-row">
+          <div class="step-left"><div class="step-num sn-purple">1</div><div class="step-line"></div></div>
+          <div class="step-content">
+            <div class="step-title">Admin-only endpoint có decorator đặc biệt</div>
+            <div class="step-code"><span class="c">// Chỉ Admin mới POST được</span>
+[HttpPost]
+[Authorize(Roles = <span class="s">"Admin"</span>)]  <span class="c">← decorator này</span>
+<span class="k">public</span> IActionResult Create([FromBody] ProductCreateDto dto)
+{ ... }</div>
+          </div>
+        </div>
+        <div class="step-row">
+          <div class="step-left"><div class="step-num sn-purple">2</div></div>
+          <div class="step-content">
+            <div class="step-title">ASP.NET tự kiểm tra Role trong token</div>
+            <div class="step-code"><span class="c">// Token của User thường</span>
+{ "Role": <span class="s">"User"</span> }  → POST /api/products → <span class="v">403 Forbidden</span>
+
+<span class="c">// Token của Admin</span>
+{ "Role": <span class="s">"Admin"</span> } → POST /api/products → <span class="s">201 Created ✓</span></div>
+            <div class="step-warn">⚠️ Frontend cũng ẩn các nút Admin — nhưng đây chỉ là UX. Bảo mật thật sự là ở server check role trong token.</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <hr class="divider">
+
+  <!-- ======= LUỒNG 5: TẠO ĐƠN HÀNG ======= -->
+  <div class="chapter">
+    <div class="chapter-num">Luồng 5</div>
+    <div class="chapter-title">Tạo đơn hàng — Transaction Database</div>
+    <div class="chapter-sub">Luồng phức tạp nhất — phải đảm bảo tính toàn vẹn dữ liệu: không bao giờ bán hàng khi không có hàng</div>
+
+    <div class="analogy">
+      <div class="analogy-label">Ví dụ thực tế</div>
+      <p>Hãy tưởng tượng bạn đặt mua 2 cuốn sách tại nhà sách. Nhân viên phải: (1) kiểm tra kho còn hàng không, (2) giữ sách đó lại cho bạn, (3) in hóa đơn — tất cả <strong>trong cùng một lần</strong>. Không thể in hóa đơn xong mới kiểm tra kho — nếu hết hàng thì rắc rối. <strong>Database Transaction</strong> đảm bảo điều này: làm tất cả hoặc không làm gì.</p>
+    </div>
+
+    <div class="flow-card">
+      <div class="flow-header green">📋 Từng bước chi tiết — Tạo đơn hàng</div>
+      <div class="flow-body">
+
+        <div class="step-row">
+          <div class="step-left"><div class="step-num sn-green">1</div><div class="step-line"></div></div>
+          <div class="step-content">
+            <div class="step-title">User nhấn "Đặt hàng" ở trang giỏ hàng</div>
+            <div class="step-code">POST <span class="s">/api/orders</span>
+Authorization: Bearer eyJ...
+
+{
+  <span class="v">"items"</span>: [
+    { <span class="v">"productId"</span>: 5, <span class="v">"quantity"</span>: 2 },
+    { <span class="v">"productId"</span>: 12, <span class="v">"quantity"</span>: 1 }
+  ],
+  <span class="v">"shippingAddress"</span>: <span class="s">"123 Đường ABC, Q1, TP.HCM"</span>,
+  <span class="v">"recipientName"</span>: <span class="s">"Nguyễn Văn A"</span>,
+  <span class="v">"paymentMethod"</span>: <span class="s">"COD"</span>
+}</div>
+          </div>
+        </div>
+
+        <div class="step-row">
+          <div class="step-left"><div class="step-num sn-green">2</div><div class="step-line"></div></div>
+          <div class="step-content">
+            <div class="step-title">Lấy userId từ JWT Token</div>
+            <div class="step-desc">Server đọc token, lấy userId — không tin dữ liệu từ client gửi lên.</div>
+            <div class="step-code"><span class="c">// Lấy userId từ claim trong token (không từ body)</span>
+<span class="k">var</span> userId = <span class="k">int</span>.Parse(
+    User.FindFirst(ClaimTypes.NameIdentifier).Value
+);</div>
+            <div class="step-note">💡 <strong>Nguyên tắc bảo mật</strong>: Server không tin bất kỳ dữ liệu nào từ client về danh tính. Chỉ tin token đã được ký.</div>
+          </div>
+        </div>
+
+        <div class="step-row">
+          <div class="step-left"><div class="step-num sn-green">3</div><div class="step-line"></div></div>
+          <div class="step-content">
+            <div class="step-title">Mở Transaction — "Khóa" tất cả lại</div>
+            <div class="step-code"><span class="k">await using var</span> transaction = <span class="k">await</span> _db.BeginTransactionAsync();
+<span class="c">// Từ đây mọi thay đổi DB chưa thật sự lưu
+// Chỉ lưu khi gọi CommitAsync()</span></div>
+          </div>
+        </div>
+
+        <div class="step-row">
+          <div class="step-left"><div class="step-num sn-green">4</div><div class="step-line"></div></div>
+          <div class="step-content">
+            <div class="step-title">Kiểm tra từng sản phẩm trong giỏ</div>
+            <div class="step-code"><span class="k">foreach</span> (var item in orderItems) {
+  <span class="k">var</span> product = <span class="k">await</span> _productRepo.GetByIdAsync(item.ProductId);
+
+  <span class="c">// Sản phẩm có tồn tại không?</span>
+  <span class="k">if</span> (product == <span class="k">null</span>)
+    <span class="k">throw new</span> Exception(<span class="s">"Sản phẩm không tồn tại"</span>);
+
+  <span class="c">// Còn đủ hàng không?</span>
+  <span class="k">if</span> (product.Stock < item.Quantity)
+    <span class="k">throw new</span> Exception(<span class="s">$"Hết hàng: {product.Name}"</span>);
+}</div>
+          </div>
+        </div>
+
+        <div class="step-row">
+          <div class="step-left"><div class="step-num sn-green">5</div><div class="step-line"></div></div>
+          <div class="step-content">
+            <div class="step-title">Snapshot giá và trừ tồn kho</div>
+            <div class="step-desc">Đây là bước then chốt: lưu giá tại thời điểm mua vào OrderDetail. Dù sau này sản phẩm tăng/giảm giá, đơn hàng cũ vẫn giữ đúng giá lúc mua.</div>
+            <div class="step-code"><span class="k">foreach</span> (var item in orderItems) {
+  <span class="c">// Snapshot giá hiện tại</span>
+  item.UnitPrice = product.Price;  <span class="c">← lưu vào OrderDetail</span>
+
+  <span class="c">// Trừ tồn kho</span>
+  product.Stock -= item.Quantity;
+  _db.Update(product);
+}</div>
+          </div>
+        </div>
+
+        <div class="step-row">
+          <div class="step-left"><div class="step-num sn-green">6</div><div class="step-line"></div></div>
+          <div class="step-content">
+            <div class="step-title">Tạo bản ghi Order + OrderDetails</div>
+            <div class="step-code"><span class="c">// Tạo đơn hàng chính</span>
+<span class="k">var</span> order = <span class="k">new</span> Order {
+  UserId = userId,
+  TotalAmount = items.Sum(i => i.UnitPrice * i.Quantity),
+  Status = <span class="s">"Pending"</span>,
+  PaymentStatus = <span class="s">"Unpaid"</span>,
+  OrderDate = DateTime.Now
+};
+<span class="k">await</span> _db.Orders.AddAsync(order);
+
+<span class="c">// Tạo chi tiết từng sản phẩm</span>
+<span class="k">await</span> _db.OrderDetails.AddRangeAsync(orderDetails);</div>
+          </div>
+        </div>
+
+        <div class="step-row">
+          <div class="step-left"><div class="step-num sn-green">7</div><div class="step-line"></div></div>
+          <div class="step-content">
+            <div class="step-title">COMMIT — Lưu tất cả vào database</div>
+            <div class="step-code"><span class="k">await</span> _db.SaveChangesAsync();
+<span class="k">await</span> transaction.CommitAsync();
+<span class="c">// ✅ Chỉ đến đây mới thật sự lưu vào DB</span></div>
+            <div class="step-ok">✅ Đơn hàng tạo thành công. Trả về 201 Created kèm order ID.</div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- ROLLBACK -->
+    <div class="flow-card">
+      <div class="flow-header red">💥 Điều gì xảy ra nếu có lỗi? — ROLLBACK</div>
+      <div class="flow-body">
+        <div class="step-row">
+          <div class="step-left"><div class="step-num sn-red">!</div></div>
+          <div class="step-content">
+            <div class="step-title">Rollback — Hoàn tác toàn bộ</div>
+            <div class="step-desc">Nếu bất kỳ bước nào ném exception (hết hàng, lỗi mạng, lỗi DB...) → transaction tự động rollback → tất cả thay đổi bị hủy → tồn kho trở về như cũ.</div>
+            <div class="step-code"><span class="k">try</span> {
+  <span class="c">// ... tất cả bước trên ...</span>
+  <span class="k">await</span> transaction.CommitAsync();
+}
+<span class="k">catch</span> (Exception ex) {
+  <span class="k">await</span> transaction.RollbackAsync();
+  <span class="c">// Tồn kho được hoàn trả tự động</span>
+  <span class="k">return</span> StatusCode(500, <span class="s">"Đặt hàng thất bại"</span>);
+}</div>
+            <div class="step-warn">⚠️ <strong>Không có transaction</strong>: Có thể trừ kho xong nhưng lưu đơn hàng thất bại → hàng bị "mất" mà không có đơn. Transaction ngăn chặn tình huống này.</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <hr class="divider">
+
+  <!-- ======= LUỒNG 6: SOFT DELETE ======= -->
+  <div class="chapter">
+    <div class="chapter-num">Luồng 6</div>
+    <div class="chapter-title">Xóa sản phẩm — Soft Delete</div>
+    <div class="chapter-sub">Không xóa thật — chỉ đánh dấu "đã xóa" để bảo toàn lịch sử đơn hàng</div>
+
+    <div class="analogy">
+      <div class="analogy-label">Ví dụ thực tế</div>
+      <p>Hãy nghĩ đến hồ sơ nhân viên nghỉ việc. Công ty không đốt hồ sơ — họ chuyển vào ngăn "Đã nghỉ". Vẫn tra cứu được nếu cần, nhưng nhân viên đó không xuất hiện trong danh sách đang làm. Soft Delete hoạt động tương tự.</p>
+    </div>
+
+    <div class="two">
+      <div class="flow-card" style="margin:0;">
+        <div class="flow-header red">❌ Xóa thông thường (KHÔNG dùng)</div>
+        <div class="flow-body">
+          <div class="step-code">DELETE FROM Products WHERE Id = 5;
+
+<span class="c">// VẤN ĐỀ: OrderDetail vẫn còn FK đến Product 5
+-- ERROR: FOREIGN KEY VIOLATION
+-- Hoặc xóa được nhưng mất lịch sử đơn hàng!</span></div>
+        </div>
+      </div>
+      <div class="flow-card" style="margin:0;">
+        <div class="flow-header green">✅ Soft Delete (đang dùng)</div>
+        <div class="flow-body">
+          <div class="step-code">UPDATE Products
+SET IsDeleted = 1
+WHERE Id = 5;
+
+<span class="c">// ✓ Không vi phạm FK
+// ✓ OrderDetail vẫn xem được giá cũ
+// ✓ Có thể khôi phục nếu cần</span></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="flow-card" style="margin-top:16px;">
+      <div class="flow-header blue">🔍 Global Query Filter — Tự động lọc</div>
+      <div class="flow-body">
+        <div class="step-row">
+          <div class="step-left"><div class="step-num sn-blue">1</div><div class="step-line"></div></div>
+          <div class="step-content">
+            <div class="step-title">Cấu hình một lần trong DbContext</div>
+            <div class="step-code"><span class="c">// MySqlDbContext.cs — cấu hình 1 lần duy nhất</span>
+modelBuilder.Entity&lt;Product&gt;()
+    .HasQueryFilter(p => !p.IsDeleted);</div>
+          </div>
+        </div>
+        <div class="step-row">
+          <div class="step-left"><div class="step-num sn-blue">2</div></div>
+          <div class="step-content">
+            <div class="step-title">Mọi query sau đó tự động lọc</div>
+            <div class="step-code"><span class="c">// Code viết vậy</span>
+_db.Products.ToList()
+
+<span class="c">// EF Core tự động thêm WHERE</span>
+SELECT * FROM Products WHERE IsDeleted = 0
+<span class="c">// Sản phẩm "đã xóa" không bao giờ xuất hiện!</span></div>
+            <div class="step-ok">✅ Lập trình viên không bao giờ cần nhớ thêm điều kiện IsDeleted. Tự động 100%.</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <hr class="divider">
+
+  <!-- ======= LUỒNG 7: FRONTEND ROUTING ======= -->
+  <div class="chapter">
+    <div class="chapter-num">Luồng 7</div>
+    <div class="chapter-title">Phân quyền trang — Protected Routes</div>
+    <div class="chapter-sub">Ngăn User thường truy cập trang Admin trong React</div>
+
+    <div class="analogy">
+      <div class="analogy-label">Ví dụ thực tế</div>
+      <p>Trong tòa nhà, thẻ từ nhân viên bình thường không mở được cửa phòng Giám đốc. Dù biết số phòng, bạn vẫn không vào được. <code>ProtectedRoute</code> là bảo vệ đứng trước mỗi trang Admin.</p>
+    </div>
+
+    <div class="flow-card">
+      <div class="flow-header purple">📋 Luồng kiểm tra quyền khi truy cập /admin</div>
+      <div class="flow-body">
+
+        <div class="step-row">
+          <div class="step-left"><div class="step-num sn-purple">1</div><div class="step-line"></div></div>
+          <div class="step-content">
+            <div class="step-title">User gõ URL /admin/products vào trình duyệt</div>
+          </div>
+        </div>
+
+        <div class="step-row">
+          <div class="step-left"><div class="step-num sn-purple">2</div><div class="step-line"></div></div>
+          <div class="step-content">
+            <div class="step-title">React Router gặp ProtectedRoute</div>
+            <div class="step-code"><span class="c">// Trong App.jsx — mọi route /admin đều qua đây</span>
+&lt;Route path=<span class="s">"/admin"</span> element={&lt;ProtectedRoute /&gt;}&gt;
+    &lt;Route path=<span class="s">"products"</span> element={&lt;Products /&gt;} /&gt;
+    &lt;Route path=<span class="s">"users"</span> element={&lt;Users /&gt;} /&gt;
+    ...
+&lt;/Route&gt;</div>
+          </div>
+        </div>
+
+        <div class="step-row">
+          <div class="step-left"><div class="step-num sn-purple">3</div><div class="step-line"></div></div>
+          <div class="step-content">
+            <div class="step-title">ProtectedRoute kiểm tra 3 điều kiện</div>
+            <div class="step-code"><span class="c">// ProtectedRoute.jsx</span>
+<span class="k">const</span> { user, isAdmin } = useAuth();
+
+<span class="c">// 1. Có đăng nhập không?</span>
+<span class="k">if</span> (!user) <span class="k">return</span> &lt;Navigate to=<span class="s">"/login"</span> /&gt;;
+
+<span class="c">// 2. Có phải Admin không?</span>
+<span class="k">if</span> (!isAdmin()) <span class="k">return</span> &lt;Navigate to=<span class="s">"/"</span> /&gt;;
+
+<span class="c">// 3. Đủ điều kiện → cho vào</span>
+<span class="k">return</span> &lt;Outlet /&gt;;</div>
+          </div>
+        </div>
+
+        <div class="step-row">
+          <div class="step-left"><div class="step-num sn-purple">4</div></div>
+          <div class="step-content">
+            <div class="step-title">Kết quả</div>
+            <div class="step-code"><span class="c">// Chưa đăng nhập</span>
+→ Redirect /login
+
+<span class="c">// Đăng nhập nhưng là User thường</span>
+→ Redirect / (trang chủ)
+
+<span class="c">// Là Admin</span>
+→ Hiển thị trang /admin/products ✓</div>
+            <div class="step-warn">⚠️ Đây chỉ là bảo vệ ở frontend. Hacker có thể bypass. Bảo mật thật sự là server kiểm tra <code>[Authorize(Roles = "Admin")]</code>.</div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+  <hr class="divider">
+
+  <!-- BẢNG TỔNG KẾT -->
+  <div class="chapter">
+    <div class="chapter-num">Tổng kết</div>
+    <div class="chapter-title">So sánh các luồng</div>
+    <div class="chapter-sub">Nhìn nhanh tất cả 7 luồng đã học</div>
+
+    <div style="background:#fff;border-radius:12px;border:1px solid var(--border);overflow:hidden;">
+      <table>
+        <thead>
+          <tr>
+            <th>Luồng</th>
+            <th>Khi nào xảy ra?</th>
+            <th>Công nghệ chính</th>
+            <th>Điểm cốt lõi</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><strong>0. Hệ thống</strong></td>
+            <td>Mọi request</td>
+            <td>Ocelot Gateway</td>
+            <td>1 cổng vào, nhiều service sau</td>
+          </tr>
+          <tr>
+            <td><strong>1. Đăng nhập</strong></td>
+            <td>Gõ user/pass</td>
+            <td>PBKDF2 + JWT</td>
+            <td>Hash mật khẩu, cấp token 8 giờ</td>
+          </tr>
+          <tr>
+            <td><strong>2. Google OAuth</strong></td>
+            <td>Nhấn nút Google</td>
+            <td>OAuth 2.0 ID Token</td>
+            <td>Google xác minh, hệ thống tin theo</td>
+          </tr>
+          <tr>
+            <td><strong>3. OTP</strong></td>
+            <td>Cần xác minh email</td>
+            <td>Gmail SMTP</td>
+            <td>Mã 6 số, hết hạn 5 phút</td>
+          </tr>
+          <tr>
+            <td><strong>4. Gọi API</strong></td>
+            <td>Mọi thao tác sau login</td>
+            <td>JWT + Axios Interceptor</td>
+            <td>Token tự động đính kèm mọi request</td>
+          </tr>
+          <tr>
+            <td><strong>5. Đặt hàng</strong></td>
+            <td>Nhấn "Đặt hàng"</td>
+            <td>SQL Transaction</td>
+            <td>Làm tất cả hoặc không làm gì</td>
+          </tr>
+          <tr>
+            <td><strong>6. Xóa SP</strong></td>
+            <td>Admin xóa sản phẩm</td>
+            <td>Soft Delete + Query Filter</td>
+            <td>Không xóa thật, chỉ đánh dấu</td>
+          </tr>
+          <tr>
+            <td><strong>7. Phân quyền</strong></td>
+            <td>Truy cập /admin</td>
+            <td>ProtectedRoute + RBAC</td>
+            <td>Frontend ẩn, server chặn thật</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="insight" style="margin-top:24px;">
+      <div class="insight-label">Câu hỏi để tự kiểm tra</div>
+      <h4>Bạn đã hiểu chưa?</h4>
+      <p>
+        1. JWT Token là gì? Tại sao không cần hỏi database mỗi lần? <br>
+        2. Tại sao phải hash mật khẩu thay vì lưu thẳng? <br>
+        3. Điều gì xảy ra nếu đặt hàng không có transaction? <br>
+        4. Soft Delete khác gì với DELETE thông thường? Khi nào nên dùng? <br>
+        5. Tại sao bảo vệ frontend thôi chưa đủ?
+      </p>
+    </div>
+  </div>
+
+</div>
+</body>
+</html>

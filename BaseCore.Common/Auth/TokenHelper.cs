@@ -38,8 +38,8 @@ namespace BaseCore.Common
             string hashed = Convert.ToBase64String(KeyDerivation.Pbkdf2(
                 password: password,
                 salt: salt,
-                prf: KeyDerivationPrf.HMACSHA1,
-                iterationCount: 10000,
+                prf: KeyDerivationPrf.HMACSHA256,
+                iterationCount: 100000,
                 numBytesRequested: 256 / 8));
 
             return hashed;
@@ -50,14 +50,15 @@ namespace BaseCore.Common
             var hashed = Convert.ToBase64String(KeyDerivation.Pbkdf2(
                 password: password,
                 salt: salt,
-                prf: KeyDerivationPrf.HMACSHA1,
-                iterationCount: 10000,
+                prf: KeyDerivationPrf.HMACSHA256,
+                iterationCount: 100000,
                 numBytesRequested: 256 / 8));
 
             return hashed.Equals(hashedParam);
         }
 
-        public static string GenerateToken(string secretKey, int minuteExpireTime, string userId, string userName, string roles)
+        public static string GenerateToken(string secretKey, int minuteExpireTime, string userId, string userName, string roles,
+            string issuer = "BaseCore", string audience = "BaseCore.Clients")
         {
             var tokenHandler = new JwtSecurityTokenHandler();
             var key = Encoding.ASCII.GetBytes(secretKey);
@@ -71,6 +72,8 @@ namespace BaseCore.Common
                     new Claim(ClaimTypes.Role, roles)
                 }),
                 Expires = DateTime.UtcNow.AddMinutes(minuteExpireTime),
+                Issuer = issuer,
+                Audience = audience,
                 SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(key), SecurityAlgorithms.HmacSha256Signature)
             };
 
@@ -78,14 +81,17 @@ namespace BaseCore.Common
             return tokenHandler.WriteToken(token);
         }
 
-        private static TokenValidationParameters GetValidationParameters(string secretKey)
+        private static TokenValidationParameters GetValidationParameters(string secretKey,
+            string issuer = "BaseCore", string audience = "BaseCore.Clients")
         {
             return new TokenValidationParameters
             {
                 ValidateIssuerSigningKey = true,
                 IssuerSigningKey = new SymmetricSecurityKey(Encoding.ASCII.GetBytes(secretKey)),
-                ValidateIssuer = false,
-                ValidateAudience = false,
+                ValidateIssuer = true,
+                ValidIssuer = issuer,
+                ValidateAudience = true,
+                ValidAudience = audience,
                 ValidateLifetime = true
             };
         }

@@ -22,5 +22,7 @@ namespace BaseCore.Entities
         public bool IsActive { get; set; } = true;
         public int UserType { get; set; }
         public DateTime Created { get; set; } = DateTime.Now;
+        // Google OAuth: null cho tài khoản đăng ký thông thường.
+        public string? GoogleId { get; set; }
     }
 }

@@ -76,7 +76,7 @@
 
 
 	// Scroll animation init
-	window.sr = new scrollReveal();
+	if (typeof scrollReveal !== 'undefined') window.sr = new scrollReveal();
 	
 
 	// Menu Dropdown Toggle

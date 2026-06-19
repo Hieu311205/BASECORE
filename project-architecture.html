@@ -1,0 +1,928 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>BaseCore — Kiến Trúc & Luồng Dự Án</title>
+<style>
+  :root {
+    --blue: #1a56db;
+    --blue-light: #e8f0fe;
+    --green: #057a55;
+    --green-light: #def7ec;
+    --orange: #c05621;
+    --orange-light: #fef3c7;
+    --red: #c81e1e;
+    --red-light: #fde8e8;
+    --purple: #6c2bd9;
+    --purple-light: #edebfe;
+    --gray: #374151;
+    --gray-light: #f9fafb;
+    --border: #e5e7eb;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    background: #f3f4f6;
+    color: var(--gray);
+    line-height: 1.6;
+  }
+  /* HEADER */
+  .hero {
+    background: linear-gradient(135deg, #1e3a5f 0%, #1a56db 60%, #6c2bd9 100%);
+    color: white;
+    padding: 48px 32px 40px;
+    text-align: center;
+  }
+  .hero .badge {
+    display: inline-block;
+    background: rgba(255,255,255,0.15);
+    border: 1px solid rgba(255,255,255,0.3);
+    padding: 4px 14px;
+    border-radius: 20px;
+    font-size: 12px;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    margin-bottom: 16px;
+  }
+  .hero h1 { font-size: clamp(24px, 4vw, 42px); font-weight: 800; margin-bottom: 10px; }
+  .hero p { font-size: 16px; opacity: 0.85; max-width: 600px; margin: 0 auto; }
+  /* MAIN */
+  .container { max-width: 1100px; margin: 0 auto; padding: 32px 16px 64px; }
+  /* SECTION */
+  .section { margin-bottom: 40px; }
+  .section-title {
+    font-size: 20px; font-weight: 700; color: #111827;
+    border-left: 4px solid var(--blue);
+    padding-left: 14px; margin-bottom: 20px;
+  }
+  .section-title span { font-size: 13px; font-weight: 400; color: #6b7280; margin-left: 8px; }
+  /* CARDS GRID */
+  .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 16px; }
+  .card {
+    background: white;
+    border-radius: 12px;
+    border: 1px solid var(--border);
+    padding: 20px;
+    position: relative;
+    overflow: hidden;
+  }
+  .card::before {
+    content: '';
+    position: absolute; top: 0; left: 0; right: 0; height: 3px;
+  }
+  .card.blue::before { background: var(--blue); }
+  .card.green::before { background: var(--green); }
+  .card.orange::before { background: #f59e0b; }
+  .card.purple::before { background: var(--purple); }
+  .card.red::before { background: var(--red); }
+  .card-icon { font-size: 28px; margin-bottom: 8px; }
+  .card h3 { font-size: 15px; font-weight: 700; margin-bottom: 4px; }
+  .card .port {
+    display: inline-block; font-size: 11px; font-weight: 600;
+    padding: 2px 8px; border-radius: 10px; margin-bottom: 8px;
+  }
+  .port-blue { background: var(--blue-light); color: var(--blue); }
+  .port-green { background: var(--green-light); color: var(--green); }
+  .port-orange { background: var(--orange-light); color: var(--orange); }
+  .port-purple { background: var(--purple-light); color: var(--purple); }
+  .card p { font-size: 13px; color: #6b7280; }
+  .card ul { margin-top: 8px; padding-left: 16px; }
+  .card li { font-size: 12px; color: #374151; margin-bottom: 3px; }
+  /* FLOW DIAGRAM */
+  .flow-box {
+    background: white; border-radius: 12px; border: 1px solid var(--border);
+    padding: 24px; margin-bottom: 20px; overflow-x: auto;
+  }
+  .flow-title { font-size: 16px; font-weight: 700; margin-bottom: 18px; display: flex; align-items: center; gap: 8px; }
+  .flow-title .dot { width: 10px; height: 10px; border-radius: 50%; }
+  .dot-blue { background: var(--blue); }
+  .dot-green { background: var(--green); }
+  .dot-orange { background: #f59e0b; }
+  .dot-purple { background: var(--purple); }
+  /* FLOW STEPS */
+  .flow {
+    display: flex; align-items: flex-start; flex-wrap: wrap; gap: 0;
+    position: relative;
+  }
+  .step {
+    display: flex; flex-direction: column; align-items: center; gap: 4px;
+    min-width: 110px; flex: 1;
+  }
+  .step-box {
+    width: 100%; max-width: 130px;
+    border-radius: 8px; border: 2px solid;
+    padding: 10px 8px; text-align: center; font-size: 12px; font-weight: 600;
+    position: relative;
+  }
+  .step-box.blue { border-color: var(--blue); background: var(--blue-light); color: var(--blue); }
+  .step-box.green { border-color: var(--green); background: var(--green-light); color: var(--green); }
+  .step-box.orange { border-color: #f59e0b; background: #fffbeb; color: #92400e; }
+  .step-box.purple { border-color: var(--purple); background: var(--purple-light); color: var(--purple); }
+  .step-box.red { border-color: var(--red); background: var(--red-light); color: var(--red); }
+  .step-box.gray { border-color: #9ca3af; background: #f9fafb; color: #374151; }
+  .step-label { font-size: 10px; color: #9ca3af; text-align: center; max-width: 130px; }
+  .arrow {
+    display: flex; align-items: center; padding: 0 4px;
+    color: #9ca3af; font-size: 20px; line-height: 1;
+    padding-top: 18px; flex-shrink: 0;
+  }
+  /* TABLE */
+  .table-wrap { overflow-x: auto; }
+  table { width: 100%; border-collapse: collapse; font-size: 13px; }
+  th { background: #f3f4f6; font-weight: 600; padding: 10px 14px; text-align: left; border-bottom: 2px solid var(--border); }
+  td { padding: 9px 14px; border-bottom: 1px solid var(--border); }
+  tr:hover td { background: #f9fafb; }
+  .tag {
+    display: inline-block; padding: 2px 8px; border-radius: 10px;
+    font-size: 11px; font-weight: 600;
+  }
+  .tag-get { background: var(--green-light); color: var(--green); }
+  .tag-post { background: var(--blue-light); color: var(--blue); }
+  .tag-put { background: var(--orange-light); color: var(--orange); }
+  .tag-delete { background: var(--red-light); color: var(--red); }
+  .tag-admin { background: var(--purple-light); color: var(--purple); }
+  /* ARCHITECTURE DIAGRAM */
+  .arch {
+    background: white; border-radius: 12px; border: 1px solid var(--border);
+    padding: 32px 24px; text-align: center;
+  }
+  .arch-row { display: flex; justify-content: center; gap: 12px; flex-wrap: wrap; margin: 8px 0; }
+  .arch-node {
+    border: 2px solid; border-radius: 8px; padding: 10px 16px;
+    font-size: 12px; font-weight: 600; min-width: 110px;
+  }
+  .arch-node.client { border-color: #6b7280; background: #f9fafb; }
+  .arch-node.gateway { border-color: var(--blue); background: var(--blue-light); color: var(--blue); }
+  .arch-node.auth { border-color: var(--orange); background: var(--orange-light); color: var(--orange); }
+  .arch-node.api { border-color: var(--green); background: var(--green-light); color: var(--green); }
+  .arch-node.audit { border-color: var(--purple); background: var(--purple-light); color: var(--purple); }
+  .arch-node.db { border-color: #374151; background: #f3f4f6; }
+  .arch-arrow { color: #9ca3af; font-size: 24px; margin: 4px 0; }
+  .arch-arrows { display: flex; justify-content: center; gap: 12px; flex-wrap: wrap; }
+  .arch-line { width: 2px; background: #d1d5db; height: 24px; margin: 0 auto; }
+  .arch-lines { display: flex; justify-content: center; gap: 80px; flex-wrap: wrap; }
+  /* CODE */
+  code {
+    font-family: 'Consolas', 'Monaco', monospace;
+    background: #f3f4f6; padding: 2px 6px; border-radius: 4px;
+    font-size: 12px; color: #c81e1e;
+  }
+  pre {
+    background: #1e293b; color: #e2e8f0;
+    border-radius: 10px; padding: 20px; font-size: 12px;
+    font-family: 'Consolas', monospace;
+    overflow-x: auto; line-height: 1.7;
+  }
+  pre .c { color: #94a3b8; }
+  pre .k { color: #93c5fd; }
+  pre .s { color: #86efac; }
+  pre .n { color: #fde68a; }
+  /* ENTITY TABLE */
+  .entity-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 12px; }
+  .entity-card {
+    background: white; border-radius: 10px; border: 1px solid var(--border);
+    overflow: hidden;
+  }
+  .entity-header {
+    padding: 10px 14px; font-weight: 700; font-size: 13px;
+    background: #1e3a5f; color: white;
+  }
+  .entity-body { padding: 10px 14px; }
+  .entity-field { font-size: 12px; color: #374151; padding: 3px 0; border-bottom: 1px solid #f3f4f6; }
+  .entity-field:last-child { border: none; }
+  .field-key { color: #f59e0b; font-weight: 600; }
+  .field-fk { color: var(--blue); font-weight: 600; }
+  /* TWO COL */
+  .two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+  @media (max-width: 700px) { .two-col { grid-template-columns: 1fr; } }
+  /* TECH STACK */
+  .tech-list { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 8px; }
+  .tech-tag {
+    padding: 4px 12px; border-radius: 20px; font-size: 12px; font-weight: 600;
+  }
+  /* SUMMARY BAR */
+  .summary {
+    background: linear-gradient(135deg, #1e3a5f, #1a56db);
+    color: white; border-radius: 12px; padding: 24px;
+    display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+    gap: 16px; text-align: center; margin-bottom: 40px;
+  }
+  .summary-item { }
+  .summary-num { font-size: 32px; font-weight: 800; }
+  .summary-label { font-size: 12px; opacity: 0.75; margin-top: 2px; }
+</style>
+</head>
+<body>
+
+<!-- HERO -->
+<div class="hero">
+  <div class="badge">Tài liệu kiến trúc hệ thống</div>
+  <h1>BaseCore — E-Commerce Platform</h1>
+  <p>Phân tích toàn diện kiến trúc Microservices, luồng dữ liệu và thiết kế hệ thống</p>
+</div>
+
+<div class="container">
+
+  <!-- SUMMARY -->
+  <div class="summary">
+    <div class="summary-item"><div class="summary-num">4</div><div class="summary-label">Microservices</div></div>
+    <div class="summary-item"><div class="summary-num">2</div><div class="summary-label">Frontend Apps</div></div>
+    <div class="summary-item"><div class="summary-num">14</div><div class="summary-label">Entities</div></div>
+    <div class="summary-item"><div class="summary-num">3</div><div class="summary-label">Auth Methods</div></div>
+    <div class="summary-item"><div class="summary-num">JWT</div><div class="summary-label">Authentication</div></div>
+    <div class="summary-item"><div class="summary-num">Ocelot</div><div class="summary-label">API Gateway</div></div>
+  </div>
+
+  <!-- 1. TỔNG QUAN KIẾN TRÚC -->
+  <div class="section">
+    <div class="section-title">1. Tổng Quan Kiến Trúc <span>Microservices Architecture</span></div>
+
+    <div class="arch" style="margin-bottom:16px;">
+      <div style="font-size:12px;color:#6b7280;margin-bottom:20px;font-weight:600;letter-spacing:.5px;text-transform:uppercase;">Sơ đồ tổng quan hệ thống</div>
+
+      <!-- Clients -->
+      <div class="arch-row">
+        <div class="arch-node client">🌐 WebClient<br><small>React :3000</small></div>
+        <div class="arch-node client">🛒 HexaShop<br><small>HTML :5173</small></div>
+      </div>
+      <div class="arch-line"></div>
+
+      <!-- Gateway -->
+      <div class="arch-row">
+        <div class="arch-node gateway" style="min-width:200px;">🔀 API Gateway (Ocelot)<br><small>:5000 — Routing + CORS</small></div>
+      </div>
+
+      <!-- Services arrows -->
+      <div style="display:flex;justify-content:center;gap:60px;margin:4px 0;">
+        <div class="arch-line"></div>
+        <div class="arch-line"></div>
+        <div class="arch-line"></div>
+      </div>
+
+      <!-- Services -->
+      <div class="arch-row">
+        <div class="arch-node auth">🔐 AuthService<br><small>:5002</small></div>
+        <div class="arch-node api">📦 APIService<br><small>:5001</small></div>
+        <div class="arch-node audit">📋 AuditLog<br><small>:5004</small></div>
+      </div>
+
+      <div style="display:flex;justify-content:center;gap:60px;margin:4px 0;">
+        <div class="arch-line"></div>
+        <div class="arch-line"></div>
+      </div>
+
+      <!-- Database -->
+      <div class="arch-row">
+        <div class="arch-node db" style="min-width:280px;">🗄️ SQL Server — LapTrinhWeb<br><small>EF Core / Repository Pattern</small></div>
+      </div>
+    </div>
+
+    <div class="grid">
+      <div class="card blue">
+        <div class="card-icon">🔀</div>
+        <h3>API Gateway</h3>
+        <div class="port port-blue">:5000 — Ocelot</div>
+        <p>Cổng vào duy nhất của hệ thống. Route tất cả request đến microservice phù hợp.</p>
+        <ul>
+          <li>Route-based forwarding</li>
+          <li>CORS AllowAll policy</li>
+          <li>Swagger aggregation</li>
+          <li>19 route definitions</li>
+        </ul>
+      </div>
+      <div class="card orange">
+        <div class="card-icon">🔐</div>
+        <h3>AuthService</h3>
+        <div class="port port-orange">:5002 — ASP.NET Core</div>
+        <p>Xác thực & phân quyền. Quản lý user, role, JWT token, Google OAuth, OTP.</p>
+        <ul>
+          <li>Login / Register</li>
+          <li>Google OAuth 2.0</li>
+          <li>OTP via Gmail SMTP</li>
+          <li>Rate limit: 20 req/min</li>
+        </ul>
+      </div>
+      <div class="card green">
+        <div class="card-icon">📦</div>
+        <h3>APIService</h3>
+        <div class="port port-green">:5001 — ASP.NET Core</div>
+        <p>Nghiệp vụ chính: sản phẩm, đơn hàng, danh mục, nhà cung cấp, khuyến mãi.</p>
+        <ul>
+          <li>Product / Category CRUD</li>
+          <li>Order transactions</li>
+          <li>Supplier / Promotion</li>
+          <li>Rate limit: 100 req/min</li>
+        </ul>
+      </div>
+      <div class="card purple">
+        <div class="card-icon">📋</div>
+        <h3>AuditLog Service</h3>
+        <div class="port port-purple">:5004 — ASP.NET Core</div>
+        <p>Ghi nhận lỗi và hoạt động hệ thống. Hỗ trợ giám sát và debug.</p>
+        <ul>
+          <li>Log error entries</li>
+          <li>Query audit history</li>
+          <li>Test error endpoint</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <!-- 2. LUỒNG XÁC THỰC -->
+  <div class="section">
+    <div class="section-title">2. Luồng Xác Thực <span>Authentication Flows</span></div>
+
+    <!-- 2A Login -->
+    <div class="flow-box">
+      <div class="flow-title"><span class="dot dot-blue"></span> 2A. Đăng Nhập Username / Password</div>
+      <div class="flow">
+        <div class="step">
+          <div class="step-box blue">User nhập<br>Username + Pass</div>
+          <div class="step-label">Trình duyệt</div>
+        </div>
+        <div class="arrow">→</div>
+        <div class="step">
+          <div class="step-box blue">POST /api/auth/login</div>
+          <div class="step-label">API Gateway :5000</div>
+        </div>
+        <div class="arrow">→</div>
+        <div class="step">
+          <div class="step-box orange">Route → AuthService</div>
+          <div class="step-label">:5002</div>
+        </div>
+        <div class="arrow">→</div>
+        <div class="step">
+          <div class="step-box orange">Query DB<br>Hash+Salt verify</div>
+          <div class="step-label">PBKDF2 100K iter</div>
+        </div>
+        <div class="arrow">→</div>
+        <div class="step">
+          <div class="step-box green">Generate JWT<br>480 phút</div>
+          <div class="step-label">HS256 + Claims</div>
+        </div>
+        <div class="arrow">→</div>
+        <div class="step">
+          <div class="step-box blue">Lưu localStorage<br>Redirect Dashboard</div>
+          <div class="step-label">Frontend</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 2B Google -->
+    <div class="flow-box">
+      <div class="flow-title"><span class="dot dot-orange"></span> 2B. Google OAuth 2.0</div>
+      <div class="flow">
+        <div class="step">
+          <div class="step-box blue">Click<br>"Sign in Google"</div>
+          <div class="step-label">Frontend SDK</div>
+        </div>
+        <div class="arrow">→</div>
+        <div class="step">
+          <div class="step-box gray">Google Identity<br>ID Token</div>
+          <div class="step-label">Google OAuth</div>
+        </div>
+        <div class="arrow">→</div>
+        <div class="step">
+          <div class="step-box orange">POST /api/auth/google<br>{ idToken }</div>
+          <div class="step-label">AuthService</div>
+        </div>
+        <div class="arrow">→</div>
+        <div class="step">
+          <div class="step-box orange">Verify token<br>oauth2.googleapis.com</div>
+          <div class="step-label">Google verify</div>
+        </div>
+        <div class="arrow">→</div>
+        <div class="step">
+          <div class="step-box orange">Lookup GoogleId<br>→ email fallback<br>→ tạo user mới</div>
+          <div class="step-label">User management</div>
+        </div>
+        <div class="arrow">→</div>
+        <div class="step">
+          <div class="step-box green">Return JWT<br>(same as login)</div>
+          <div class="step-label">Response</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 2C OTP -->
+    <div class="flow-box">
+      <div class="flow-title"><span class="dot dot-purple"></span> 2C. OTP Verification</div>
+      <div class="flow">
+        <div class="step">
+          <div class="step-box blue">POST /api/auth<br>/send-otp</div>
+          <div class="step-label">Client</div>
+        </div>
+        <div class="arrow">→</div>
+        <div class="step">
+          <div class="step-box orange">Generate OTP<br>Lưu tạm (5 phút)</div>
+          <div class="step-label">AuthService</div>
+        </div>
+        <div class="arrow">→</div>
+        <div class="step">
+          <div class="step-box gray">Gmail SMTP :587<br>Gửi email OTP</div>
+          <div class="step-label">EmailService</div>
+        </div>
+        <div class="arrow">→</div>
+        <div class="step">
+          <div class="step-box blue">User nhập OTP<br>POST /verify-otp</div>
+          <div class="step-label">Client</div>
+        </div>
+        <div class="arrow">→</div>
+        <div class="step">
+          <div class="step-box orange">Kiểm tra OTP<br>& thời hạn</div>
+          <div class="step-label">AuthService</div>
+        </div>
+        <div class="arrow">→</div>
+        <div class="step">
+          <div class="step-box green">Xác thực thành công<br>200 OK</div>
+          <div class="step-label">Response</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- JWT Security -->
+    <div class="two-col">
+      <div class="flow-box" style="margin:0;">
+        <div class="flow-title"><span class="dot dot-blue"></span> JWT Token Structure</div>
+        <pre><span class="c">// Header</span>
+{ <span class="n">"alg"</span>: <span class="s">"HS256"</span>, <span class="n">"typ"</span>: <span class="s">"JWT"</span> }
+
+<span class="c">// Payload Claims</span>
+{
+  <span class="n">ClaimTypes.Name</span>: <span class="s">"username"</span>,
+  <span class="n">ClaimTypes.NameIdentifier</span>: <span class="s">"userId"</span>,
+  <span class="n">ClaimTypes.Role</span>: <span class="s">"Admin"</span>,
+  <span class="n">"exp"</span>: <span class="s">480 phút</span>
+}
+
+<span class="c">// Signing</span>
+<span class="k">HMAC-SHA256</span>(SecretKey)</pre>
+      </div>
+      <div class="flow-box" style="margin:0;">
+        <div class="flow-title"><span class="dot dot-orange"></span> Password Hashing — PBKDF2</div>
+        <pre><span class="c">// Khi tạo tài khoản</span>
+salt = <span class="k">RandomBytes</span>(16)
+hash = <span class="k">PBKDF2</span>(
+  password, salt,
+  iterations: <span class="s">100_000</span>,
+  prf: <span class="s">HMAC-SHA256</span>,
+  outputLen: <span class="s">32 bytes</span>
+)
+
+<span class="c">// Lưu database</span>
+User.Password = <span class="k">Base64</span>(hash)
+User.Salt     = <span class="k">Base64</span>(salt)</pre>
+      </div>
+    </div>
+  </div>
+
+  <!-- 3. API GATEWAY ROUTING -->
+  <div class="section">
+    <div class="section-title">3. API Gateway Routing <span>Ocelot Route Configuration</span></div>
+    <div class="flow-box">
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>Upstream Path (Client gọi)</th>
+              <th>Downstream Service</th>
+              <th>Port</th>
+              <th>Methods</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr><td><code>/api/auth/{everything}</code></td><td>AuthService</td><td><span class="tag tag-admin">:5002</span></td><td>POST, GET</td></tr>
+            <tr><td><code>/api/users/{everything}</code></td><td>AuthService</td><td><span class="tag tag-admin">:5002</span></td><td>GET, POST, PUT, DELETE</td></tr>
+            <tr><td><code>/api/roles/{everything}</code></td><td>AuthService</td><td><span class="tag tag-admin">:5002</span></td><td>GET</td></tr>
+            <tr><td><code>/api/products/{everything}</code></td><td>APIService</td><td><span class="tag tag-get">:5001</span></td><td>GET, POST, PUT, DELETE</td></tr>
+            <tr><td><code>/api/categories/{everything}</code></td><td>APIService</td><td><span class="tag tag-get">:5001</span></td><td>GET, POST, PUT, DELETE</td></tr>
+            <tr><td><code>/api/orders/{everything}</code></td><td>APIService</td><td><span class="tag tag-get">:5001</span></td><td>GET, POST, PUT, DELETE</td></tr>
+            <tr><td><code>/api/suppliers/{everything}</code></td><td>APIService</td><td><span class="tag tag-get">:5001</span></td><td>GET, POST, PUT, DELETE</td></tr>
+            <tr><td><code>/api/promotions/{everything}</code></td><td>APIService</td><td><span class="tag tag-get">:5001</span></td><td>GET, POST, PUT, DELETE</td></tr>
+            <tr><td><code>/api/settings/{everything}</code></td><td>APIService</td><td><span class="tag tag-get">:5001</span></td><td>GET, POST, PUT</td></tr>
+            <tr><td><code>/api/auditLog/{everything}</code></td><td>AuditLog</td><td><span class="tag tag-admin">:5004</span></td><td>GET, POST</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- 4. LUỒNG NGHIỆP VỤ -->
+  <div class="section">
+    <div class="section-title">4. Luồng Nghiệp Vụ Chính <span>Core Business Flows</span></div>
+
+    <!-- Order Flow -->
+    <div class="flow-box">
+      <div class="flow-title"><span class="dot dot-green"></span> 4A. Luồng Tạo Đơn Hàng — Transaction đảm bảo tính toàn vẹn dữ liệu</div>
+      <div class="flow" style="flex-wrap:wrap;">
+        <div class="step">
+          <div class="step-box blue">User checkout<br>POST /api/orders</div>
+          <div class="step-label">Frontend</div>
+        </div>
+        <div class="arrow">→</div>
+        <div class="step">
+          <div class="step-box blue">JWT validate<br>Lấy userId</div>
+          <div class="step-label">Middleware</div>
+        </div>
+        <div class="arrow">→</div>
+        <div class="step">
+          <div class="step-box orange">BEGIN<br>TRANSACTION</div>
+          <div class="step-label">SQL Transaction</div>
+        </div>
+        <div class="arrow">→</div>
+        <div class="step">
+          <div class="step-box orange">Kiểm tra stock<br>từng sản phẩm</div>
+          <div class="step-label">Validate</div>
+        </div>
+        <div class="arrow">→</div>
+        <div class="step">
+          <div class="step-box orange">Snapshot giá<br>Trừ tồn kho</div>
+          <div class="step-label">Price lock</div>
+        </div>
+        <div class="arrow">→</div>
+        <div class="step">
+          <div class="step-box green">Tạo Order +<br>OrderDetails</div>
+          <div class="step-label">Bulk insert</div>
+        </div>
+        <div class="arrow">→</div>
+        <div class="step">
+          <div class="step-box green">COMMIT<br>201 Created</div>
+          <div class="step-label">Success</div>
+        </div>
+      </div>
+      <div style="margin-top:14px;padding:12px;background:#fef2f2;border-radius:8px;font-size:12px;color:#991b1b;">
+        ⚠️ <strong>Rollback khi lỗi:</strong> Nếu bất kỳ bước nào thất bại (stock không đủ, lỗi DB...) → ROLLBACK toàn bộ → tồn kho được hoàn trả → trả lỗi 500
+      </div>
+    </div>
+
+    <!-- API Request Flow -->
+    <div class="flow-box">
+      <div class="flow-title"><span class="dot dot-blue"></span> 4B. Luồng API Request Có Xác Thực</div>
+      <div class="flow">
+        <div class="step">
+          <div class="step-box blue">React<br>axios.get()</div>
+          <div class="step-label">Component</div>
+        </div>
+        <div class="arrow">→</div>
+        <div class="step">
+          <div class="step-box blue">Interceptor thêm<br>Bearer Token</div>
+          <div class="step-label">Axios interceptor</div>
+        </div>
+        <div class="arrow">→</div>
+        <div class="step">
+          <div class="step-box blue">API Gateway<br>:5000</div>
+          <div class="step-label">Route + CORS</div>
+        </div>
+        <div class="arrow">→</div>
+        <div class="step">
+          <div class="step-box green">JWT Middleware<br>Validate token</div>
+          <div class="step-label">APIService</div>
+        </div>
+        <div class="arrow">→</div>
+        <div class="step">
+          <div class="step-box green">Controller →<br>Service → Repo</div>
+          <div class="step-label">Business logic</div>
+        </div>
+        <div class="arrow">→</div>
+        <div class="step">
+          <div class="step-box green">SQL Server<br>EF Core query</div>
+          <div class="step-label">Database</div>
+        </div>
+        <div class="arrow">→</div>
+        <div class="step">
+          <div class="step-box blue">200 OK<br>JSON data</div>
+          <div class="step-label">Response</div>
+        </div>
+      </div>
+      <div style="margin-top:14px;padding:12px;background:#fef3c7;border-radius:8px;font-size:12px;color:#92400e;">
+        🔁 <strong>Xử lý 401:</strong> Axios response interceptor bắt 401 → xóa localStorage → redirect /login tự động
+      </div>
+    </div>
+
+    <!-- Soft Delete -->
+    <div class="flow-box">
+      <div class="flow-title"><span class="dot dot-purple"></span> 4C. Soft Delete Pattern</div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;font-size:13px;">
+        <div>
+          <div style="font-weight:600;margin-bottom:8px;color:#374151;">Áp dụng cho:</div>
+          <ul style="padding-left:16px;line-height:2;">
+            <li>Product (<code>IsDeleted</code>)</li>
+            <li>Category (<code>IsDeleted</code>)</li>
+            <li>Supplier (<code>IsDeleted</code>)</li>
+          </ul>
+        </div>
+        <div>
+          <div style="font-weight:600;margin-bottom:8px;color:#374151;">Cơ chế:</div>
+          <ul style="padding-left:16px;line-height:2;">
+            <li>DELETE → set IsDeleted = true</li>
+            <li>Global Query Filter tự động lọc</li>
+            <li>OrderDetail vẫn giữ lịch sử đơn hàng</li>
+            <li>Restrict FK nếu có trong OrderDetail</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 5. CÁC ENDPOINT CHÍNH -->
+  <div class="section">
+    <div class="section-title">5. Bảng Endpoint Chính <span>REST API Reference</span></div>
+
+    <div class="flow-box" style="margin-bottom:16px;">
+      <div class="flow-title"><span class="dot dot-orange"></span> AuthService — :5002</div>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>Method</th><th>Endpoint</th><th>Mô tả</th><th>Auth</th></tr></thead>
+          <tbody>
+            <tr><td><span class="tag tag-post">POST</span></td><td><code>/api/auth/login</code></td><td>Đăng nhập → JWT</td><td>Public</td></tr>
+            <tr><td><span class="tag tag-post">POST</span></td><td><code>/api/auth/register</code></td><td>Đăng ký tài khoản mới</td><td>Public</td></tr>
+            <tr><td><span class="tag tag-post">POST</span></td><td><code>/api/auth/google</code></td><td>Google OAuth login</td><td>Public</td></tr>
+            <tr><td><span class="tag tag-post">POST</span></td><td><code>/api/auth/send-otp</code></td><td>Gửi OTP qua Gmail</td><td>Public</td></tr>
+            <tr><td><span class="tag tag-post">POST</span></td><td><code>/api/auth/verify-otp</code></td><td>Xác minh OTP (5 phút)</td><td>Public</td></tr>
+            <tr><td><span class="tag tag-get">GET</span></td><td><code>/api/users</code></td><td>Danh sách users (phân trang)</td><td><span class="tag tag-admin">Admin</span></td></tr>
+            <tr><td><span class="tag tag-put">PUT</span></td><td><code>/api/users/{id}</code></td><td>Cập nhật thông tin user</td><td><span class="tag tag-admin">Admin</span></td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <div class="flow-box" style="margin-bottom:16px;">
+      <div class="flow-title"><span class="dot dot-green"></span> APIService — :5001 — Products</div>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>Method</th><th>Endpoint</th><th>Mô tả</th><th>Auth</th></tr></thead>
+          <tbody>
+            <tr><td><span class="tag tag-get">GET</span></td><td><code>/api/products</code></td><td>Danh sách sản phẩm (filter, pagination)</td><td>Public</td></tr>
+            <tr><td><span class="tag tag-get">GET</span></td><td><code>/api/products/{id}</code></td><td>Chi tiết sản phẩm</td><td>Public</td></tr>
+            <tr><td><span class="tag tag-get">GET</span></td><td><code>/api/products/category/{id}</code></td><td>Sản phẩm theo danh mục</td><td>Public</td></tr>
+            <tr><td><span class="tag tag-post">POST</span></td><td><code>/api/products</code></td><td>Tạo sản phẩm mới</td><td><span class="tag tag-admin">Admin</span></td></tr>
+            <tr><td><span class="tag tag-put">PUT</span></td><td><code>/api/products/{id}</code></td><td>Cập nhật (partial update)</td><td><span class="tag tag-admin">Admin</span></td></tr>
+            <tr><td><span class="tag tag-delete">DELETE</span></td><td><code>/api/products/{id}</code></td><td>Soft delete (IsDeleted=true)</td><td><span class="tag tag-admin">Admin</span></td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <div class="flow-box">
+      <div class="flow-title"><span class="dot dot-blue"></span> APIService — :5001 — Orders</div>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>Method</th><th>Endpoint</th><th>Mô tả</th><th>Auth</th></tr></thead>
+          <tbody>
+            <tr><td><span class="tag tag-get">GET</span></td><td><code>/api/orders</code></td><td>Đơn hàng của user hiện tại</td><td>User+</td></tr>
+            <tr><td><span class="tag tag-get">GET</span></td><td><code>/api/orders/all</code></td><td>Tất cả đơn hàng (pagination, filter)</td><td><span class="tag tag-admin">Admin</span></td></tr>
+            <tr><td><span class="tag tag-get">GET</span></td><td><code>/api/orders/{id}</code></td><td>Chi tiết đơn hàng + items</td><td>User+</td></tr>
+            <tr><td><span class="tag tag-post">POST</span></td><td><code>/api/orders</code></td><td>Tạo đơn hàng (transaction)</td><td>User+</td></tr>
+            <tr><td><span class="tag tag-put">PUT</span></td><td><code>/api/orders/{id}/status</code></td><td>Cập nhật trạng thái đơn</td><td><span class="tag tag-admin">Admin</span></td></tr>
+            <tr><td><span class="tag tag-put">PUT</span></td><td><code>/api/orders/{id}/cancel</code></td><td>Hủy đơn, hoàn tồn kho</td><td>User+</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- 6. DATA MODEL -->
+  <div class="section">
+    <div class="section-title">6. Mô Hình Dữ Liệu <span>Entity Relationship</span></div>
+    <div class="entity-grid">
+      <div class="entity-card">
+        <div class="entity-header">User</div>
+        <div class="entity-body">
+          <div class="entity-field"><span class="field-key">PK</span> Id (int)</div>
+          <div class="entity-field">UserName (unique)</div>
+          <div class="entity-field">Password, Salt</div>
+          <div class="entity-field">Email, Phone, Name</div>
+          <div class="entity-field">UserType (1=Admin, 2=User)</div>
+          <div class="entity-field">GoogleId, IsActive</div>
+        </div>
+      </div>
+      <div class="entity-card">
+        <div class="entity-header">Product</div>
+        <div class="entity-body">
+          <div class="entity-field"><span class="field-key">PK</span> Id (int)</div>
+          <div class="entity-field">Name, Price (18,2)</div>
+          <div class="entity-field">Stock, Description</div>
+          <div class="entity-field">Sku, Slug (unique)</div>
+          <div class="entity-field"><span class="field-fk">FK</span> CategoryId</div>
+          <div class="entity-field"><span class="field-fk">FK</span> SupplierId (nullable)</div>
+          <div class="entity-field">IsActive, IsDeleted</div>
+        </div>
+      </div>
+      <div class="entity-card">
+        <div class="entity-header">Order</div>
+        <div class="entity-body">
+          <div class="entity-field"><span class="field-key">PK</span> Id (int)</div>
+          <div class="entity-field"><span class="field-fk">FK</span> UserId</div>
+          <div class="entity-field">OrderDate, TotalAmount</div>
+          <div class="entity-field">Status (Pending/Completed/Cancelled)</div>
+          <div class="entity-field">PaymentStatus (Paid/Unpaid)</div>
+          <div class="entity-field">PaymentMethod (COD/Online)</div>
+          <div class="entity-field">ShippingAddress</div>
+        </div>
+      </div>
+      <div class="entity-card">
+        <div class="entity-header">OrderDetail</div>
+        <div class="entity-body">
+          <div class="entity-field"><span class="field-key">PK</span> Id (int)</div>
+          <div class="entity-field"><span class="field-fk">FK</span> OrderId (cascade)</div>
+          <div class="entity-field"><span class="field-fk">FK</span> ProductId (restrict)</div>
+          <div class="entity-field">Quantity (int)</div>
+          <div class="entity-field">UnitPrice — snapshot giá</div>
+        </div>
+      </div>
+      <div class="entity-card">
+        <div class="entity-header">Category</div>
+        <div class="entity-body">
+          <div class="entity-field"><span class="field-key">PK</span> Id (int)</div>
+          <div class="entity-field">Name (required)</div>
+          <div class="entity-field">Description</div>
+          <div class="entity-field">IsDeleted, CreatedAt</div>
+        </div>
+      </div>
+      <div class="entity-card">
+        <div class="entity-header">Promotion</div>
+        <div class="entity-body">
+          <div class="entity-field"><span class="field-key">PK</span> Id (int)</div>
+          <div class="entity-field">Name (unique)</div>
+          <div class="entity-field">PromoType, Value</div>
+          <div class="entity-field">MinOrder, StartDate, EndDate</div>
+          <div class="entity-field">IsActive</div>
+          <div class="entity-field">→ PromotionProduct (M:N)</div>
+        </div>
+      </div>
+      <div class="entity-card">
+        <div class="entity-header">Cart / Wishlist</div>
+        <div class="entity-body">
+          <div class="entity-field"><span class="field-fk">FK</span> UserId (cascade)</div>
+          <div class="entity-field"><span class="field-fk">FK</span> ProductId (cascade)</div>
+          <div class="entity-field">Quantity, AddedAt</div>
+          <div class="entity-field">Unique (UserId, ProductId)</div>
+        </div>
+      </div>
+      <div class="entity-card">
+        <div class="entity-header">OrderLog</div>
+        <div class="entity-body">
+          <div class="entity-field"><span class="field-fk">FK</span> OrderId (cascade)</div>
+          <div class="entity-field"><span class="field-fk">FK</span> ChangedBy (nullable)</div>
+          <div class="entity-field">OldStatus → NewStatus</div>
+          <div class="entity-field">Note, ChangedAt</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- FK Relations -->
+    <div class="flow-box" style="margin-top:16px;">
+      <div class="flow-title"><span class="dot dot-purple"></span> Quan hệ khóa ngoại & Cascade Rules</div>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>Quan hệ</th><th>Cascade Rule</th><th>Lý do</th></tr></thead>
+          <tbody>
+            <tr><td>Order → OrderDetail</td><td><span class="tag tag-delete">CASCADE DELETE</span></td><td>Xóa đơn hàng thì xóa chi tiết theo</td></tr>
+            <tr><td>OrderDetail → Product</td><td><span class="tag tag-admin">RESTRICT</span></td><td>Không xóa sản phẩm nếu có trong đơn hàng</td></tr>
+            <tr><td>Cart/Wishlist → User</td><td><span class="tag tag-delete">CASCADE DELETE</span></td><td>Xóa user thì xóa giỏ hàng</td></tr>
+            <tr><td>UserAddress → User</td><td><span class="tag tag-delete">CASCADE DELETE</span></td><td>Xóa user thì xóa địa chỉ</td></tr>
+            <tr><td>OrderLog → Order</td><td><span class="tag tag-delete">CASCADE DELETE</span></td><td>Log đi theo đơn hàng</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- 7. FRONTEND -->
+  <div class="section">
+    <div class="section-title">7. Cấu Trúc Frontend <span>2 ứng dụng song song</span></div>
+    <div class="two-col">
+      <div class="card blue">
+        <div class="card-icon">⚛️</div>
+        <h3>WebClient — Admin Dashboard</h3>
+        <div class="port port-blue">React 18 + Vite — :3000</div>
+        <p style="margin-bottom:10px;">SPA quản trị cho Admin. React Router, Axios, Bootstrap.</p>
+        <div style="font-size:12px;font-weight:600;margin-bottom:4px;">Route Admin (Protected):</div>
+        <ul>
+          <li>/admin — Dashboard tổng quan</li>
+          <li>/admin/products — Quản lý sản phẩm</li>
+          <li>/admin/orders — Quản lý đơn hàng</li>
+          <li>/admin/users — Quản lý người dùng</li>
+          <li>/admin/reports — Báo cáo thống kê</li>
+          <li>/admin/discounts — Khuyến mãi</li>
+          <li>/admin/audit-logs — Nhật ký hệ thống</li>
+        </ul>
+        <div style="margin-top:10px;font-size:12px;font-weight:600;">State Management:</div>
+        <ul>
+          <li>AuthContext — user + token</li>
+          <li>CartContext — giỏ hàng localStorage</li>
+          <li>Axios interceptors — auto auth header</li>
+        </ul>
+      </div>
+      <div class="card green">
+        <div class="card-icon">🛍️</div>
+        <h3>HexaShop — Customer Store</h3>
+        <div class="port port-green">HTML Template — :5173</div>
+        <p style="margin-bottom:10px;">Giao diện khách hàng dựa trên template BootStrap. Vanilla JS.</p>
+        <div style="font-size:12px;font-weight:600;margin-bottom:4px;">Pages:</div>
+        <ul>
+          <li>index.html — Trang chủ</li>
+          <li>products.html — Danh sách sản phẩm</li>
+          <li>single-product.html — Chi tiết SP</li>
+          <li>cart.html — Giỏ hàng</li>
+          <li>checkout.html — Thanh toán</li>
+          <li>login.html / register.html</li>
+          <li>about.html / contact.html</li>
+        </ul>
+        <div style="margin-top:10px;font-size:12px;font-weight:600;">JS Modules:</div>
+        <ul>
+          <li>api.js — Gọi API qua gateway</li>
+          <li>cart.js — Quản lý giỏ hàng</li>
+          <li>auth-widget.js — Đăng nhập</li>
+          <li>product-detail.js — Chi tiết SP</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <!-- 8. STARTUP -->
+  <div class="section">
+    <div class="section-title">8. Thứ Tự Khởi Động <span>Service startup sequence</span></div>
+    <div class="flow-box">
+      <div class="flow" style="align-items:center;">
+        <div class="step" style="min-width:90px;">
+          <div class="step-box orange">[1] AuthService<br>:5002</div>
+          <div class="step-label">dotnet run</div>
+        </div>
+        <div class="arrow">→</div>
+        <div class="step" style="min-width:90px;">
+          <div class="step-box green">[2] APIService<br>:5001</div>
+          <div class="step-label">dotnet run</div>
+        </div>
+        <div class="arrow">→</div>
+        <div class="step" style="min-width:90px;">
+          <div class="step-box purple">[3] AuditLog<br>:5004</div>
+          <div class="step-label">dotnet run</div>
+        </div>
+        <div class="arrow">→</div>
+        <div class="step" style="min-width:90px;">
+          <div class="step-box blue">[4] API Gateway<br>:5000</div>
+          <div class="step-label">dotnet run</div>
+        </div>
+        <div class="arrow">→</div>
+        <div class="step" style="min-width:90px;">
+          <div class="step-box blue">[5] WebClient<br>:3000</div>
+          <div class="step-label">npm run dev</div>
+        </div>
+        <div class="arrow">→</div>
+        <div class="step" style="min-width:90px;">
+          <div class="step-box green">[6] HexaShop<br>:5173</div>
+          <div class="step-label">npm run dev</div>
+        </div>
+      </div>
+      <div style="margin-top:12px;padding:10px 14px;background:#f0fdf4;border-radius:8px;font-size:12px;color:#166534;">
+        ✅ Chạy <code>start-all.bat</code> để khởi động tất cả services cùng lúc. Gateway phải khởi động SAU khi các services đã ready.
+      </div>
+    </div>
+  </div>
+
+  <!-- 9. TECH STACK -->
+  <div class="section">
+    <div class="section-title">9. Tech Stack & Patterns <span>Công nghệ sử dụng</span></div>
+    <div class="two-col">
+      <div class="flow-box" style="margin:0;">
+        <div class="flow-title"><span class="dot dot-blue"></span> Backend</div>
+        <div class="tech-list">
+          <span class="tech-tag" style="background:#dbeafe;color:#1e40af;">ASP.NET Core 8</span>
+          <span class="tech-tag" style="background:#dcfce7;color:#166534;">Entity Framework Core</span>
+          <span class="tech-tag" style="background:#fef3c7;color:#92400e;">SQL Server</span>
+          <span class="tech-tag" style="background:#f3e8ff;color:#6b21a8;">Ocelot Gateway</span>
+          <span class="tech-tag" style="background:#ffe4e6;color:#9f1239;">JWT / PBKDF2</span>
+          <span class="tech-tag" style="background:#f1f5f9;color:#334155;">Repository Pattern</span>
+          <span class="tech-tag" style="background:#f1f5f9;color:#334155;">Dependency Injection</span>
+          <span class="tech-tag" style="background:#dbeafe;color:#1e40af;">Rate Limiting</span>
+          <span class="tech-tag" style="background:#dcfce7;color:#166534;">CORS</span>
+          <span class="tech-tag" style="background:#fef3c7;color:#92400e;">Gmail SMTP</span>
+        </div>
+      </div>
+      <div class="flow-box" style="margin:0;">
+        <div class="flow-title"><span class="dot dot-green"></span> Frontend & Patterns</div>
+        <div class="tech-list">
+          <span class="tech-tag" style="background:#dbeafe;color:#1e40af;">React 18</span>
+          <span class="tech-tag" style="background:#dcfce7;color:#166534;">Vite</span>
+          <span class="tech-tag" style="background:#fef3c7;color:#92400e;">React Router v7</span>
+          <span class="tech-tag" style="background:#f3e8ff;color:#6b21a8;">Axios + Interceptors</span>
+          <span class="tech-tag" style="background:#ffe4e6;color:#9f1239;">Context API</span>
+          <span class="tech-tag" style="background:#f1f5f9;color:#334155;">Bootstrap 4.6</span>
+          <span class="tech-tag" style="background:#f1f5f9;color:#334155;">localStorage</span>
+          <span class="tech-tag" style="background:#dbeafe;color:#1e40af;">Soft Delete</span>
+          <span class="tech-tag" style="background:#dcfce7;color:#166534;">Transaction</span>
+          <span class="tech-tag" style="background:#fef3c7;color:#92400e;">RBAC</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div style="text-align:center;color:#9ca3af;font-size:12px;margin-top:32px;padding-top:24px;border-top:1px solid var(--border);">
+    BaseCore E-Commerce Platform — Tài liệu kiến trúc hệ thống • Được tạo bởi Claude Code
+  </div>
+
+</div>
+</body>
+</html>

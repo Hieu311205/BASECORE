@@ -1,0 +1,324 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <title>Sổ địa chỉ - Lumière Perfume</title>
+
+    <link href="assets/css/bootstrap.min.css" rel="stylesheet">
+    <link href="assets/css/font-awesome.css" rel="stylesheet">
+    <link href="assets/css/templatemo-hexashop.css" rel="stylesheet">
+    <link href="assets/css/perfume-luxury-v2.css" rel="stylesheet">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@500;600;700;800&family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+    <style>
+        .cart-icon { position: relative; }
+        .cart-badge { position: absolute; top: -8px; right: -15px; background: #d4af37; color: #000; border-radius: 50%; padding: 2px 6px; font-size: 12px; font-weight: bold; }
+
+        .addr-wrap { max-width: 860px; margin: 0 auto; }
+        .addr-head { display: flex; justify-content: space-between; align-items: center; margin-bottom: 22px; gap: 12px; flex-wrap: wrap; }
+        .addr-head h3 { color: #d4af37; font-family: "Playfair Display", serif; margin: 0; font-size: 24px; }
+
+        .addr-card {
+            background: #101010;
+            border: 1px solid rgba(212,175,55,0.22);
+            border-radius: 10px;
+            padding: 18px 20px;
+            margin-bottom: 14px;
+            display: flex;
+            justify-content: space-between;
+            gap: 16px;
+            flex-wrap: wrap;
+        }
+        .addr-card.is-default { border-color: #d4af37; box-shadow: 0 0 0 1px rgba(212,175,55,0.25); }
+        .addr-info { flex: 1; min-width: 220px; }
+        .addr-name-row { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; margin-bottom: 6px; }
+        .addr-name { color: #fff; font-weight: 600; font-size: 15px; }
+        .addr-phone { color: #b8b0a4; font-size: 14px; border-left: 1px solid rgba(255,255,255,0.18); padding-left: 10px; }
+        .addr-text { color: #b8b0a4; font-size: 14px; line-height: 1.6; }
+        .addr-tag { font-size: 11px; color: #d4af37; border: 1px solid #d4af37; border-radius: 4px; padding: 1px 8px; letter-spacing: 0.5px; }
+        .addr-label-chip { font-size: 11px; color: #b8b0a4; background: rgba(255,255,255,0.06); border-radius: 4px; padding: 1px 8px; }
+
+        .addr-actions { display: flex; flex-direction: column; gap: 8px; align-items: flex-end; }
+        .addr-actions .row-btns { display: flex; gap: 14px; }
+        .link-btn { background: none; border: none; color: #d4af37; cursor: pointer; font-size: 13px; padding: 0; }
+        .link-btn:hover { color: #fff; }
+        .link-btn.danger { color: #c97b6b; }
+        .link-btn.danger:hover { color: #ff8c75; }
+        .ghost-btn { background: none; border: 1px solid rgba(212,175,55,0.5); color: #d4af37; border-radius: 6px; padding: 5px 12px; cursor: pointer; font-size: 12px; }
+        .ghost-btn:hover { background: rgba(212,175,55,0.12); }
+        .ghost-btn[disabled] { opacity: 0.4; cursor: default; }
+
+        .addr-empty { text-align: center; padding: 50px 20px; background: #101010; border: 1px dashed rgba(212,175,55,0.3); border-radius: 10px; color: #b8b0a4; }
+        .addr-empty i { color: #d4af37; margin-bottom: 14px; }
+
+        /* Modal */
+        .modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.7); display: none; align-items: center; justify-content: center; z-index: 2000; padding: 16px; }
+        .modal-overlay.show { display: flex; }
+        .modal-box { background: #0d0d0d; border: 1px solid #d4af37; border-radius: 12px; width: 100%; max-width: 480px; padding: 26px; }
+        .modal-box h4 { color: #d4af37; font-family: "Playfair Display", serif; margin: 0 0 18px; }
+        .modal-box label { display: block; color: #d4af37; font-weight: 600; margin-bottom: 6px; font-size: 13px; }
+        .modal-box input, .modal-box textarea {
+            width: 100%; border: 1px solid rgba(212,175,55,0.4); background: #070707; color: #fff;
+            border-radius: 6px; padding: 10px 12px; margin-bottom: 14px; font-family: 'Poppins', sans-serif; font-size: 14px;
+        }
+        .modal-box input:focus, .modal-box textarea:focus { outline: none; border-color: #d4af37; }
+        .modal-check { display: flex; align-items: center; gap: 8px; margin-bottom: 18px; color: #b8b0a4; font-size: 13px; }
+        .modal-check input { width: auto; margin: 0; }
+        .modal-actions { display: flex; justify-content: flex-end; gap: 12px; }
+        .modal-cancel { background: none; border: none; color: #b8b0a4; cursor: pointer; }
+        .modal-cancel:hover { color: #fff; }
+        .field-error { color: #ff8c75; font-size: 12px; margin: -10px 0 12px; min-height: 0; }
+    </style>
+</head>
+<body>
+    <div class="perfume-topbar">
+        <div class="container">
+            <div class="topbar-inner">
+                <span>Miễn phí giao hàng cho đơn từ 1.000.000đ</span>
+                <span>Hotline: 0123 456 789 &nbsp;&nbsp; | &nbsp;&nbsp; lumiereperfume@gmail.com</span>
+            </div>
+        </div>
+    </div>
+
+    <header class="header-area header-sticky">
+        <div class="container">
+            <div class="row">
+                <div class="col-12">
+                    <nav class="main-nav">
+                        <a class="logo" href="index.html"><span class="logo-text">LUMIÈRE <em>PERFUME</em></span></a>
+                        <ul class="nav">
+                            <li><a href="index.html">Trang chủ</a></li>
+                            <li><a href="products.html">Sản phẩm</a></li>
+                            <li><a href="about.html">Về chúng tôi</a></li>
+                            <li><a href="contact.html">Liên hệ</a></li>
+                            <li class="cart-icon">
+                                <a href="cart.html"><i class="fa fa-shopping-cart"></i><span class="cart-badge">0</span></a>
+                            </li>
+                        </ul>
+                        <a class="menu-trigger"><span>Menu</span></a>
+                    </nav>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <section class="page-hero">
+        <div class="container">
+            <h1>SỔ ĐỊA CHỈ</h1>
+            <p>Lưu nhiều địa chỉ nhận hàng để thanh toán nhanh hơn.</p>
+        </div>
+    </section>
+
+    <section class="section">
+        <div class="container">
+            <div class="addr-wrap">
+                <div class="addr-head">
+                    <h3>Địa chỉ của tôi</h3>
+                    <button type="button" class="gold-btn" id="add-address-btn">
+                        <i class="fa fa-plus" style="margin-right:8px;"></i>Thêm địa chỉ mới
+                    </button>
+                </div>
+                <div id="address-list"></div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Modal thêm/sửa địa chỉ -->
+    <div class="modal-overlay" id="addr-modal">
+        <div class="modal-box">
+            <h4 id="addr-modal-title">Địa chỉ mới</h4>
+            <form id="addr-form">
+                <input type="hidden" id="addr-id">
+
+                <label for="addr-recipient">Họ tên người nhận</label>
+                <input id="addr-recipient" type="text" placeholder="Nguyễn Văn A" required>
+
+                <label for="addr-phone">Số điện thoại</label>
+                <input id="addr-phone" type="tel" placeholder="0123 456 789" required>
+                <div class="field-error" id="addr-phone-err"></div>
+
+                <label for="addr-address">Địa chỉ nhận hàng</label>
+                <textarea id="addr-address" rows="3" placeholder="Số nhà, đường, phường/xã, quận/huyện, tỉnh/thành phố" required></textarea>
+
+                <label for="addr-label">Nhãn (tùy chọn)</label>
+                <input id="addr-label" type="text" placeholder="Nhà riêng / Cơ quan">
+
+                <div class="modal-check">
+                    <input type="checkbox" id="addr-default">
+                    <label for="addr-default" style="margin:0; color:#b8b0a4; font-weight:400;">Đặt làm địa chỉ mặc định</label>
+                </div>
+
+                <div class="modal-actions">
+                    <button type="button" class="modal-cancel" id="addr-cancel">Hủy</button>
+                    <button type="submit" class="gold-btn" id="addr-save">Lưu địa chỉ</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <footer class="footer">
+        <div class="container">
+            <div class="row">
+                <div class="col-lg-12"><div class="under-footer"><p>© 2026 Lumière Perfume. All Rights Reserved.</p></div></div>
+            </div>
+        </div>
+    </footer>
+
+    <script src="assets/js/jquery-2.1.0.min.js"></script>
+    <script src="assets/js/bootstrap.min.js"></script>
+    <script src="assets/custom-js/api.js"></script>
+    <script src="assets/custom-js/cart.js"></script>
+    <script src="assets/custom-js/addresses.js"></script>
+    <script src="assets/custom-js/auth-widget.js"></script>
+
+    <script>
+        (function () {
+            const listEl   = document.getElementById("address-list");
+            const modal    = document.getElementById("addr-modal");
+            const form     = document.getElementById("addr-form");
+            const titleEl  = document.getElementById("addr-modal-title");
+            const phoneErr = document.getElementById("addr-phone-err");
+
+            function esc(value) {
+                if (typeof escapeHtml === "function") return escapeHtml(value);
+                return String(value || "").replace(/[&<>"']/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#039;" }[c]));
+            }
+
+            function renderEmpty() {
+                listEl.innerHTML = `
+                    <div class="addr-empty">
+                        <i class="fa fa-map-marker fa-3x"></i>
+                        <h4 style="color:#fff;">Chưa có địa chỉ nào</h4>
+                        <p>Thêm địa chỉ nhận hàng để thanh toán nhanh hơn.</p>
+                    </div>`;
+            }
+
+            function cardHtml(a) {
+                const isDefault = a.isDefault || a.IsDefault;
+                const id        = a.id || a.Id;
+                const recipient = a.recipient || a.Recipient || "";
+                const phone     = a.phone || a.Phone || "";
+                const address   = a.address || a.Address || "";
+                const label     = a.label || a.Label || "";
+
+                return `
+                    <div class="addr-card ${isDefault ? "is-default" : ""}" data-id="${id}">
+                        <div class="addr-info">
+                            <div class="addr-name-row">
+                                <span class="addr-name">${esc(recipient)}</span>
+                                <span class="addr-phone">${esc(phone)}</span>
+                                ${label ? `<span class="addr-label-chip">${esc(label)}</span>` : ""}
+                                ${isDefault ? `<span class="addr-tag">Mặc định</span>` : ""}
+                            </div>
+                            <div class="addr-text">${esc(address)}</div>
+                        </div>
+                        <div class="addr-actions">
+                            <div class="row-btns">
+                                <button type="button" class="link-btn" data-action="edit" data-id="${id}">Sửa</button>
+                                <button type="button" class="link-btn danger" data-action="delete" data-id="${id}">Xóa</button>
+                            </div>
+                            <button type="button" class="ghost-btn" data-action="default" data-id="${id}" ${isDefault ? "disabled" : ""}>
+                                ${isDefault ? "Đang mặc định" : "Đặt mặc định"}
+                            </button>
+                        </div>
+                    </div>`;
+            }
+
+            let cache = [];
+
+            async function load() {
+                listEl.innerHTML = `<p style="color:#b8b0a4;text-align:center;padding:30px;">Đang tải địa chỉ...</p>`;
+                try {
+                    cache = await AddressBook.list();
+                    if (!cache.length) { renderEmpty(); return; }
+                    listEl.innerHTML = cache.map(cardHtml).join("");
+                } catch (err) {
+                    listEl.innerHTML = `<div class="addr-empty"><i class="fa fa-exclamation-triangle fa-2x"></i><p>${esc(err.message)}</p><p style="font-size:12px;color:#666;">Hãy đảm bảo ApiGateway (5000) và APIService (5001) đang chạy.</p></div>`;
+                }
+            }
+
+            function openModal(addr) {
+                phoneErr.textContent = "";
+                if (addr) {
+                    titleEl.textContent = "Sửa địa chỉ";
+                    document.getElementById("addr-id").value        = addr.id || addr.Id;
+                    document.getElementById("addr-recipient").value  = addr.recipient || addr.Recipient || "";
+                    document.getElementById("addr-phone").value      = addr.phone || addr.Phone || "";
+                    document.getElementById("addr-address").value    = addr.address || addr.Address || "";
+                    document.getElementById("addr-label").value      = addr.label || addr.Label || "";
+                    document.getElementById("addr-default").checked  = !!(addr.isDefault || addr.IsDefault);
+                } else {
+                    titleEl.textContent = "Địa chỉ mới";
+                    form.reset();
+                    document.getElementById("addr-id").value = "";
+                }
+                modal.classList.add("show");
+            }
+
+            function closeModal() { modal.classList.remove("show"); }
+
+            document.getElementById("add-address-btn").addEventListener("click", () => openModal(null));
+            document.getElementById("addr-cancel").addEventListener("click", closeModal);
+            modal.addEventListener("click", e => { if (e.target === modal) closeModal(); });
+
+            listEl.addEventListener("click", async function (e) {
+                const btn = e.target.closest("[data-action]");
+                if (!btn) return;
+                const id = Number(btn.dataset.id);
+                const action = btn.dataset.action;
+
+                if (action === "edit") {
+                    const addr = cache.find(a => (a.id || a.Id) === id);
+                    openModal(addr);
+                } else if (action === "delete") {
+                    if (!confirm("Xóa địa chỉ này?")) return;
+                    try { await AddressBook.remove(id); await load(); }
+                    catch (err) { alert(err.message); }
+                } else if (action === "default") {
+                    try { await AddressBook.setDefault(id); await load(); }
+                    catch (err) { alert(err.message); }
+                }
+            });
+
+            form.addEventListener("submit", async function (e) {
+                e.preventDefault();
+                phoneErr.textContent = "";
+
+                const id = document.getElementById("addr-id").value;
+                const phone = document.getElementById("addr-phone").value.trim();
+                if (!/^[0-9+\s.\-]{8,15}$/.test(phone)) {
+                    phoneErr.textContent = "Số điện thoại không hợp lệ (8-15 chữ số).";
+                    return;
+                }
+
+                const payload = {
+                    recipient: document.getElementById("addr-recipient").value.trim(),
+                    phone,
+                    address: document.getElementById("addr-address").value.trim(),
+                    label: document.getElementById("addr-label").value.trim(),
+                    isDefault: document.getElementById("addr-default").checked
+                };
+
+                const saveBtn = document.getElementById("addr-save");
+                saveBtn.disabled = true; saveBtn.textContent = "Đang lưu...";
+                try {
+                    if (id) await AddressBook.update(Number(id), payload);
+                    else await AddressBook.create(payload);
+                    closeModal();
+                    await load();
+                } catch (err) {
+                    alert(err.message);
+                } finally {
+                    saveBtn.disabled = false; saveBtn.textContent = "Lưu địa chỉ";
+                }
+            });
+
+            document.addEventListener("DOMContentLoaded", load);
+            if (document.readyState !== "loading") load();
+        })();
+    </script>
+</body>
+</html>

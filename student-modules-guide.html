@@ -1,0 +1,1058 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Gợi ý Module Thực Hành — BaseCore</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+      background: #0f1117;
+      color: #e2e8f0;
+      line-height: 1.6;
+      padding: 0 0 60px;
+    }
+
+    /* ── HERO ── */
+    .hero {
+      background: linear-gradient(135deg, #1a1f2e 0%, #0d1b2a 60%, #0f2744 100%);
+      border-bottom: 1px solid #2d3748;
+      padding: 48px 32px 40px;
+      text-align: center;
+    }
+    .hero h1 {
+      font-size: 2rem;
+      font-weight: 700;
+      color: #63b3ed;
+      margin-bottom: 8px;
+      letter-spacing: -0.5px;
+    }
+    .hero p {
+      color: #94a3b8;
+      font-size: 0.95rem;
+      max-width: 620px;
+      margin: 0 auto;
+    }
+    .tag-row {
+      display: flex;
+      justify-content: center;
+      gap: 8px;
+      flex-wrap: wrap;
+      margin-top: 18px;
+    }
+    .tag {
+      padding: 4px 12px;
+      border-radius: 20px;
+      font-size: 0.75rem;
+      font-weight: 600;
+      letter-spacing: 0.4px;
+    }
+    .tag-green  { background: #1a4731; color: #6ee7b7; }
+    .tag-blue   { background: #1e3a5f; color: #93c5fd; }
+    .tag-purple { background: #2e1f5e; color: #c4b5fd; }
+    .tag-orange { background: #3d2000; color: #fbbf24; }
+
+    /* ── LAYOUT ── */
+    .container { max-width: 960px; margin: 0 auto; padding: 0 20px; }
+
+    /* ── LEGEND ── */
+    .legend {
+      display: flex;
+      gap: 20px;
+      flex-wrap: wrap;
+      background: #1a1f2e;
+      border: 1px solid #2d3748;
+      border-radius: 10px;
+      padding: 16px 20px;
+      margin: 28px 0 0;
+      font-size: 0.82rem;
+    }
+    .legend-item { display: flex; align-items: center; gap: 7px; }
+    .dot { width: 10px; height: 10px; border-radius: 50%; }
+    .dot-easy   { background: #48bb78; }
+    .dot-medium { background: #ed8936; }
+    .dot-hard   { background: #fc8181; }
+
+    /* ── MODULE CARD ── */
+    .module {
+      background: #1a1f2e;
+      border: 1px solid #2d3748;
+      border-radius: 14px;
+      margin-top: 32px;
+      overflow: hidden;
+    }
+    .module-header {
+      display: flex;
+      align-items: flex-start;
+      gap: 16px;
+      padding: 22px 24px 18px;
+      border-bottom: 1px solid #2d3748;
+    }
+    .module-icon {
+      font-size: 2rem;
+      line-height: 1;
+      flex-shrink: 0;
+    }
+    .module-meta { flex: 1; }
+    .module-meta h2 {
+      font-size: 1.2rem;
+      font-weight: 700;
+      color: #f0f4ff;
+      margin-bottom: 4px;
+    }
+    .module-meta p {
+      font-size: 0.85rem;
+      color: #94a3b8;
+    }
+    .badge {
+      padding: 3px 10px;
+      border-radius: 12px;
+      font-size: 0.72rem;
+      font-weight: 700;
+      white-space: nowrap;
+      flex-shrink: 0;
+    }
+    .badge-easy   { background: #1c4532; color: #48bb78; }
+    .badge-medium { background: #3d1f00; color: #ed8936; }
+    .badge-hard   { background: #3d1515; color: #fc8181; }
+
+    /* ── STEPS ── */
+    .steps { padding: 20px 24px 24px; }
+    .steps h3 {
+      font-size: 0.78rem;
+      font-weight: 700;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+      color: #718096;
+      margin-bottom: 16px;
+    }
+    .step {
+      display: grid;
+      grid-template-columns: 28px 1fr;
+      gap: 0 14px;
+      margin-bottom: 18px;
+    }
+    .step:last-child { margin-bottom: 0; }
+    .step-num {
+      width: 28px;
+      height: 28px;
+      border-radius: 50%;
+      background: #2d3748;
+      color: #90cdf4;
+      font-size: 0.78rem;
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+      margin-top: 2px;
+    }
+    .step-body {}
+    .step-body strong {
+      display: block;
+      color: #e2e8f0;
+      font-size: 0.9rem;
+      margin-bottom: 4px;
+    }
+    .step-body .note {
+      font-size: 0.82rem;
+      color: #718096;
+      margin-bottom: 6px;
+    }
+
+    /* ── CODE BLOCK ── */
+    pre {
+      background: #0d1117;
+      border: 1px solid #2d3748;
+      border-radius: 8px;
+      padding: 14px 16px;
+      overflow-x: auto;
+      font-size: 0.78rem;
+      line-height: 1.55;
+      color: #c9d1d9;
+      margin-top: 8px;
+    }
+    .c  { color: #8b949e; } /* comment */
+    .k  { color: #ff7b72; } /* keyword */
+    .t  { color: #79c0ff; } /* type */
+    .s  { color: #a5d6ff; } /* string */
+    .m  { color: #ffa657; } /* method/member */
+    .p  { color: #cae8ff; } /* property */
+    .n  { color: #e6edf3; } /* normal */
+    .kw { color: #ff7b72; } /* keyword */
+    .at { color: #d2a8ff; } /* attribute */
+
+    /* ── CHECKLIST ── */
+    .checklist {
+      background: #0d1117;
+      border: 1px solid #2d3748;
+      border-radius: 8px;
+      padding: 14px 16px;
+      margin-top: 8px;
+    }
+    .checklist li {
+      list-style: none;
+      font-size: 0.82rem;
+      color: #94a3b8;
+      padding: 3px 0;
+      display: flex;
+      align-items: flex-start;
+      gap: 8px;
+    }
+    .checklist li::before {
+      content: '○';
+      color: #4a5568;
+      flex-shrink: 0;
+      margin-top: 1px;
+    }
+
+    /* ── FILE PATH PILL ── */
+    .path {
+      display: inline-block;
+      background: #0d1117;
+      border: 1px solid #374151;
+      border-radius: 6px;
+      padding: 2px 8px;
+      font-size: 0.72rem;
+      color: #6ee7b7;
+      font-family: 'Cascadia Code', 'Fira Code', monospace;
+      word-break: break-all;
+    }
+
+    /* ── DIVIDER ── */
+    .section-title {
+      text-align: center;
+      margin: 44px 0 0;
+      color: #4a5568;
+      font-size: 0.78rem;
+      font-weight: 700;
+      letter-spacing: 1.5px;
+      text-transform: uppercase;
+    }
+    hr.divider {
+      border: none;
+      border-top: 1px solid #2d3748;
+      margin: 12px 0 0;
+    }
+
+    /* ── TIP BOX ── */
+    .tip {
+      background: #1a2744;
+      border-left: 3px solid #3b82f6;
+      border-radius: 0 8px 8px 0;
+      padding: 10px 14px;
+      font-size: 0.82rem;
+      color: #93c5fd;
+      margin-top: 8px;
+    }
+    .tip strong { color: #60a5fa; }
+
+    @media (max-width: 600px) {
+      .hero h1 { font-size: 1.4rem; }
+      .module-header { flex-direction: column; }
+      pre { font-size: 0.72rem; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- ════════════════════════════════════════
+     HERO
+════════════════════════════════════════ -->
+<div class="hero">
+  <h1>Module Thực Hành Gợi Ý — BaseCore</h1>
+  <p>
+    Các module bên dưới bám sát kiến trúc <strong>microservices + Repository Pattern + React</strong>
+    của dự án. Mỗi module có chú thích mục tiêu học, file cần tạo/sửa, và code mẫu tham khảo.
+  </p>
+  <div class="tag-row">
+    <span class="tag tag-blue">ASP.NET Core 8</span>
+    <span class="tag tag-green">EF Core · MySQL</span>
+    <span class="tag tag-purple">React + Vite</span>
+    <span class="tag tag-orange">Microservices</span>
+  </div>
+  <div style="max-width:620px;margin:0 auto;">
+    <div class="legend">
+      <span class="legend-item"><span class="dot dot-easy"></span>Dễ — ~2–4 giờ</span>
+      <span class="legend-item"><span class="dot dot-medium"></span>Trung bình — ~4–8 giờ</span>
+      <span class="legend-item"><span class="dot dot-hard"></span>Nâng cao — ~1–2 ngày</span>
+    </div>
+  </div>
+</div>
+
+<div class="container">
+
+<!-- ════════════════════
+     MODULE 1 — WISHLIST
+════════════════════ -->
+<p class="section-title">Module 1</p>
+<hr class="divider" />
+
+<div class="module">
+  <div class="module-header">
+    <div class="module-icon">❤️</div>
+    <div class="module-meta">
+      <h2>Wishlist — Danh sách yêu thích</h2>
+      <p>Entity <code>Wishlist</code> đã có sẵn trong DB. Sinh viên chỉ cần expose API + tạo UI. Thích hợp làm bài tập đầu tiên để quen với flow đầy đủ backend → frontend.</p>
+    </div>
+    <span class="badge badge-easy">DỄ</span>
+  </div>
+
+  <div class="steps">
+    <h3>Các bước thực hiện</h3>
+
+    <div class="step">
+      <div class="step-num">1</div>
+      <div class="step-body">
+        <strong>Kiểm tra Entity đã có sẵn</strong>
+        <p class="note">File: <span class="path">BaseCore.Entities/Wishlist.cs</span> — Đã có <code>UserId</code>, <code>ProductId</code>, unique constraint <code>(UserId, ProductId)</code>.</p>
+        <div class="tip"><strong>Mục tiêu học:</strong> Hiểu cách đọc entity để biết DB đang có gì trước khi code.</div>
+      </div>
+    </div>
+
+    <div class="step">
+      <div class="step-num">2</div>
+      <div class="step-body">
+        <strong>Tạo Repository Interface & Implementation</strong>
+        <p class="note">File mới: <span class="path">BaseCore.Repository/EFCore/IWishlistRepositoryEF.cs</span></p>
+<pre><span class="c">// Interface định nghĩa các thao tác dữ liệu cho Wishlist</span>
+<span class="k">public interface</span> <span class="t">IWishlistRepositoryEF</span>
+{
+    <span class="c">// Lấy tất cả sản phẩm yêu thích của 1 user, kèm thông tin sản phẩm</span>
+    Task&lt;List&lt;<span class="t">Wishlist</span>&gt;&gt; <span class="m">GetByUserAsync</span>(<span class="t">int</span> userId);
+
+    <span class="c">// Thêm sản phẩm vào danh sách yêu thích</span>
+    Task&lt;<span class="t">Wishlist</span>&gt; <span class="m">AddAsync</span>(<span class="t">int</span> userId, <span class="t">int</span> productId);
+
+    <span class="c">// Xóa sản phẩm khỏi danh sách yêu thích</span>
+    Task&lt;<span class="t">bool</span>&gt; <span class="m">RemoveAsync</span>(<span class="t">int</span> userId, <span class="t">int</span> productId);
+
+    <span class="c">// Kiểm tra sản phẩm có đang trong wishlist không (dùng ở UI để toggle icon)</span>
+    Task&lt;<span class="t">bool</span>&gt; <span class="m">ExistsAsync</span>(<span class="t">int</span> userId, <span class="t">int</span> productId);
+}</pre>
+      </div>
+    </div>
+
+    <div class="step">
+      <div class="step-num">3</div>
+      <div class="step-body">
+        <strong>Tạo Controller trong APIService</strong>
+        <p class="note">File mới: <span class="path">BaseCore.APIService/Controllers/WishlistController.cs</span></p>
+<pre><span class="at">[ApiController]</span>
+<span class="at">[Route("api/[controller]")]</span>
+<span class="at">[Authorize]</span> <span class="c">// Phải đăng nhập mới dùng được</span>
+<span class="k">public class</span> <span class="t">WishlistController</span> : <span class="t">ControllerBase</span>
+{
+    <span class="k">private readonly</span> <span class="t">IWishlistRepositoryEF</span> _repo;
+
+    <span class="c">// Lấy userId từ JWT token, không để client tự truyền lên (bảo mật)</span>
+    <span class="k">private int</span> <span class="m">GetUserId</span>() =>
+        <span class="t">int</span>.Parse(User.FindFirst(<span class="t">ClaimTypes</span>.NameIdentifier)!.Value);
+
+    <span class="at">[HttpGet]</span>
+    <span class="k">public async</span> Task&lt;<span class="t">IActionResult</span>&gt; <span class="m">GetMyWishlist</span>() =>
+        Ok(<span class="k">await</span> _repo.<span class="m">GetByUserAsync</span>(<span class="m">GetUserId</span>()));
+
+    <span class="at">[HttpPost("{productId}")]</span>
+    <span class="k">public async</span> Task&lt;<span class="t">IActionResult</span>&gt; <span class="m">Add</span>(<span class="t">int</span> productId) =>
+        Ok(<span class="k">await</span> _repo.<span class="m">AddAsync</span>(<span class="m">GetUserId</span>(), productId));
+
+    <span class="at">[HttpDelete("{productId}")]</span>
+    <span class="k">public async</span> Task&lt;<span class="t">IActionResult</span>&gt; <span class="m">Remove</span>(<span class="t">int</span> productId) =>
+        Ok(<span class="k">await</span> _repo.<span class="m">RemoveAsync</span>(<span class="m">GetUserId</span>(), productId));
+}</pre>
+      </div>
+    </div>
+
+    <div class="step">
+      <div class="step-num">4</div>
+      <div class="step-body">
+        <strong>Thêm route vào API Gateway</strong>
+        <p class="note">File sửa: <span class="path">BaseCore.ApiGateway/ocelot.json</span> — Thêm route <code>/api/wishlist/**</code> trỏ đến APIService tương tự các route đã có.</p>
+        <div class="tip"><strong>Mục tiêu học:</strong> Hiểu vai trò của API Gateway trong microservices — mọi request từ frontend đều đi qua đây.</div>
+      </div>
+    </div>
+
+    <div class="step">
+      <div class="step-num">5</div>
+      <div class="step-body">
+        <strong>Tạo trang Wishlist trên React</strong>
+        <p class="note">File mới: <span class="path">BaseCore.WebClient/src/pages/Wishlist.jsx</span></p>
+<pre><span class="c">// Gọi API lấy danh sách, render dạng grid giống trang Products</span>
+<span class="c">// Mỗi item có nút "Xóa khỏi Wishlist" và "Thêm vào giỏ hàng"</span>
+<span class="k">export default function</span> <span class="m">Wishlist</span>() {
+  <span class="k">const</span> [items, setItems] = <span class="m">useState</span>([]);
+  <span class="k">useEffect</span>(() => { api.<span class="m">get</span>(<span class="s">'/api/wishlist'</span>).<span class="m">then</span>(r => <span class="m">setItems</span>(r.data)); }, []);
+  <span class="c">// ... render items</span>
+}</pre>
+      </div>
+    </div>
+
+    <div class="step">
+      <div class="step-num">6</div>
+      <div class="step-body">
+        <strong>Kiểm thử</strong>
+        <ul class="checklist">
+          <li>Thêm sản phẩm vào wishlist khi chưa đăng nhập → phải redirect về /login</li>
+          <li>Thêm cùng 1 sản phẩm 2 lần → phải báo lỗi hoặc idempotent</li>
+          <li>Trang Wishlist hiển thị đúng sau khi thêm/xóa</li>
+        </ul>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- ════════════════════
+     MODULE 2 — REVIEW
+════════════════════ -->
+<p class="section-title">Module 2</p>
+<hr class="divider" />
+
+<div class="module">
+  <div class="module-header">
+    <div class="module-icon">⭐</div>
+    <div class="module-meta">
+      <h2>Product Review — Đánh giá sản phẩm</h2>
+      <p>Người dùng đã mua hàng có thể đánh giá 1–5 sao + bình luận. Bài tập luyện tập tạo Entity mới, Migration, và validate nghiệp vụ (chỉ được review nếu đã mua).</p>
+    </div>
+    <span class="badge badge-medium">TRUNG BÌNH</span>
+  </div>
+
+  <div class="steps">
+    <h3>Các bước thực hiện</h3>
+
+    <div class="step">
+      <div class="step-num">1</div>
+      <div class="step-body">
+        <strong>Tạo Entity <code>ProductReview</code></strong>
+        <p class="note">File mới: <span class="path">BaseCore.Entities/ProductReview.cs</span></p>
+<pre><span class="c">// Entity lưu đánh giá sản phẩm của người dùng</span>
+<span class="k">public class</span> <span class="t">ProductReview</span> : <span class="t">IAuditable</span>  <span class="c">// kế thừa để tự động có CreatedAt, UpdatedAt</span>
+{
+    <span class="k">public int</span> <span class="p">Id</span> { <span class="k">get</span>; <span class="k">set</span>; }
+
+    <span class="c">// Ai đánh giá</span>
+    <span class="k">public int</span> <span class="p">UserId</span> { <span class="k">get</span>; <span class="k">set</span>; }
+    <span class="k">public</span> <span class="t">User</span> <span class="p">User</span> { <span class="k">get</span>; <span class="k">set</span>; } = <span class="k">null</span>!;
+
+    <span class="c">// Sản phẩm được đánh giá</span>
+    <span class="k">public int</span> <span class="p">ProductId</span> { <span class="k">get</span>; <span class="k">set</span>; }
+    <span class="k">public</span> <span class="t">Product</span> <span class="p">Product</span> { <span class="k">get</span>; <span class="k">set</span>; } = <span class="k">null</span>!;
+
+    <span class="c">// Rating từ 1–5 sao, dùng Range attribute để validate</span>
+    <span class="at">[Range(1, 5)]</span>
+    <span class="k">public int</span> <span class="p">Rating</span> { <span class="k">get</span>; <span class="k">set</span>; }
+
+    <span class="c">// Nội dung bình luận (không bắt buộc)</span>
+    <span class="k">public string?</span> <span class="p">Comment</span> { <span class="k">get</span>; <span class="k">set</span>; }
+
+    <span class="c">// Ngày tạo/cập nhật — do IAuditable cung cấp</span>
+    <span class="k">public</span> <span class="t">DateTime</span> <span class="p">CreatedAt</span> { <span class="k">get</span>; <span class="k">set</span>; }
+    <span class="k">public</span> <span class="t">DateTime</span> <span class="p">UpdatedAt</span> { <span class="k">get</span>; <span class="k">set</span>; }
+}</pre>
+      </div>
+    </div>
+
+    <div class="step">
+      <div class="step-num">2</div>
+      <div class="step-body">
+        <strong>Đăng ký vào DbContext & chạy Migration</strong>
+        <p class="note">File sửa: <span class="path">BaseCore.Repository/MySqlDbContext.cs</span> — Thêm <code>DbSet</code> và unique index.</p>
+<pre><span class="c">// Thêm vào MySqlDbContext</span>
+<span class="k">public</span> <span class="t">DbSet</span>&lt;<span class="t">ProductReview</span>&gt; <span class="p">ProductReviews</span> { <span class="k">get</span>; <span class="k">set</span>; }
+
+<span class="c">// Trong OnModelCreating: một user chỉ được review 1 lần / 1 sản phẩm</span>
+modelBuilder.Entity&lt;<span class="t">ProductReview</span>&gt;()
+    .HasIndex(r => <span class="k">new</span> { r.UserId, r.ProductId })
+    .IsUnique();</pre>
+        <p class="note" style="margin-top:8px;">Sau đó chạy: <code>dotnet ef migrations add AddProductReview</code> → <code>dotnet ef database update</code></p>
+        <div class="tip"><strong>Mục tiêu học:</strong> Quy trình Code-First migration — thay đổi model C# → cập nhật schema DB thực tế.</div>
+      </div>
+    </div>
+
+    <div class="step">
+      <div class="step-num">3</div>
+      <div class="step-body">
+        <strong>Tạo Controller với logic nghiệp vụ</strong>
+        <p class="note">Điểm quan trọng: chỉ user đã có đơn hàng <code>Completed</code> với sản phẩm đó mới được review.</p>
+<pre><span class="at">[HttpPost]</span>
+<span class="k">public async</span> Task&lt;<span class="t">IActionResult</span>&gt; <span class="m">AddReview</span>(<span class="t">CreateReviewDto</span> dto)
+{
+    <span class="k">int</span> userId = <span class="m">GetUserId</span>();
+
+    <span class="c">// Kiểm tra user có đơn hàng COMPLETED chứa sản phẩm này không</span>
+    <span class="k">bool</span> hasPurchased = <span class="k">await</span> _orderRepo
+        .<span class="m">HasCompletedOrderWithProductAsync</span>(userId, dto.ProductId);
+
+    <span class="k">if</span> (!hasPurchased)
+        <span class="k">return</span> <span class="m">BadRequest</span>(<span class="s">"Bạn chưa mua sản phẩm này."</span>);
+
+    <span class="c">// Kiểm tra đã review chưa (unique constraint sẽ bắt ở DB, nhưng check trước cho UX tốt)</span>
+    <span class="k">bool</span> alreadyReviewed = <span class="k">await</span> _reviewRepo
+        .<span class="m">ExistsAsync</span>(userId, dto.ProductId);
+
+    <span class="k">if</span> (alreadyReviewed)
+        <span class="k">return</span> <span class="m">Conflict</span>(<span class="s">"Bạn đã đánh giá sản phẩm này rồi."</span>);
+
+    <span class="k">var</span> review = <span class="k">await</span> _reviewRepo.<span class="m">AddAsync</span>(userId, dto);
+    <span class="k">return</span> <span class="m">Ok</span>(review);
+}</pre>
+      </div>
+    </div>
+
+    <div class="step">
+      <div class="step-num">4</div>
+      <div class="step-body">
+        <strong>Tính điểm trung bình — hiện lên trang sản phẩm</strong>
+        <p class="note">Trong <span class="path">BaseCore.APIService/Controllers/ProductsController.cs</span> — Thêm vào response của <code>GET /api/products/{id}</code>:</p>
+<pre><span class="c">// Thêm AverageRating vào ProductDto trả về client</span>
+<span class="k">var</span> avgRating = <span class="k">await</span> _reviewRepo
+    .<span class="m">GetAverageRatingAsync</span>(product.Id);  <span class="c">// SELECT AVG(Rating)</span>
+
+<span class="k">return</span> <span class="m">Ok</span>(<span class="k">new</span> { product, avgRating, reviewCount });</pre>
+      </div>
+    </div>
+
+    <div class="step">
+      <div class="step-num">5</div>
+      <div class="step-body">
+        <strong>Kiểm thử</strong>
+        <ul class="checklist">
+          <li>User chưa mua → 400 Bad Request khi POST review</li>
+          <li>User đã mua → tạo review thành công lần đầu</li>
+          <li>User review lần 2 cùng sản phẩm → 409 Conflict</li>
+          <li>Điểm sao hiển thị đúng trên trang chi tiết sản phẩm</li>
+        </ul>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- ════════════════════
+     MODULE 3 — INVENTORY ALERT
+════════════════════ -->
+<p class="section-title">Module 3</p>
+<hr class="divider" />
+
+<div class="module">
+  <div class="module-header">
+    <div class="module-icon">🔔</div>
+    <div class="module-meta">
+      <h2>Low-Stock Alert — Cảnh báo hết hàng</h2>
+      <p>Admin nhận cảnh báo khi sản phẩm sắp hết hàng. Luyện tập Background Service, Notification Pattern, và phân quyền Admin-only.</p>
+    </div>
+    <span class="badge badge-medium">TRUNG BÌNH</span>
+  </div>
+
+  <div class="steps">
+    <h3>Các bước thực hiện</h3>
+
+    <div class="step">
+      <div class="step-num">1</div>
+      <div class="step-body">
+        <strong>Tạo Entity <code>StockAlert</code></strong>
+        <p class="note">File mới: <span class="path">BaseCore.Entities/StockAlert.cs</span></p>
+<pre><span class="c">// Lưu lịch sử cảnh báo tồn kho thấp</span>
+<span class="k">public class</span> <span class="t">StockAlert</span>
+{
+    <span class="k">public int</span>      <span class="p">Id</span>          { <span class="k">get</span>; <span class="k">set</span>; }
+    <span class="k">public int</span>      <span class="p">ProductId</span>   { <span class="k">get</span>; <span class="k">set</span>; }
+    <span class="k">public</span> <span class="t">Product</span>  <span class="p">Product</span>     { <span class="k">get</span>; <span class="k">set</span>; } = <span class="k">null</span>!;
+    <span class="k">public int</span>      <span class="p">StockLeft</span>   { <span class="k">get</span>; <span class="k">set</span>; }   <span class="c">// tồn kho tại thời điểm cảnh báo</span>
+    <span class="k">public bool</span>     <span class="p">IsRead</span>      { <span class="k">get</span>; <span class="k">set</span>; }   <span class="c">// admin đã xem chưa</span>
+    <span class="k">public</span> <span class="t">DateTime</span> <span class="p">CreatedAt</span>   { <span class="k">get</span>; <span class="k">set</span>; }
+}</pre>
+      </div>
+    </div>
+
+    <div class="step">
+      <div class="step-num">2</div>
+      <div class="step-body">
+        <strong>Tạo Background Service quét định kỳ</strong>
+        <p class="note">File mới: <span class="path">BaseCore.APIService/Services/StockAlertService.cs</span></p>
+<pre><span class="c">// IHostedService chạy nền, tự động quét mỗi 60 giây</span>
+<span class="k">public class</span> <span class="t">StockAlertService</span> : <span class="t">BackgroundService</span>
+{
+    <span class="k">private const int</span> <span class="p">LOW_STOCK_THRESHOLD</span> = 5; <span class="c">// ngưỡng cảnh báo</span>
+
+    <span class="k">protected override async</span> Task <span class="m">ExecuteAsync</span>(<span class="t">CancellationToken</span> ct)
+    {
+        <span class="k">while</span> (!ct.IsCancellationRequested)
+        {
+            <span class="c">// Lấy danh sách sản phẩm có Stock <= ngưỡng</span>
+            <span class="k">var</span> lowStockProducts = <span class="k">await</span> _productRepo
+                .<span class="m">GetLowStockAsync</span>(<span class="p">LOW_STOCK_THRESHOLD</span>);
+
+            <span class="k">foreach</span> (<span class="k">var</span> product <span class="k">in</span> lowStockProducts)
+            {
+                <span class="c">// Tránh tạo alert trùng nếu chưa được giải quyết</span>
+                <span class="k">bool</span> hasUnread = <span class="k">await</span> _alertRepo
+                    .<span class="m">HasUnreadAlertAsync</span>(product.Id);
+
+                <span class="k">if</span> (!hasUnread)
+                    <span class="k">await</span> _alertRepo.<span class="m">CreateAsync</span>(product.Id, product.Stock);
+            }
+
+            <span class="k">await</span> Task.<span class="m">Delay</span>(TimeSpan.<span class="m">FromSeconds</span>(60), ct);
+        }
+    }
+}</pre>
+        <div class="tip"><strong>Mục tiêu học:</strong> <code>BackgroundService</code> trong .NET — chạy tác vụ định kỳ mà không cần cron job bên ngoài.</div>
+      </div>
+    </div>
+
+    <div class="step">
+      <div class="step-num">3</div>
+      <div class="step-body">
+        <strong>Tạo API endpoint cho Admin xem và đánh dấu đã đọc</strong>
+<pre><span class="at">[Authorize(Roles = "Admin")]</span>
+<span class="at">[HttpGet("alerts")]</span>
+<span class="k">public async</span> Task&lt;<span class="t">IActionResult</span>&gt; <span class="m">GetAlerts</span>() =>
+    Ok(<span class="k">await</span> _alertRepo.<span class="m">GetUnreadAsync</span>());
+
+<span class="at">[HttpPut("alerts/{id}/read")]</span>
+<span class="k">public async</span> Task&lt;<span class="t">IActionResult</span>&gt; <span class="m">MarkRead</span>(<span class="t">int</span> id) =>
+    Ok(<span class="k">await</span> _alertRepo.<span class="m">MarkReadAsync</span>(id));</pre>
+      </div>
+    </div>
+
+    <div class="step">
+      <div class="step-num">4</div>
+      <div class="step-body">
+        <strong>Hiện badge thông báo trên Admin Dashboard</strong>
+        <p class="note">File sửa: <span class="path">BaseCore.WebClient/src/components/MainLayout.jsx</span></p>
+        <p class="note">Thêm badge đỏ số lượng alert chưa đọc bên cạnh icon chuông trên header admin.</p>
+        <ul class="checklist">
+          <li>Gọi <code>GET /api/inventory/alerts</code> khi load layout</li>
+          <li>Hiện badge số lượng chưa đọc</li>
+          <li>Click → điều hướng tới trang Inventory</li>
+        </ul>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- ════════════════════
+     MODULE 4 — COUPON
+════════════════════ -->
+<p class="section-title">Module 4</p>
+<hr class="divider" />
+
+<div class="module">
+  <div class="module-header">
+    <div class="module-icon">🎟️</div>
+    <div class="module-meta">
+      <h2>Coupon Code — Mã giảm giá</h2>
+      <p>Người dùng nhập mã coupon khi checkout để được giảm giá. Luyện tập validate nghiệp vụ phức tạp (hạn dùng, số lần dùng, giá tối thiểu) và tích hợp vào luồng đặt hàng hiện có.</p>
+    </div>
+    <span class="badge badge-medium">TRUNG BÌNH</span>
+  </div>
+
+  <div class="steps">
+    <h3>Các bước thực hiện</h3>
+
+    <div class="step">
+      <div class="step-num">1</div>
+      <div class="step-body">
+        <strong>Tạo Entity <code>Coupon</code></strong>
+        <p class="note">File mới: <span class="path">BaseCore.Entities/Coupon.cs</span></p>
+<pre><span class="k">public class</span> <span class="t">Coupon</span>
+{
+    <span class="k">public int</span>      <span class="p">Id</span>           { <span class="k">get</span>; <span class="k">set</span>; }
+
+    <span class="c">// Mã duy nhất người dùng nhập (VD: "SALE50", "FREESHIP")</span>
+    <span class="k">public string</span>   <span class="p">Code</span>         { <span class="k">get</span>; <span class="k">set</span>; } = <span class="s">""</span>;
+
+    <span class="c">// Loại: "percent" giảm theo %, "fixed" giảm số tiền cố định</span>
+    <span class="k">public string</span>   <span class="p">DiscountType</span> { <span class="k">get</span>; <span class="k">set</span>; } = <span class="s">"percent"</span>;
+    <span class="k">public decimal</span>  <span class="p">DiscountValue</span>{ <span class="k">get</span>; <span class="k">set</span>; }
+
+    <span class="c">// Giới hạn sử dụng</span>
+    <span class="k">public decimal</span>  <span class="p">MinOrderValue</span>{ <span class="k">get</span>; <span class="k">set</span>; } <span class="c">// đơn tối thiểu</span>
+    <span class="k">public int</span>      <span class="p">MaxUses</span>      { <span class="k">get</span>; <span class="k">set</span>; } <span class="c">// tổng lượt dùng tối đa</span>
+    <span class="k">public int</span>      <span class="p">UsedCount</span>    { <span class="k">get</span>; <span class="k">set</span>; } <span class="c">// đã dùng bao nhiêu lượt</span>
+    <span class="k">public</span> <span class="t">DateTime</span> <span class="p">ExpiresAt</span>    { <span class="k">get</span>; <span class="k">set</span>; } <span class="c">// ngày hết hạn</span>
+    <span class="k">public bool</span>     <span class="p">IsActive</span>     { <span class="k">get</span>; <span class="k">set</span>; } = <span class="k">true</span>;
+}</pre>
+      </div>
+    </div>
+
+    <div class="step">
+      <div class="step-num">2</div>
+      <div class="step-body">
+        <strong>Tạo endpoint xác thực mã coupon</strong>
+        <p class="note">Endpoint này chỉ kiểm tra, chưa áp dụng — dùng khi user nhập mã trước khi bấm đặt hàng.</p>
+<pre><span class="at">[HttpPost("validate")]</span>
+<span class="at">[Authorize]</span>
+<span class="k">public async</span> Task&lt;<span class="t">IActionResult</span>&gt; <span class="m">Validate</span>(<span class="t">ValidateCouponDto</span> dto)
+{
+    <span class="k">var</span> coupon = <span class="k">await</span> _couponRepo.<span class="m">FindByCodeAsync</span>(dto.Code);
+
+    <span class="k">if</span> (coupon == <span class="k">null</span> || !coupon.IsActive)
+        <span class="k">return</span> <span class="m">NotFound</span>(<span class="s">"Mã không hợp lệ."</span>);
+
+    <span class="k">if</span> (coupon.ExpiresAt &lt; <span class="t">DateTime</span>.UtcNow)
+        <span class="k">return</span> <span class="m">BadRequest</span>(<span class="s">"Mã đã hết hạn."</span>);
+
+    <span class="k">if</span> (coupon.UsedCount &gt;= coupon.MaxUses)
+        <span class="k">return</span> <span class="m">BadRequest</span>(<span class="s">"Mã đã được dùng đủ số lần cho phép."</span>);
+
+    <span class="k">if</span> (dto.OrderTotal &lt; coupon.MinOrderValue)
+        <span class="k">return</span> <span class="m">BadRequest</span>($<span class="s">"Đơn hàng phải từ {coupon.MinOrderValue:N0}đ trở lên."</span>);
+
+    <span class="c">// Trả về số tiền được giảm để hiện preview cho user</span>
+    <span class="k">decimal</span> discount = coupon.DiscountType == <span class="s">"percent"</span>
+        ? dto.OrderTotal * coupon.DiscountValue / 100
+        : coupon.DiscountValue;
+
+    <span class="k">return</span> <span class="m">Ok</span>(<span class="k">new</span> { discount, message = <span class="s">"Áp dụng thành công!"</span> });
+}</pre>
+        <div class="tip"><strong>Mục tiêu học:</strong> Viết các guard clause tuần tự để validate business rules — mỗi điều kiện một <code>return</code> rõ ràng, không lồng if.</div>
+      </div>
+    </div>
+
+    <div class="step">
+      <div class="step-num">3</div>
+      <div class="step-body">
+        <strong>Tích hợp vào <code>OrdersController.cs</code></strong>
+        <p class="note">File sửa: <span class="path">BaseCore.APIService/Controllers/OrdersController.cs</span> — Khi tạo đơn hàng, nếu có <code>CouponCode</code> thì trừ giảm giá và tăng <code>UsedCount</code>.</p>
+      </div>
+    </div>
+
+    <div class="step">
+      <div class="step-num">4</div>
+      <div class="step-body">
+        <strong>UI: Ô nhập mã ở trang Cart/Checkout</strong>
+        <ul class="checklist">
+          <li>Input nhập mã + nút "Áp dụng" → gọi <code>POST /api/coupons/validate</code></li>
+          <li>Hiện thông báo thành công + số tiền tiết kiệm được</li>
+          <li>Trang Admin quản lý Coupon: tạo, vô hiệu hóa mã</li>
+        </ul>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- ════════════════════
+     MODULE 5 — USER PROFILE
+════════════════════ -->
+<p class="section-title">Module 5</p>
+<hr class="divider" />
+
+<div class="module">
+  <div class="module-header">
+    <div class="module-icon">👤</div>
+    <div class="module-meta">
+      <h2>User Profile — Trang hồ sơ cá nhân</h2>
+      <p>Người dùng xem và cập nhật thông tin cá nhân, đổi mật khẩu, quản lý địa chỉ giao hàng. Module thuần CRUD, thích hợp để sinh viên hiểu flow đọc/ghi dữ liệu từ token.</p>
+    </div>
+    <span class="badge badge-easy">DỄ</span>
+  </div>
+
+  <div class="steps">
+    <h3>Các bước thực hiện</h3>
+
+    <div class="step">
+      <div class="step-num">1</div>
+      <div class="step-body">
+        <strong>Thêm endpoint vào <code>UserController</code> (AuthService)</strong>
+        <p class="note">File sửa: <span class="path">BaseCore.AuthService/Controllers/UserController.cs</span></p>
+<pre><span class="at">[HttpGet("me")]</span>
+<span class="at">[Authorize]</span>
+<span class="k">public async</span> Task&lt;<span class="t">IActionResult</span>&gt; <span class="m">GetProfile</span>()
+{
+    <span class="c">// Đọc userId từ JWT, không nhận từ URL để tránh user xem profile người khác</span>
+    <span class="k">int</span> userId = <span class="t">int</span>.Parse(User.<span class="m">FindFirst</span>(<span class="t">ClaimTypes</span>.NameIdentifier)!.Value);
+    <span class="k">var</span> user = <span class="k">await</span> _userRepo.<span class="m">GetByIdAsync</span>(userId);
+    <span class="k">return</span> user == <span class="k">null</span> ? <span class="m">NotFound</span>() : <span class="m">Ok</span>(<span class="k">new</span> <span class="t">UserProfileDto</span>(user));
+}
+
+<span class="at">[HttpPut("me")]</span>
+<span class="at">[Authorize]</span>
+<span class="k">public async</span> Task&lt;<span class="t">IActionResult</span>&gt; <span class="m">UpdateProfile</span>(<span class="t">UpdateProfileDto</span> dto)
+{
+    <span class="k">int</span> userId = <span class="t">int</span>.Parse(User.<span class="m">FindFirst</span>(<span class="t">ClaimTypes</span>.NameIdentifier)!.Value);
+    <span class="k">var</span> result = <span class="k">await</span> _userRepo.<span class="m">UpdateProfileAsync</span>(userId, dto);
+    <span class="k">return</span> <span class="m">Ok</span>(result);
+}</pre>
+      </div>
+    </div>
+
+    <div class="step">
+      <div class="step-num">2</div>
+      <div class="step-body">
+        <strong>Tạo trang Profile trên React</strong>
+        <p class="note">File mới: <span class="path">BaseCore.WebClient/src/pages/Profile.jsx</span></p>
+        <p class="note">Dùng <code>AuthContext</code> để lấy token, form gồm: họ tên, email, số điện thoại. Tách riêng section "Đổi mật khẩu" với confirm password.</p>
+        <div class="tip"><strong>Mục tiêu học:</strong> Cách đọc thông tin user từ JWT token trên cả backend (Claims) lẫn frontend (AuthContext).</div>
+      </div>
+    </div>
+
+    <div class="step">
+      <div class="step-num">3</div>
+      <div class="step-body">
+        <strong>Tích hợp Quản lý địa chỉ</strong>
+        <p class="note">Entity <code>UserAddress</code> đã có, Controller <code>AddressesController.cs</code> đã có. Sinh viên chỉ cần:</p>
+        <ul class="checklist">
+          <li>Gọi <code>GET /api/addresses</code> → hiện danh sách địa chỉ</li>
+          <li>Form thêm địa chỉ mới (tỉnh/thành, quận/huyện, số nhà)</li>
+          <li>Nút "Đặt làm mặc định" và nút "Xóa"</li>
+        </ul>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- ════════════════════
+     MODULE 6 — EXPORT CSV
+════════════════════ -->
+<p class="section-title">Module 6</p>
+<hr class="divider" />
+
+<div class="module">
+  <div class="module-header">
+    <div class="module-icon">📊</div>
+    <div class="module-meta">
+      <h2>Export CSV — Xuất báo cáo đơn hàng</h2>
+      <p>Admin xuất danh sách đơn hàng/sản phẩm ra file CSV. Module nhỏ, không cần DB mới, luyện tập streaming response và xử lý file download trên frontend.</p>
+    </div>
+    <span class="badge badge-easy">DỄ</span>
+  </div>
+
+  <div class="steps">
+    <h3>Các bước thực hiện</h3>
+
+    <div class="step">
+      <div class="step-num">1</div>
+      <div class="step-body">
+        <strong>Thêm endpoint export vào <code>ReportsController</code></strong>
+        <p class="note">File sửa: <span class="path">BaseCore.APIService/Controllers/ReportsController.cs</span></p>
+<pre><span class="at">[HttpGet("orders/export")]</span>
+<span class="at">[Authorize(Roles = "Admin")]</span>
+<span class="k">public async</span> Task&lt;<span class="t">IActionResult</span>&gt; <span class="m">ExportOrders</span>(
+    [<span class="t">FromQuery</span>] <span class="t">DateTime</span>? from,
+    [<span class="t">FromQuery</span>] <span class="t">DateTime</span>? to)
+{
+    <span class="k">var</span> orders = <span class="k">await</span> _orderRepo.<span class="m">GetByDateRangeAsync</span>(from, to);
+
+    <span class="c">// Dùng StringBuilder để build CSV trong bộ nhớ (không cần thư viện ngoài)</span>
+    <span class="k">var</span> sb = <span class="k">new</span> <span class="t">StringBuilder</span>();
+    sb.<span class="m">AppendLine</span>(<span class="s">"OrderId,CustomerName,Total,Status,CreatedAt"</span>);
+
+    <span class="k">foreach</span> (<span class="k">var</span> o <span class="k">in</span> orders)
+        sb.<span class="m">AppendLine</span>($<span class="s">"{o.Id},{o.User.Username},{o.Total},{o.Status},{o.CreatedAt:yyyy-MM-dd}"</span>);
+
+    <span class="c">// Trả về file download — browser tự mở hộp thoại Save As</span>
+    <span class="k">var</span> bytes = <span class="t">Encoding</span>.UTF8.<span class="m">GetBytes</span>(sb.ToString());
+    <span class="k">return</span> <span class="m">File</span>(bytes, <span class="s">"text/csv"</span>, $<span class="s">"orders-{DateTime.Now:yyyyMMdd}.csv"</span>);
+}</pre>
+        <div class="tip"><strong>Mục tiêu học:</strong> <code>File()</code> action result trong ASP.NET Core — trả về binary content thay vì JSON.</div>
+      </div>
+    </div>
+
+    <div class="step">
+      <div class="step-num">2</div>
+      <div class="step-body">
+        <strong>Xử lý download trên React</strong>
+        <p class="note">File sửa: <span class="path">BaseCore.WebClient/src/pages/Reports.jsx</span></p>
+<pre><span class="k">const</span> <span class="m">handleExport</span> = <span class="k">async</span> () => {
+    <span class="c">// Dùng blob response — không thể dùng json() vì đây là binary</span>
+    <span class="k">const</span> res = <span class="k">await</span> api.<span class="m">get</span>(<span class="s">'/api/reports/orders/export'</span>, {
+        responseType: <span class="s">'blob'</span>
+    });
+    <span class="c">// Tạo link ảo để trigger download</span>
+    <span class="k">const</span> url = URL.<span class="m">createObjectURL</span>(res.data);
+    <span class="k">const</span> a = document.<span class="m">createElement</span>(<span class="s">'a'</span>);
+    a.href = url;
+    a.download = <span class="s">'orders.csv'</span>;
+    a.<span class="m">click</span>();
+    URL.<span class="m">revokeObjectURL</span>(url); <span class="c">// giải phóng bộ nhớ sau khi xong</span>
+};</pre>
+      </div>
+    </div>
+
+    <div class="step">
+      <div class="step-num">3</div>
+      <div class="step-body">
+        <strong>Nâng cao (tùy chọn)</strong>
+        <ul class="checklist">
+          <li>Thêm bộ lọc ngày tháng (date range picker) trước khi export</li>
+          <li>Export sản phẩm tồn kho thấp để gửi cho nhà cung cấp</li>
+          <li>Thêm BOM UTF-8 (<code>﻿</code>) để Excel mở đúng tiếng Việt</li>
+        </ul>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- ════════════════════
+     MODULE 7 — SEARCH HISTORY
+════════════════════ -->
+<p class="section-title">Module 7 (Nâng cao)</p>
+<hr class="divider" />
+
+<div class="module">
+  <div class="module-header">
+    <div class="module-icon">🔍</div>
+    <div class="module-meta">
+      <h2>Search History — Lịch sử tìm kiếm</h2>
+      <p>Lưu lại từ khóa tìm kiếm của user, hiển thị gợi ý tìm kiếm gần đây. Luyện tập Debounce, Autocomplete, và tối ưu query DB.</p>
+    </div>
+    <span class="badge badge-hard">NÂNG CAO</span>
+  </div>
+
+  <div class="steps">
+    <h3>Các bước thực hiện</h3>
+
+    <div class="step">
+      <div class="step-num">1</div>
+      <div class="step-body">
+        <strong>Tạo Entity <code>SearchHistory</code></strong>
+<pre><span class="k">public class</span> <span class="t">SearchHistory</span>
+{
+    <span class="k">public int</span>      <span class="p">Id</span>        { <span class="k">get</span>; <span class="k">set</span>; }
+    <span class="k">public int?</span>     <span class="p">UserId</span>    { <span class="k">get</span>; <span class="k">set</span>; }   <span class="c">// null = khách vãng lai</span>
+    <span class="k">public string</span>   <span class="p">Keyword</span>   { <span class="k">get</span>; <span class="k">set</span>; } = <span class="s">""</span>;
+    <span class="k">public int</span>      <span class="p">SearchCount</span>{ <span class="k">get</span>; <span class="k">set</span>; }  <span class="c">// số lần tìm keyword này</span>
+    <span class="k">public</span> <span class="t">DateTime</span> <span class="p">LastSearchedAt</span>{ <span class="k">get</span>; <span class="k">set</span>; }
+}</pre>
+      </div>
+    </div>
+
+    <div class="step">
+      <div class="step-num">2</div>
+      <div class="step-body">
+        <strong>Tích hợp vào <code>ProductsController</code> — ghi log khi search</strong>
+<pre><span class="at">[HttpGet]</span>
+<span class="k">public async</span> Task&lt;<span class="t">IActionResult</span>&gt; <span class="m">Search</span>([<span class="t">FromQuery</span>] <span class="k">string?</span> q)
+{
+    <span class="c">// Ghi lịch sử bất đồng bộ — không block response về cho user</span>
+    <span class="k">if</span> (!<span class="k">string</span>.IsNullOrWhiteSpace(q))
+        _ = _searchHistoryRepo.<span class="m">LogAsync</span>(<span class="m">GetUserIdOrNull</span>(), q);
+
+    <span class="k">var</span> products = <span class="k">await</span> _productRepo.<span class="m">SearchAsync</span>(q);
+    <span class="k">return</span> <span class="m">Ok</span>(products);
+}</pre>
+        <div class="tip"><strong>Mục tiêu học:</strong> Fire-and-forget pattern (<code>_ =</code>) để ghi log mà không làm chậm response chính.</div>
+      </div>
+    </div>
+
+    <div class="step">
+      <div class="step-num">3</div>
+      <div class="step-body">
+        <strong>Autocomplete với Debounce trên React</strong>
+<pre><span class="c">// Chỉ gọi API sau 300ms user ngừng gõ — tránh spam request</span>
+<span class="k">const</span> [suggestions, setSuggestions] = <span class="m">useState</span>([]);
+
+<span class="m">useEffect</span>(() => {
+    <span class="k">if</span> (!query.<span class="m">trim</span>()) <span class="k">return</span>;
+    <span class="k">const</span> timer = <span class="m">setTimeout</span>(<span class="k">async</span> () => {
+        <span class="k">const</span> res = <span class="k">await</span> api.<span class="m">get</span>(`/api/search/suggestions?q=${query}`);
+        <span class="m">setSuggestions</span>(res.data);
+    }, 300);                        <span class="c">// debounce 300ms</span>
+    <span class="k">return</span> () => <span class="m">clearTimeout</span>(timer); <span class="c">// cleanup khi query thay đổi</span>
+}, [query]);</pre>
+      </div>
+    </div>
+
+    <div class="step">
+      <div class="step-num">4</div>
+      <div class="step-body">
+        <strong>Admin: Từ khóa tìm kiếm phổ biến</strong>
+        <p class="note">Thêm vào trang Reports một bảng Top 10 keyword tìm kiếm nhiều nhất trong tuần — giúp admin hiểu xu hướng khách hàng.</p>
+        <ul class="checklist">
+          <li><code>SELECT Keyword, SUM(SearchCount) FROM SearchHistory GROUP BY Keyword ORDER BY 2 DESC LIMIT 10</code></li>
+          <li>Hiện dưới dạng bar chart hoặc bảng đơn giản</li>
+        </ul>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- ════════════════════
+     BẢNG TỔNG KẾT
+════════════════════ -->
+<p class="section-title">Tổng kết</p>
+<hr class="divider" />
+
+<div style="background:#1a1f2e;border:1px solid #2d3748;border-radius:14px;margin-top:32px;overflow:hidden;">
+  <div style="padding:20px 24px 16px;border-bottom:1px solid #2d3748;">
+    <h2 style="font-size:1rem;font-weight:700;color:#e2e8f0;">Lộ trình gợi ý cho học viên</h2>
+  </div>
+  <div style="overflow-x:auto;">
+  <table style="width:100%;border-collapse:collapse;font-size:0.83rem;">
+    <thead>
+      <tr style="background:#0d1117;">
+        <th style="padding:12px 16px;text-align:left;color:#718096;font-weight:600;border-bottom:1px solid #2d3748;">Module</th>
+        <th style="padding:12px 16px;text-align:left;color:#718096;font-weight:600;border-bottom:1px solid #2d3748;">Độ khó</th>
+        <th style="padding:12px 16px;text-align:left;color:#718096;font-weight:600;border-bottom:1px solid #2d3748;">Kỹ năng chính</th>
+        <th style="padding:12px 16px;text-align:left;color:#718096;font-weight:600;border-bottom:1px solid #2d3748;">Entity mới?</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr style="border-bottom:1px solid #2d3748;">
+        <td style="padding:11px 16px;color:#e2e8f0;">❤️ Wishlist</td>
+        <td style="padding:11px 16px;"><span class="badge badge-easy">Dễ</span></td>
+        <td style="padding:11px 16px;color:#94a3b8;">Repository + Controller + React CRUD</td>
+        <td style="padding:11px 16px;color:#48bb78;">Không (đã có)</td>
+      </tr>
+      <tr style="border-bottom:1px solid #2d3748;background:#161b27;">
+        <td style="padding:11px 16px;color:#e2e8f0;">📊 Export CSV</td>
+        <td style="padding:11px 16px;"><span class="badge badge-easy">Dễ</span></td>
+        <td style="padding:11px 16px;color:#94a3b8;">File response, Blob download</td>
+        <td style="padding:11px 16px;color:#48bb78;">Không</td>
+      </tr>
+      <tr style="border-bottom:1px solid #2d3748;">
+        <td style="padding:11px 16px;color:#e2e8f0;">👤 User Profile</td>
+        <td style="padding:11px 16px;"><span class="badge badge-easy">Dễ</span></td>
+        <td style="padding:11px 16px;color:#94a3b8;">JWT Claims, form React</td>
+        <td style="padding:11px 16px;color:#48bb78;">Không</td>
+      </tr>
+      <tr style="border-bottom:1px solid #2d3748;background:#161b27;">
+        <td style="padding:11px 16px;color:#e2e8f0;">⭐ Product Review</td>
+        <td style="padding:11px 16px;"><span class="badge badge-medium">Trung bình</span></td>
+        <td style="padding:11px 16px;color:#94a3b8;">Migration, Business rule validation</td>
+        <td style="padding:11px 16px;color:#fbbf24;">Có (ProductReview)</td>
+      </tr>
+      <tr style="border-bottom:1px solid #2d3748;">
+        <td style="padding:11px 16px;color:#e2e8f0;">🎟️ Coupon Code</td>
+        <td style="padding:11px 16px;"><span class="badge badge-medium">Trung bình</span></td>
+        <td style="padding:11px 16px;color:#94a3b8;">Guard clauses, tích hợp Order flow</td>
+        <td style="padding:11px 16px;color:#fbbf24;">Có (Coupon)</td>
+      </tr>
+      <tr style="border-bottom:1px solid #2d3748;background:#161b27;">
+        <td style="padding:11px 16px;color:#e2e8f0;">🔔 Stock Alert</td>
+        <td style="padding:11px 16px;"><span class="badge badge-medium">Trung bình</span></td>
+        <td style="padding:11px 16px;color:#94a3b8;">BackgroundService, polling pattern</td>
+        <td style="padding:11px 16px;color:#fbbf24;">Có (StockAlert)</td>
+      </tr>
+      <tr>
+        <td style="padding:11px 16px;color:#e2e8f0;">🔍 Search History</td>
+        <td style="padding:11px 16px;"><span class="badge badge-hard">Nâng cao</span></td>
+        <td style="padding:11px 16px;color:#94a3b8;">Debounce, Autocomplete, Analytics</td>
+        <td style="padding:11px 16px;color:#fbbf24;">Có (SearchHistory)</td>
+      </tr>
+    </tbody>
+  </table>
+  </div>
+</div>
+
+<div style="margin-top:32px;padding:18px 20px;background:#1a2e1a;border:1px solid #2d5a2d;border-radius:10px;font-size:0.83rem;color:#86efac;">
+  <strong style="color:#4ade80;">Lưu ý khi code:</strong>
+  Mỗi module nên <strong>đăng ký Dependency Injection</strong> trong <code>Program.cs</code> sau khi tạo repository mới.
+  Xem mẫu trong <span class="path">BaseCore.APIService/Program.cs</span> để làm theo đúng pattern
+  <code>builder.Services.AddScoped&lt;IXxxRepository, XxxRepository&gt;()</code>.
+</div>
+
+</div><!-- /container -->
+</body>
+</html>

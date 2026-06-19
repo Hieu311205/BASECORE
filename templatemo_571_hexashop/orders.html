@@ -1,0 +1,412 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <title>Đơn hàng của tôi - Lumière Perfume</title>
+
+    <link href="assets/css/bootstrap.min.css" rel="stylesheet">
+    <link href="assets/css/font-awesome.css" rel="stylesheet">
+    <link href="assets/css/templatemo-hexashop.css" rel="stylesheet">
+    <link href="assets/css/perfume-luxury-v2.css" rel="stylesheet">
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@500;600;700;800&family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+    <style>
+        .cart-icon { position: relative; }
+        .cart-badge { position: absolute; top: -8px; right: -15px; background: #d4af37; color: #000; border-radius: 50%; padding: 2px 6px; font-size: 12px; font-weight: bold; }
+
+        .ord-wrap { max-width: 860px; margin: 0 auto; }
+
+        /* Thẻ đơn hàng */
+        .ord-card { background: #101010; border: 1px solid rgba(212,175,55,0.2); border-radius: 10px; margin-bottom: 16px; overflow: hidden; }
+        .ord-header { display: flex; justify-content: space-between; align-items: center; padding: 16px 20px; flex-wrap: wrap; gap: 10px; cursor: pointer; user-select: none; }
+        .ord-header:hover { background: rgba(212,175,55,0.04); }
+        .ord-id { color: #d4af37; font-weight: 700; font-size: 15px; }
+        .ord-date { color: #6f6a64; font-size: 13px; margin-top: 3px; }
+        .ord-right { display: flex; align-items: center; gap: 14px; flex-wrap: wrap; }
+        .ord-total { color: #fff; font-weight: 600; }
+        .status-badge { font-size: 12px; font-weight: 600; padding: 3px 10px; border-radius: 20px; }
+        .status-Pending    { background: rgba(212,175,55,0.15); color: #d4af37; }
+        .status-Processing { background: rgba(59,130,246,0.15); color: #60a5fa; }
+        .status-Shipping   { background: rgba(139,92,246,0.15); color: #a78bfa; }
+        .status-Completed  { background: rgba(34,197,94,0.15);  color: #4ade80; }
+        .status-Cancelled  { background: rgba(239,68,68,0.15);  color: #f87171; }
+
+        /* Chi tiết đơn */
+        .ord-body { border-top: 1px solid rgba(212,175,55,0.1); padding: 16px 20px; display: none; }
+        .ord-body.show { display: block; }
+        .ord-item { display: grid; grid-template-columns: 50px 1fr auto; gap: 12px; align-items: center; padding: 8px 0; border-bottom: 1px solid rgba(255,255,255,0.04); }
+        .ord-item:last-of-type { border-bottom: none; }
+        .ord-item img { width: 50px; height: 50px; border-radius: 7px; object-fit: cover; }
+        .ord-item .iname { color: #fff; font-size: 14px; font-weight: 500; }
+        .ord-item .imeta { color: #6f6a64; font-size: 13px; margin-top: 2px; }
+        .ord-item .iprice { color: #d4af37; font-weight: 600; white-space: nowrap; }
+
+        .ord-meta-row { display: flex; gap: 24px; flex-wrap: wrap; margin-top: 12px; padding-top: 12px; border-top: 1px solid rgba(212,175,55,0.1); font-size: 13px; color: #6f6a64; }
+        .ord-meta-row span { color: #b8b0a4; }
+
+        .cancel-btn { margin-top: 12px; background: none; border: 1px solid rgba(239,68,68,0.4); color: #f87171; padding: 6px 18px; border-radius: 6px; cursor: pointer; font-size: 13px; }
+        .cancel-btn:hover { background: rgba(239,68,68,0.1); }
+        .cancel-btn:disabled { opacity: 0.4; cursor: default; }
+
+        /* Trống / lỗi */
+        .ord-empty { text-align: center; padding: 60px 20px; }
+        .ord-empty i { font-size: 48px; color: rgba(212,175,55,0.3); margin-bottom: 18px; }
+        .ord-empty p { color: #6f6a64; }
+
+        .ord-login-notice { text-align: center; padding: 60px 20px; }
+        .ord-login-notice i { font-size: 48px; color: rgba(212,175,55,0.3); margin-bottom: 18px; }
+
+        /* Skeleton */
+        .ord-skeleton { background: #101010; border: 1px solid rgba(212,175,55,0.1); border-radius: 10px; padding: 20px; margin-bottom: 14px; }
+        .sk-line { height: 14px; background: rgba(255,255,255,0.06); border-radius: 4px; margin-bottom: 10px; }
+        .sk-line.w60 { width: 60%; }
+        .sk-line.w40 { width: 40%; }
+        @keyframes sk-shine { to { background-position: 200% center; } }
+        .sk-line { background: linear-gradient(90deg, rgba(255,255,255,0.06) 25%, rgba(255,255,255,0.12) 50%, rgba(255,255,255,0.06) 75%); background-size: 200%; animation: sk-shine 1.4s linear infinite; }
+
+        .chevron { transition: transform 0.25s; }
+        .chevron.open { transform: rotate(180deg); }
+    </style>
+</head>
+<body>
+
+<div class="perfume-topbar">
+    <div class="container">
+        <div class="topbar-inner">
+            <span>Miễn phí giao hàng cho đơn từ 1.000.000đ</span>
+            <span>Hotline: 0123 456 789 &nbsp;&nbsp;|&nbsp;&nbsp; lumiereperfume@gmail.com</span>
+        </div>
+    </div>
+</div>
+
+<header class="header-area header-sticky">
+    <div class="container">
+        <div class="row">
+            <div class="col-12">
+                <nav class="main-nav">
+                    <a class="logo" href="index.html"><span class="logo-text">LUMIÈRE <em>PERFUME</em></span></a>
+                    <ul class="nav">
+                        <li><a href="index.html">Trang chủ</a></li>
+                        <li><a href="products.html">Sản phẩm</a></li>
+                        <li><a href="about.html">Về chúng tôi</a></li>
+                        <li><a href="contact.html">Liên hệ</a></li>
+                        <li class="cart-icon">
+                            <a href="cart.html"><i class="fa fa-shopping-cart"></i><span class="cart-badge">0</span></a>
+                        </li>
+                    </ul>
+                    <a class="menu-trigger"><span>Menu</span></a>
+                </nav>
+            </div>
+        </div>
+    </div>
+</header>
+
+<section class="page-hero">
+    <div class="container">
+        <h1>ĐƠN HÀNG CỦA TÔI</h1>
+        <p>Theo dõi trạng thái và lịch sử mua hàng của bạn tại Lumière Perfume.</p>
+    </div>
+</section>
+
+<section class="section">
+    <div class="container">
+        <div class="ord-wrap" id="orders-root">
+            <div class="ord-skeleton"><div class="sk-line w60"></div><div class="sk-line w40"></div></div>
+            <div class="ord-skeleton"><div class="sk-line w60"></div><div class="sk-line w40"></div></div>
+            <div class="ord-skeleton"><div class="sk-line w60"></div><div class="sk-line w40"></div></div>
+        </div>
+    </div>
+</section>
+
+<footer class="footer">
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-12">
+                <div class="under-footer"><p>© 2026 Lumière Perfume. All Rights Reserved.</p></div>
+            </div>
+        </div>
+    </div>
+</footer>
+
+<script src="assets/js/jquery-2.1.0.min.js"></script>
+<script src="assets/js/bootstrap.min.js"></script>
+<script src="assets/custom-js/api.js"></script>
+<script src="assets/custom-js/cart.js"></script>
+<script src="assets/custom-js/auth-widget.js"></script>
+
+<script>
+(function () {
+    "use strict";
+
+    const root = document.getElementById("orders-root");
+
+    function getToken() {
+        return localStorage.getItem("token") || localStorage.getItem("accessToken") || "";
+    }
+
+    function esc(v) {
+        return String(v || "").replace(/[&<>"']/g, c =>
+            ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#039;" }[c])
+        );
+    }
+
+    function money(v) {
+        return Number(v || 0).toLocaleString("vi-VN") + "đ";
+    }
+
+    function imgUrl(u) {
+        if (!u) return "assets/images/default.jpg";
+        if (String(u).startsWith("http")) return u;
+        if (String(u).startsWith("assets/")) return u;
+        return "assets/images/" + u;
+    }
+
+    function formatDate(dateStr) {
+        if (!dateStr) return "";
+        const d = new Date(dateStr);
+        if (isNaN(d)) return dateStr;
+        return d.toLocaleDateString("vi-VN", { day: "2-digit", month: "2-digit", year: "numeric", hour: "2-digit", minute: "2-digit" });
+    }
+
+    function statusLabel(status) {
+        const map = { Pending: "Chờ xử lý", Processing: "Đang xử lý", Shipping: "Đang giao", Completed: "Hoàn thành", Cancelled: "Đã hủy" };
+        return map[status] || status || "Không rõ";
+    }
+
+    function payLabel(method) {
+        const map = { COD: "Tiền mặt (COD)", GooglePay: "Google Pay", QR: "Chuyển khoản QR" };
+        return map[method] || method || "COD";
+    }
+
+    // Gọi API orders — yêu cầu JWT Bearer token
+    async function fetchOrders() {
+        const token = getToken();
+        const res = await fetch(`${window.API_BASE_URL}/orders`, {
+            headers: { "Authorization": `Bearer ${token}` }
+        });
+        if (res.status === 401) throw new Error("UNAUTHORIZED");
+        if (!res.ok) throw new Error(`Lỗi ${res.status}`);
+        const json = await res.json();
+        // API trả { success, data } hoặc mảng trực tiếp
+        if (Array.isArray(json)) return json;
+        if (Array.isArray(json.data)) return json.data;
+        return [];
+    }
+
+    // Gọi API lấy chi tiết đơn (items)
+    async function fetchOrderDetail(orderId) {
+        const token = getToken();
+        const res = await fetch(`${window.API_BASE_URL}/orders/${orderId}`, {
+            headers: { "Authorization": `Bearer ${token}` }
+        });
+        if (!res.ok) return null;
+        const json = await res.json();
+        const payload = json.data || json;
+        return payload.details || payload.orderDetails || [];
+    }
+
+    // Hủy đơn hàng
+    async function cancelOrder(orderId, btn) {
+        if (!confirm("Bạn có chắc muốn hủy đơn hàng này?")) return;
+        btn.disabled = true;
+        btn.textContent = "Đang hủy...";
+        const token = getToken();
+        try {
+            const res = await fetch(`${window.API_BASE_URL}/orders/${orderId}/cancel`, {
+                method: "PUT",
+                headers: { "Authorization": `Bearer ${token}` }
+            });
+            if (!res.ok) {
+                const err = await res.json().catch(() => ({}));
+                alert(err.message || "Hủy đơn thất bại.");
+                btn.disabled = false;
+                btn.textContent = "Hủy đơn hàng";
+                return;
+            }
+            // Cập nhật badge trạng thái trên card
+            const card = btn.closest(".ord-card");
+            const badge = card.querySelector(".status-badge");
+            if (badge) {
+                badge.className = "status-badge status-Cancelled";
+                badge.textContent = "Đã hủy";
+            }
+            btn.remove();
+        } catch (e) {
+            alert("Không thể kết nối server.");
+            btn.disabled = false;
+            btn.textContent = "Hủy đơn hàng";
+        }
+    }
+
+    // Render danh sách chi tiết items (gọi khi expand)
+    async function renderBody(orderId, bodyEl) {
+        bodyEl.innerHTML = `<div style="color:#6f6a64;font-size:13px;padding:8px 0;">Đang tải...</div>`;
+        const details = await fetchOrderDetail(orderId);
+
+        if (!details || details.length === 0) {
+            bodyEl.innerHTML = `<p style="color:#6f6a64;font-size:13px;">Không có chi tiết.</p>`;
+            return;
+        }
+
+        const itemsHtml = details.map(d => {
+            const name = d.productName || d.ProductName || d.product?.name || d.product?.Name || `Sản phẩm #${d.productId || d.ProductId}`;
+            const qty  = d.quantity || d.Quantity || 1;
+            const unit = d.unitPrice || d.UnitPrice || 0;
+            const img  = d.imageUrl || d.product?.imageUrl || d.product?.ImageUrl || "";
+            return `
+                <div class="ord-item">
+                    <img src="${esc(imgUrl(img))}" alt="${esc(name)}" onerror="this.src='assets/images/default.jpg'">
+                    <div>
+                        <div class="iname">${esc(name)}</div>
+                        <div class="imeta">x${qty} — ${money(unit)}/cái</div>
+                    </div>
+                    <div class="iprice">${money(unit * qty)}</div>
+                </div>`;
+        }).join("");
+
+        bodyEl.innerHTML = itemsHtml;
+    }
+
+    function buildOrderCard(order) {
+        const id     = order.id || order.Id;
+        const date   = order.orderDate || order.OrderDate;
+        const status = order.status || order.Status || "Pending";
+        const total  = order.totalAmount || order.TotalAmount || 0;
+        const addr   = order.shippingAddress || order.ShippingAddress || "";
+        const method = order.paymentMethod || order.PaymentMethod || "COD";
+        const pstatus= order.paymentStatus || order.PaymentStatus || "Unpaid";
+        const canCancel = status === "Pending";
+
+        const card = document.createElement("div");
+        card.className = "ord-card";
+        card.innerHTML = `
+            <div class="ord-header">
+                <div>
+                    <div class="ord-id">Đơn hàng #${id}</div>
+                    <div class="ord-date">${formatDate(date)}</div>
+                </div>
+                <div class="ord-right">
+                    <span class="ord-total">${money(total)}</span>
+                    <span class="status-badge status-${esc(status)}">${statusLabel(status)}</span>
+                    <i class="fa fa-chevron-down chevron"></i>
+                </div>
+            </div>
+            <div class="ord-body" id="body-${id}">
+                <!-- items được load khi expand -->
+                <div class="ord-meta-row">
+                    <div>Thanh toán: <span>${payLabel(method)}</span></div>
+                    <div>Trạng thái TT: <span>${pstatus === "Paid" ? "Đã thanh toán" : "Chưa thanh toán"}</span></div>
+                    <div>Địa chỉ: <span>${esc(addr)}</span></div>
+                </div>
+                ${canCancel ? `<button class="cancel-btn" data-id="${id}">Hủy đơn hàng</button>` : ""}
+            </div>`;
+
+        // Toggle expand
+        let loaded = false;
+        const header  = card.querySelector(".ord-header");
+        const body    = card.querySelector(".ord-body");
+        const chevron = card.querySelector(".chevron");
+
+        header.addEventListener("click", async function () {
+            const isOpen = body.classList.contains("show");
+            if (isOpen) {
+                body.classList.remove("show");
+                chevron.classList.remove("open");
+            } else {
+                body.classList.add("show");
+                chevron.classList.add("open");
+                if (!loaded) {
+                    loaded = true;
+                    // Chèn items trước meta-row
+                    const metaRow = body.querySelector(".ord-meta-row");
+                    const tempDiv = document.createElement("div");
+                    body.insertBefore(tempDiv, metaRow);
+                    await renderBody(id, tempDiv);
+                }
+            }
+        });
+
+        // Nút hủy
+        const cancelBtn = card.querySelector(".cancel-btn");
+        if (cancelBtn) {
+            cancelBtn.addEventListener("click", function (e) {
+                e.stopPropagation();
+                cancelOrder(id, this);
+            });
+        }
+
+        return card;
+    }
+
+    async function init() {
+        const token = getToken();
+
+        // Chưa đăng nhập
+        if (!token) {
+            root.innerHTML = `
+                <div class="ord-login-notice">
+                    <i class="fa fa-lock"></i>
+                    <h4 style="color:#fff;margin-bottom:10px;">Vui lòng đăng nhập</h4>
+                    <p style="color:#6f6a64;margin-bottom:20px;">Bạn cần đăng nhập để xem lịch sử đơn hàng.</p>
+                    <a href="login.html" class="gold-btn">Đăng nhập ngay</a>
+                </div>`;
+            return;
+        }
+
+        try {
+            const orders = await fetchOrders();
+
+            if (orders.length === 0) {
+                root.innerHTML = `
+                    <div class="ord-empty">
+                        <i class="fa fa-shopping-bag"></i>
+                        <h4 style="color:#fff;margin-bottom:10px;">Chưa có đơn hàng nào</h4>
+                        <p>Hãy khám phá và đặt hàng tại Lumière Perfume.</p>
+                        <a href="products.html" class="gold-btn" style="display:inline-block;margin-top:16px;">Mua ngay</a>
+                    </div>`;
+                return;
+            }
+
+            root.innerHTML = "";
+
+            // Sắp xếp mới nhất trước
+            orders.sort((a, b) => {
+                const da = new Date(a.orderDate || a.OrderDate || 0);
+                const db = new Date(b.orderDate || b.OrderDate || 0);
+                return db - da;
+            });
+
+            orders.forEach(order => {
+                root.appendChild(buildOrderCard(order));
+            });
+
+        } catch (err) {
+            if (err.message === "UNAUTHORIZED") {
+                root.innerHTML = `
+                    <div class="ord-login-notice">
+                        <i class="fa fa-lock"></i>
+                        <h4 style="color:#fff;margin-bottom:10px;">Phiên đăng nhập hết hạn</h4>
+                        <p style="color:#6f6a64;margin-bottom:20px;">Vui lòng đăng nhập lại để xem đơn hàng.</p>
+                        <a href="login.html" class="gold-btn">Đăng nhập lại</a>
+                    </div>`;
+            } else {
+                root.innerHTML = `
+                    <div class="ord-empty">
+                        <i class="fa fa-exclamation-triangle" style="color:#d4af37;"></i>
+                        <p style="color:#6f6a64;margin-top:14px;">${esc(err.message)}</p>
+                        <button onclick="location.reload()" style="margin-top:14px;padding:8px 24px;background:#d4af37;color:#000;border:none;border-radius:4px;cursor:pointer;font-weight:600;">Thử lại</button>
+                    </div>`;
+            }
+        }
+    }
+
+    if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", init);
+    else init();
+})();
+</script>
+</body>
+</html>

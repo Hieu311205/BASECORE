@@ -15,103 +15,97 @@
 
     <style>
         .cart-icon { position: relative; }
-        .cart-badge {
-            position: absolute;
-            top: -8px;
-            right: -15px;
-            background: #d4af37;
-            color: #000;
-            border-radius: 50%;
-            padding: 2px 6px;
-            font-size: 12px;
-            font-weight: bold;
+        .cart-badge { position: absolute; top: -8px; right: -15px; background: #d4af37; color: #000; border-radius: 50%; padding: 2px 6px; font-size: 12px; font-weight: bold; }
+
+        .co-wrap { max-width: 880px; margin: 0 auto; }
+        .co-panel { background: #101010; border: 1px solid rgba(212,175,55,0.22); border-radius: 10px; padding: 22px 24px; margin-bottom: 18px; }
+        .co-panel-title { display: flex; align-items: center; gap: 10px; color: #d4af37; font-family: "Playfair Display", serif; font-size: 19px; margin: 0 0 16px; }
+        .co-panel-title i { font-size: 18px; }
+
+        /* Địa chỉ */
+        .addr-selected { display: flex; justify-content: space-between; align-items: flex-start; gap: 16px; flex-wrap: wrap; }
+        .addr-selected .info { flex: 1; min-width: 220px; }
+        .addr-name-row { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; margin-bottom: 5px; }
+        .addr-name { color: #fff; font-weight: 600; }
+        .addr-phone { color: #b8b0a4; border-left: 1px solid rgba(255,255,255,0.18); padding-left: 10px; }
+        .addr-text { color: #b8b0a4; font-size: 14px; line-height: 1.6; }
+        .addr-tag { font-size: 11px; color: #d4af37; border: 1px solid #d4af37; border-radius: 4px; padding: 1px 8px; }
+        .addr-label-chip { font-size: 11px; color: #b8b0a4; background: rgba(255,255,255,0.06); border-radius: 4px; padding: 1px 8px; }
+        .text-link { color: #d4af37; background: none; border: none; cursor: pointer; font-size: 14px; white-space: nowrap; }
+        .text-link:hover { color: #fff; }
+
+        .addr-picker { margin-top: 14px; border-top: 1px solid rgba(212,175,55,0.15); padding-top: 14px; display: none; }
+        .addr-picker.show { display: block; }
+        .addr-option { display: flex; gap: 12px; align-items: flex-start; padding: 12px; border: 1px solid rgba(255,255,255,0.08); border-radius: 8px; margin-bottom: 10px; cursor: pointer; }
+        .addr-option:hover { border-color: rgba(212,175,55,0.5); }
+        .addr-option input { margin-top: 4px; }
+        .addr-empty-note { color: #b8b0a4; font-size: 14px; padding: 6px 0 12px; }
+
+        /* Sản phẩm */
+        .co-item { display: grid; grid-template-columns: 54px 1fr auto; gap: 12px; align-items: center; border-bottom: 1px solid rgba(212,175,55,0.12); padding: 11px 0; }
+        .co-item:last-child { border-bottom: none; }
+        .co-item img { width: 54px; height: 54px; border-radius: 8px; object-fit: cover; }
+        .co-item strong { color: #fff; font-weight: 500; font-size: 14px; }
+        .co-item .meta { color: #b8b0a4; font-size: 13px; margin-top: 3px; }
+        .co-item .line-total { color: #fff; font-weight: 600; }
+
+        /* Thanh toán */
+        .pay-option { display: flex; align-items: center; gap: 14px; padding: 14px 16px; border: 1px solid rgba(255,255,255,0.1); border-radius: 8px; margin-bottom: 12px; cursor: pointer; transition: border-color 0.2s, background 0.2s; }
+        .pay-option:hover { border-color: rgba(212,175,55,0.5); }
+        .pay-option.active { border-color: #d4af37; background: rgba(212,175,55,0.07); }
+        .pay-option input { width: auto; }
+        .pay-icon { width: 40px; height: 40px; border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 20px; flex-shrink: 0; }
+        .pay-icon.cod { background: rgba(212,175,55,0.15); color: #d4af37; }
+        .pay-icon.gpay { background: #fff; color: #4285F4; }
+        .pay-icon.qr { background: rgba(255,255,255,0.08); color: #fff; }
+        .pay-info { flex: 1; }
+        .pay-info .t { color: #fff; font-weight: 600; }
+        .pay-info .d { color: #b8b0a4; font-size: 13px; margin-top: 2px; }
+
+        /* Summary bar */
+        .co-summary { background: #101010; border: 1px solid #d4af37; border-radius: 10px; padding: 18px 24px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 16px; }
+        .co-summary .rows { font-size: 14px; color: #b8b0a4; }
+        .co-summary .rows .grand { font-size: 22px; color: #d4af37; font-weight: 700; }
+        .co-summary .rows .grand span { color: #fff; margin-right: 8px; font-size: 14px; font-weight: 400; }
+        .co-back { color: #d4af37; text-decoration: none; }
+        .co-back:hover { color: #fff; }
+        .co-actions { display: flex; align-items: center; gap: 18px; }
+
+        .co-empty { text-align: center; padding: 50px 20px; }
+
+        /* Modal chung */
+        .modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.75); display: none; align-items: center; justify-content: center; z-index: 2000; padding: 16px; }
+        .modal-overlay.show { display: flex; }
+        .modal-box { background: #0d0d0d; border: 1px solid #d4af37; border-radius: 12px; width: 100%; max-width: 440px; padding: 28px; text-align: center; }
+        .modal-box h4 { color: #d4af37; font-family: "Playfair Display", serif; margin: 0 0 8px; }
+        .modal-box p.sub { color: #b8b0a4; font-size: 14px; margin-bottom: 20px; line-height: 1.6; }
+        .modal-cancel { background: none; border: none; color: #b8b0a4; cursor: pointer; margin-top: 16px; display: inline-block; }
+        .modal-cancel:hover { color: #fff; }
+        .modal-box label { display:block; text-align:left; color:#d4af37; font-weight:600; font-size:13px; margin-bottom:6px; }
+        .modal-box input[type=text], .modal-box input[type=tel], .modal-box textarea {
+            width:100%; border:1px solid rgba(212,175,55,0.4); background:#070707; color:#fff; border-radius:6px;
+            padding:10px 12px; margin-bottom:14px; font-family:'Poppins',sans-serif; font-size:14px;
         }
-        .checkout-grid {
-            display: grid;
-            grid-template-columns: minmax(0, 1.1fr) minmax(320px, 0.9fr);
-            gap: 24px;
-        }
-        .checkout-panel {
-            background: #101010;
-            border: 1px solid rgba(212, 175, 55, 0.25);
-            border-radius: 8px;
-            padding: 24px;
-        }
-        .checkout-panel h3 {
-            color: #d4af37;
-            font-family: "Playfair Display", serif;
-            margin-bottom: 18px;
-        }
-        .checkout-form label {
-            color: #d4af37;
-            font-weight: 600;
-            margin-bottom: 6px;
-        }
-        .checkout-form input,
-        .checkout-form textarea {
-            width: 100%;
-            border: 1px solid rgba(212, 175, 55, 0.45);
-            background: #070707;
-            color: #fff;
-            border-radius: 6px;
-            padding: 11px 12px;
-            margin-bottom: 16px;
-        }
-        .checkout-item {
-            display: grid;
-            grid-template-columns: 58px 1fr auto;
-            gap: 12px;
-            align-items: center;
-            border-bottom: 1px solid rgba(212, 175, 55, 0.18);
-            padding: 12px 0;
-        }
-        .checkout-item img {
-            width: 58px;
-            height: 58px;
-            border-radius: 8px;
-            object-fit: cover;
-        }
-        .checkout-item strong,
-        .checkout-total {
-            color: #fff;
-        }
-        .checkout-meta {
-            color: #bbb;
-            font-size: 13px;
-            margin-top: 3px;
-        }
-        .checkout-total {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            border-top: 2px solid #d4af37;
-            margin-top: 18px;
-            padding-top: 18px;
-            font-size: 20px;
-            font-weight: 700;
-        }
-        .checkout-actions {
-            display: flex;
-            gap: 12px;
-            align-items: center;
-            margin-top: 8px;
-        }
-        .checkout-back {
-            color: #d4af37;
-            text-decoration: none;
-        }
-        .checkout-back:hover {
-            color: #fff;
-        }
-        .checkout-empty {
-            text-align: center;
-            padding: 50px 20px;
-        }
-        @media (max-width: 991px) {
-            .checkout-grid {
-                grid-template-columns: 1fr;
-            }
-        }
+
+        /* OTP */
+        .otp-inputs { display: flex; gap: 10px; justify-content: center; margin-bottom: 8px; }
+        .otp-inputs input { width: 46px; height: 54px; text-align: center; font-size: 22px; border: 1px solid rgba(212,175,55,0.4); background: #070707; color: #fff; border-radius: 8px; }
+        .otp-inputs input:focus { outline: none; border-color: #d4af37; }
+        .otp-hint { color: #6f6a64; font-size: 12px; margin-bottom: 18px; }
+        .otp-hint b { color: #d4af37; }
+        .modal-err { color: #ff8c75; font-size: 13px; min-height: 18px; margin-bottom: 8px; }
+
+        /* QR */
+        .qr-box { background: #fff; width: 220px; height: 220px; border-radius: 12px; margin: 0 auto 16px; display: flex; align-items: center; justify-content: center; padding: 10px; }
+        .qr-box img { width: 100%; height: 100%; object-fit: contain; }
+        .qr-amount { color: #fff; font-size: 20px; font-weight: 700; margin-bottom: 4px; }
+        .qr-amount span { color: #d4af37; }
+
+        /* Success */
+        .success-check { width: 76px; height: 76px; border-radius: 50%; background: rgba(212,175,55,0.15); color: #d4af37; display: flex; align-items: center; justify-content: center; font-size: 38px; margin: 0 auto 18px; }
+
+        .gold-btn[disabled] { opacity: 0.5; cursor: default; }
+        @media (max-width: 600px) { .co-summary { flex-direction: column; align-items: stretch; } .co-actions { justify-content: space-between; } }
     </style>
 </head>
 <body>
@@ -129,19 +123,14 @@
             <div class="row">
                 <div class="col-12">
                     <nav class="main-nav">
-                        <a class="logo" href="index.html">
-                            <span class="logo-text">LUMIÈRE <em>PERFUME</em></span>
-                        </a>
+                        <a class="logo" href="index.html"><span class="logo-text">LUMIÈRE <em>PERFUME</em></span></a>
                         <ul class="nav">
                             <li><a href="index.html">Trang chủ</a></li>
                             <li><a href="products.html">Sản phẩm</a></li>
                             <li><a href="about.html">Về chúng tôi</a></li>
                             <li><a href="contact.html">Liên hệ</a></li>
                             <li class="cart-icon">
-                                <a href="cart.html">
-                                    <i class="fa fa-shopping-cart"></i>
-                                    <span class="cart-badge">0</span>
-                                </a>
+                                <a href="cart.html"><i class="fa fa-shopping-cart"></i><span class="cart-badge">0</span></a>
                             </li>
                         </ul>
                         <a class="menu-trigger"><span>Menu</span></a>
@@ -154,61 +143,149 @@
     <section class="page-hero">
         <div class="container">
             <h1>THANH TOÁN</h1>
-            <p>Kiểm tra đơn hàng và nhập thông tin giao hàng trước khi đặt mua.</p>
+            <p>Chọn địa chỉ nhận hàng và phương thức thanh toán để hoàn tất đơn hàng.</p>
         </div>
     </section>
 
     <section class="section">
-        <div class="container" id="checkout-container">
-            <div class="checkout-grid">
-                <form class="checkout-panel checkout-form" id="checkout-form">
-                    <h3>Thông tin giao hàng</h3>
+        <div class="container">
+            <div class="co-wrap" id="checkout-root">
 
-                    <label for="customer-name">Họ tên</label>
-                    <input id="customer-name" type="text" placeholder="Nguyễn Văn A" required>
+                <!-- Địa chỉ nhận hàng -->
+                <div class="co-panel">
+                    <h3 class="co-panel-title"><i class="fa fa-map-marker"></i> Địa chỉ nhận hàng</h3>
+                    <div id="address-area"><p style="color:#b8b0a4;">Đang tải địa chỉ...</p></div>
+                    <div class="addr-picker" id="address-picker"></div>
+                </div>
 
-                    <label for="customer-phone">Số điện thoại</label>
-                    <input id="customer-phone" type="tel" placeholder="0123 456 789" required>
+                <!-- Sản phẩm -->
+                <div class="co-panel">
+                    <h3 class="co-panel-title"><i class="fa fa-shopping-bag"></i> Sản phẩm</h3>
+                    <div id="checkout-items"></div>
+                </div>
 
-                    <label for="customer-email">Email</label>
-                    <input id="customer-email" type="email" placeholder="email@example.com">
+                <!-- Phương thức thanh toán -->
+                <div class="co-panel">
+                    <h3 class="co-panel-title"><i class="fa fa-credit-card"></i> Phương thức thanh toán</h3>
 
-                    <label for="shipping-address">Địa chỉ giao hàng</label>
-                    <textarea id="shipping-address" rows="4" placeholder="Số nhà, đường, phường/xã, quận/huyện, tỉnh/thành phố" required></textarea>
+                    <label class="pay-option active" data-method="COD">
+                        <input type="radio" name="payment" value="COD" checked>
+                        <span class="pay-icon cod"><i class="fa fa-money"></i></span>
+                        <span class="pay-info">
+                            <span class="t">Thanh toán khi nhận hàng (COD)</span>
+                            <span class="d">Trả tiền mặt cho shipper khi nhận sản phẩm.</span>
+                        </span>
+                    </label>
 
-                    <label for="order-note">Ghi chú</label>
-                    <textarea id="order-note" rows="3" placeholder="Thời gian nhận hàng, ghi chú thêm..."></textarea>
+                    <label class="pay-option" data-method="GooglePay" id="gpay-option" style="display:none;">
+                        <input type="radio" name="payment" value="GooglePay">
+                        <span class="pay-icon gpay"><i class="fa fa-google"></i></span>
+                        <span class="pay-info">
+                            <span class="t">Google Pay (OTP qua Gmail)</span>
+                            <span class="d">Mã OTP 6 số sẽ được gửi tới Gmail của bạn để xác nhận.</span>
+                        </span>
+                    </label>
 
-                    <div class="checkout-actions">
-                        <button type="submit" class="gold-btn" id="place-order-btn">ĐẶT HÀNG</button>
-                        <a href="cart.html" class="checkout-back">Quay lại giỏ hàng</a>
+                    <label class="pay-option" data-method="QR">
+                        <input type="radio" name="payment" value="QR">
+                        <span class="pay-icon qr"><i class="fa fa-qrcode"></i></span>
+                        <span class="pay-info">
+                            <span class="t">Quét mã QR</span>
+                            <span class="d">Chuyển khoản bằng cách quét mã QR ngân hàng/ví điện tử.</span>
+                        </span>
+                    </label>
+
+                    <label for="order-note" style="display:block;color:#d4af37;font-weight:600;font-size:13px;margin:8px 0 6px;">Ghi chú (tùy chọn)</label>
+                    <textarea id="order-note" rows="2" placeholder="Thời gian nhận hàng, ghi chú thêm..."
+                        style="width:100%;border:1px solid rgba(212,175,55,0.4);background:#070707;color:#fff;border-radius:6px;padding:10px 12px;font-family:'Poppins',sans-serif;font-size:14px;"></textarea>
+                </div>
+
+                <!-- Tổng kết -->
+                <div class="co-summary">
+                    <div class="rows">
+                        <div class="grand"><span>Tổng thanh toán:</span><span id="grand-total">0đ</span></div>
                     </div>
-                </form>
+                    <div class="co-actions">
+                        <a href="cart.html" class="co-back">Quay lại giỏ hàng</a>
+                        <button type="button" class="gold-btn" id="place-order-btn">ĐẶT HÀNG</button>
+                    </div>
+                </div>
 
-                <aside class="checkout-panel">
-                    <h3>Đơn hàng của bạn</h3>
-                    <div id="checkout-summary"></div>
-                </aside>
             </div>
         </div>
     </section>
 
+    <!-- Modal: thêm địa chỉ nhanh -->
+    <div class="modal-overlay" id="new-addr-modal">
+        <div class="modal-box" style="text-align:left;">
+            <h4 style="text-align:center;">Thêm địa chỉ mới</h4>
+            <form id="new-addr-form">
+                <label>Họ tên người nhận</label>
+                <input type="text" id="na-recipient" required placeholder="Nguyễn Văn A">
+                <label>Số điện thoại</label>
+                <input type="tel" id="na-phone" required placeholder="0123 456 789">
+                <label>Địa chỉ nhận hàng</label>
+                <textarea id="na-address" rows="3" required placeholder="Số nhà, đường, phường/xã, quận/huyện, tỉnh/thành"></textarea>
+                <label>Nhãn (tùy chọn)</label>
+                <input type="text" id="na-label" placeholder="Nhà riêng / Cơ quan">
+                <div class="modal-err" id="na-err"></div>
+                <div style="display:flex;justify-content:flex-end;gap:12px;">
+                    <button type="button" class="modal-cancel" id="na-cancel" style="margin:0;">Hủy</button>
+                    <button type="submit" class="gold-btn" id="na-save">Lưu địa chỉ</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Modal: OTP Google Pay -->
+    <div class="modal-overlay" id="otp-modal">
+        <div class="modal-box">
+            <div class="pay-icon gpay" style="width:54px;height:54px;font-size:26px;margin:0 auto 14px;"><i class="fa fa-google"></i></div>
+            <h4>Xác thực Google Pay</h4>
+            <p class="sub">Nhập mã OTP gồm 6 chữ số để xác nhận thanh toán.</p>
+            <div class="otp-inputs" id="otp-inputs">
+                <input type="text" inputmode="numeric" maxlength="1">
+                <input type="text" inputmode="numeric" maxlength="1">
+                <input type="text" inputmode="numeric" maxlength="1">
+                <input type="text" inputmode="numeric" maxlength="1">
+                <input type="text" inputmode="numeric" maxlength="1">
+                <input type="text" inputmode="numeric" maxlength="1">
+            </div>
+            <div class="otp-hint">Mã OTP demo: <b>123456</b></div>
+            <div class="modal-err" id="otp-err"></div>
+            <button type="button" class="gold-btn" id="otp-confirm" style="width:100%;">XÁC NHẬN THANH TOÁN</button>
+            <button type="button" class="modal-cancel" id="otp-cancel">Hủy</button>
+        </div>
+    </div>
+
+    <!-- Modal: QR -->
+    <div class="modal-overlay" id="qr-modal">
+        <div class="modal-box">
+            <h4>Quét mã QR để thanh toán</h4>
+            <p class="sub">Dùng app ngân hàng hoặc ví điện tử quét mã bên dưới.</p>
+            <div class="qr-box"><img id="qr-img" alt="QR thanh toán"></div>
+            <div class="qr-amount">Số tiền: <span id="qr-amount">0đ</span></div>
+            <p class="sub" style="margin-top:6px;">Lumière Perfume &nbsp;·&nbsp; NỘI DUNG: LUMIERE</p>
+            <button type="button" class="gold-btn" id="qr-confirm" style="width:100%;">TÔI ĐÃ THANH TOÁN</button>
+            <button type="button" class="modal-cancel" id="qr-cancel">Hủy</button>
+        </div>
+    </div>
+
+    <!-- Modal: thành công -->
+    <div class="modal-overlay" id="success-modal">
+        <div class="modal-box">
+            <div class="success-check"><i class="fa fa-check"></i></div>
+            <h4>Đặt hàng thành công!</h4>
+            <p class="sub" id="success-msg">Cảm ơn bạn đã mua sắm tại Lumière Perfume.</p>
+            <a href="index.html" class="gold-btn" style="display:inline-block;width:100%;box-sizing:border-box;">VỀ TRANG CHỦ</a>
+            <a href="products.html" class="modal-cancel" style="text-decoration:none;">Tiếp tục mua sắm</a>
+        </div>
+    </div>
+
     <footer class="footer">
         <div class="container">
             <div class="row">
-                <div class="col-lg-4">
-                    <div class="first-item">
-                        <div class="logo"><span class="logo-text">LUMIÈRE <em>PERFUME</em></span></div>
-                        <ul>
-                            <li><a href="#">Hà Nội, Việt Nam</a></li>
-                            <li><a href="#">lumiereperfume@gmail.com</a></li>
-                            <li><a href="#">0123 456 789</a></li>
-                        </ul>
-                    </div>
-                </div>
-                <div class="col-lg-2"><h4>Danh mục</h4><ul><li><a href="products.html?categoryId=8">Nước hoa nam</a></li><li><a href="products.html?categoryId=9">Nước hoa nữ</a></li><li><a href="products.html?categoryId=10">Unisex</a></li><li><a href="products.html?categoryId=11">Gift set</a></li></ul></div>
-                <div class="col-lg-2"><h4>Hỗ trợ</h4><ul><li><a href="about.html">Về chúng tôi</a></li><li><a href="contact.html">Liên hệ</a></li><li><a href="products.html">Sản phẩm</a></li><li><a href="single-product.html">Chi tiết</a></li></ul></div>
-                <div class="col-lg-4"><h4>Về Lumière</h4><p>Lumière Perfume mang đến các dòng nước hoa chính hãng với phong cách sang trọng, tinh tế và dịch vụ chăm sóc khách hàng tận tâm.</p></div>
+                <div class="col-lg-12"><div class="under-footer"><p>© 2026 Lumière Perfume. All Rights Reserved.</p></div></div>
             </div>
         </div>
     </footer>
@@ -217,104 +294,347 @@
     <script src="assets/js/bootstrap.min.js"></script>
     <script src="assets/custom-js/api.js"></script>
     <script src="assets/custom-js/cart.js"></script>
+    <script src="assets/custom-js/addresses.js"></script>
     <script src="assets/custom-js/auth-widget.js"></script>
 
     <script>
-        function checkoutFormatPrice(value) {
-            if (typeof formatPrice === "function") return formatPrice(value);
-            return Number(value || 0).toLocaleString("vi-VN") + "đ";
+    (function () {
+        "use strict";
+
+        const DEMO_OTP = "123456";
+
+        // Lấy thông tin user hiện tại từ localStorage.
+        function getStoredUser() {
+            try { return JSON.parse(localStorage.getItem("user") || "null"); } catch { return null; }
         }
 
-        function checkoutEscapeHtml(value) {
-            if (typeof escapeHtml === "function") return escapeHtml(value);
-            return String(value || "")
-                .replaceAll("&", "&amp;")
-                .replaceAll("<", "&lt;")
-                .replaceAll(">", "&gt;")
-                .replaceAll('"', "&quot;")
-                .replaceAll("'", "&#039;");
+        // Chỉ tài khoản đăng nhập bằng Google mới được dùng Google Pay.
+        function isGoogleUser() {
+            const u = getStoredUser();
+            return u && u.isGoogleUser === true;
         }
 
-        function checkoutImageUrl(imageUrl) {
-            if (!imageUrl) return "assets/images/default.jpg";
-            if (String(imageUrl).startsWith("http")) return imageUrl;
-            if (String(imageUrl).startsWith("assets/")) return imageUrl;
-            return "assets/images/" + imageUrl;
-        }
+        let addresses = [];
+        let selectedAddressId = null;
 
-        function renderCheckoutSummary() {
+        function esc(v) {
+            if (typeof escapeHtml === "function") return escapeHtml(v);
+            return String(v || "").replace(/[&<>"']/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#039;" }[c]));
+        }
+        function money(v) {
+            if (typeof formatPrice === "function") return formatPrice(v);
+            return Number(v || 0).toLocaleString("vi-VN") + "đ";
+        }
+        function imgUrl(u) {
+            if (!u) return "assets/images/default.jpg";
+            if (String(u).startsWith("http")) return u;
+            if (String(u).startsWith("assets/")) return u;
+            return "assets/images/" + u;
+        }
+        function aId(a) { return a.id || a.Id; }
+        function aField(a, lower, Upper) { return a[lower] !== undefined ? a[lower] : a[Upper]; }
+
+        // ---------- Render sản phẩm ----------
+        function renderItems() {
             const cart = getCart();
-            const summary = document.getElementById("checkout-summary");
-            const container = document.getElementById("checkout-container");
-
-            if (!summary || !container) return;
-
-            if (cart.length === 0) {
-                container.innerHTML = `
-                    <div class="checkout-panel checkout-empty">
-                        <i class="fa fa-shopping-cart fa-3x" style="color:#d4af37; margin-bottom:18px;"></i>
-                        <h3>Giỏ hàng đang trống</h3>
-                        <p>Vui lòng chọn sản phẩm trước khi thanh toán.</p>
-                        <a href="products.html" class="gold-btn" style="display:inline-block; margin-top:12px;">Tiếp tục mua sắm</a>
+            const box = document.getElementById("checkout-items");
+            box.innerHTML = cart.map(it => `
+                <div class="co-item">
+                    <img src="${esc(imgUrl(it.imageUrl))}" alt="${esc(it.name)}">
+                    <div>
+                        <strong>${esc(it.name)}</strong>
+                        <div class="meta">${money(it.price)} x ${it.quantity}</div>
                     </div>
-                `;
+                    <div class="line-total">${money(it.price * it.quantity)}</div>
+                </div>`).join("");
+            document.getElementById("grand-total").textContent = money(getCartTotal(cart));
+        }
+
+        // ---------- Render địa chỉ ----------
+        function selectedAddress() {
+            return addresses.find(a => aId(a) === selectedAddressId) || null;
+        }
+
+        function renderSelectedAddress() {
+            const area = document.getElementById("address-area");
+            const a = selectedAddress();
+
+            if (!a) {
+                area.innerHTML = `
+                    <div class="addr-empty-note">Bạn chưa có địa chỉ nhận hàng.</div>
+                    <button type="button" class="gold-btn" id="open-new-addr">+ Thêm địa chỉ mới</button>`;
+                document.getElementById("open-new-addr").addEventListener("click", openNewAddr);
                 return;
             }
 
-            summary.innerHTML = cart.map(item => `
-                <div class="checkout-item">
-                    <img src="${checkoutEscapeHtml(checkoutImageUrl(item.imageUrl))}" alt="${checkoutEscapeHtml(item.name)}">
-                    <div>
-                        <strong>${checkoutEscapeHtml(item.name)}</strong>
-                        <div class="checkout-meta">${checkoutFormatPrice(item.price)} x ${item.quantity}</div>
+            const isDefault = aField(a, "isDefault", "IsDefault");
+            const label = aField(a, "label", "Label");
+            area.innerHTML = `
+                <div class="addr-selected">
+                    <div class="info">
+                        <div class="addr-name-row">
+                            <span class="addr-name">${esc(aField(a, "recipient", "Recipient"))}</span>
+                            <span class="addr-phone">${esc(aField(a, "phone", "Phone"))}</span>
+                            ${label ? `<span class="addr-label-chip">${esc(label)}</span>` : ""}
+                            ${isDefault ? `<span class="addr-tag">Mặc định</span>` : ""}
+                        </div>
+                        <div class="addr-text">${esc(aField(a, "address", "Address"))}</div>
                     </div>
-                    <strong>${checkoutFormatPrice(item.price * item.quantity)}</strong>
-                </div>
-            `).join("") + `
-                <div class="checkout-total">
-                    <span>Tổng cộng</span>
-                    <span>${checkoutFormatPrice(getCartTotal(cart))}</span>
-                </div>
-            `;
+                    <button type="button" class="text-link" id="change-addr">Thay đổi</button>
+                </div>`;
+            document.getElementById("change-addr").addEventListener("click", togglePicker);
         }
 
-        document.addEventListener("DOMContentLoaded", function () {
-            renderCheckoutSummary();
+        function renderPicker() {
+            const picker = document.getElementById("address-picker");
+            const options = addresses.map(a => {
+                const id = aId(a);
+                const isDefault = aField(a, "isDefault", "IsDefault");
+                const label = aField(a, "label", "Label");
+                return `
+                    <label class="addr-option">
+                        <input type="radio" name="addr-pick" value="${id}" ${id === selectedAddressId ? "checked" : ""}>
+                        <span>
+                            <span class="addr-name-row">
+                                <span class="addr-name">${esc(aField(a, "recipient", "Recipient"))}</span>
+                                <span class="addr-phone">${esc(aField(a, "phone", "Phone"))}</span>
+                                ${label ? `<span class="addr-label-chip">${esc(label)}</span>` : ""}
+                                ${isDefault ? `<span class="addr-tag">Mặc định</span>` : ""}
+                            </span>
+                            <span class="addr-text" style="display:block;margin-top:4px;">${esc(aField(a, "address", "Address"))}</span>
+                        </span>
+                    </label>`;
+            }).join("");
 
-            const form = document.getElementById("checkout-form");
-            if (!form) return;
+            picker.innerHTML = options + `
+                <button type="button" class="text-link" id="open-new-addr2" style="margin-top:4px;">+ Thêm địa chỉ mới</button>
+                &nbsp;·&nbsp;
+                <a href="addresses.html" class="text-link" style="display:inline;">Quản lý sổ địa chỉ</a>`;
 
-            form.addEventListener("submit", async function (event) {
-                event.preventDefault();
+            picker.querySelectorAll('input[name="addr-pick"]').forEach(r => {
+                r.addEventListener("change", function () {
+                    selectedAddressId = Number(this.value);
+                    renderSelectedAddress();
+                    picker.classList.remove("show");
+                });
+            });
+            document.getElementById("open-new-addr2").addEventListener("click", openNewAddr);
+        }
 
-                const name = document.getElementById("customer-name").value.trim();
-                const phone = document.getElementById("customer-phone").value.trim();
-                const email = document.getElementById("customer-email").value.trim();
-                const address = document.getElementById("shipping-address").value.trim();
-                const note = document.getElementById("order-note").value.trim();
+        function togglePicker() {
+            const picker = document.getElementById("address-picker");
+            if (picker.classList.contains("show")) { picker.classList.remove("show"); return; }
+            renderPicker();
+            picker.classList.add("show");
+        }
 
-                const shippingAddress = [
-                    `Khách hàng: ${name}`,
-                    `SĐT: ${phone}`,
-                    email ? `Email: ${email}` : "",
-                    `Địa chỉ: ${address}`,
-                    note ? `Ghi chú: ${note}` : ""
-                ].filter(Boolean).join(" | ");
+        async function loadAddresses() {
+            try {
+                addresses = await AddressBook.list();
+            } catch (err) {
+                document.getElementById("address-area").innerHTML =
+                    `<p style="color:#ff8c75;">${esc(err.message)}</p>
+                     <p style="font-size:12px;color:#666;">Hãy đảm bảo ApiGateway (5000) và APIService (5001) đang chạy.</p>`;
+                addresses = [];
+                return;
+            }
+            const def = addresses.find(a => aField(a, "isDefault", "IsDefault"));
+            selectedAddressId = def ? aId(def) : (addresses[0] ? aId(addresses[0]) : null);
+            renderSelectedAddress();
+        }
 
-                const button = document.getElementById("place-order-btn");
-                if (button) {
-                    button.disabled = true;
-                    button.textContent = "ĐANG XỬ LÝ...";
-                }
+        // ---------- Modal thêm địa chỉ ----------
+        const newAddrModal = document.getElementById("new-addr-modal");
+        function openNewAddr() {
+            document.getElementById("new-addr-form").reset();
+            document.getElementById("na-err").textContent = "";
+            newAddrModal.classList.add("show");
+        }
+        function closeNewAddr() { newAddrModal.classList.remove("show"); }
+        document.getElementById("na-cancel").addEventListener("click", closeNewAddr);
+        newAddrModal.addEventListener("click", e => { if (e.target === newAddrModal) closeNewAddr(); });
 
-                const success = await placeOrder(shippingAddress);
+        document.getElementById("new-addr-form").addEventListener("submit", async function (e) {
+            e.preventDefault();
+            const errEl = document.getElementById("na-err");
+            errEl.textContent = "";
+            const phone = document.getElementById("na-phone").value.trim();
+            if (!/^[0-9+\s.\-]{8,15}$/.test(phone)) { errEl.textContent = "Số điện thoại không hợp lệ."; return; }
 
-                if (!success && button) {
-                    button.disabled = false;
-                    button.textContent = "ĐẶT HÀNG";
-                }
+            const payload = {
+                recipient: document.getElementById("na-recipient").value.trim(),
+                phone,
+                address: document.getElementById("na-address").value.trim(),
+                label: document.getElementById("na-label").value.trim(),
+                isDefault: addresses.length === 0
+            };
+            const btn = document.getElementById("na-save");
+            btn.disabled = true; btn.textContent = "Đang lưu...";
+            try {
+                const created = await AddressBook.create(payload);
+                closeNewAddr();
+                await loadAddresses();
+                if (created) selectedAddressId = aId(created);
+                renderSelectedAddress();
+            } catch (err) {
+                errEl.textContent = err.message;
+            } finally {
+                btn.disabled = false; btn.textContent = "Lưu địa chỉ";
+            }
+        });
+
+        // ---------- Phương thức thanh toán ----------
+        function selectedMethod() {
+            const r = document.querySelector('input[name="payment"]:checked');
+            return r ? r.value : "COD";
+        }
+        document.querySelectorAll('input[name="payment"]').forEach(r => {
+            r.addEventListener("change", function () {
+                document.querySelectorAll(".pay-option").forEach(o => o.classList.remove("active"));
+                this.closest(".pay-option").classList.add("active");
             });
         });
+
+        // ---------- OTP modal ----------
+        const otpModal = document.getElementById("otp-modal");
+        const otpInputs = Array.from(document.getElementById("otp-inputs").querySelectorAll("input"));
+        otpInputs.forEach((inp, idx) => {
+            inp.addEventListener("input", function () {
+                this.value = this.value.replace(/\D/g, "");
+                if (this.value && idx < otpInputs.length - 1) otpInputs[idx + 1].focus();
+            });
+            inp.addEventListener("keydown", function (e) {
+                if (e.key === "Backspace" && !this.value && idx > 0) otpInputs[idx - 1].focus();
+            });
+        });
+
+        function openOtp() {
+            otpInputs.forEach(i => i.value = "");
+            document.getElementById("otp-err").textContent = "";
+            otpModal.classList.add("show");
+            setTimeout(() => otpInputs[0].focus(), 50);
+        }
+
+        function closeOtp() { otpModal.classList.remove("show"); }
+        document.getElementById("otp-cancel").addEventListener("click", closeOtp);
+
+        document.getElementById("otp-confirm").addEventListener("click", function () {
+            const code = otpInputs.map(i => i.value).join("");
+            if (code.length !== 6) { document.getElementById("otp-err").textContent = "Vui lòng nhập đủ 6 chữ số."; return; }
+            if (code !== DEMO_OTP) { document.getElementById("otp-err").textContent = "Mã OTP không đúng. (demo: 123456)"; return; }
+            closeOtp();
+            submitOrder("GooglePay", "Paid");
+        });
+
+        // ---------- QR modal ----------
+        const qrModal = document.getElementById("qr-modal");
+        function openQr() {
+            const total = getCartTotal(getCart());
+            document.getElementById("qr-amount").textContent = money(total);
+            const data = encodeURIComponent(`LUMIERE PERFUME|AMOUNT:${total}|ND:LUMIERE`);
+            document.getElementById("qr-img").src =
+                `https://api.qrserver.com/v1/create-qr-code/?size=400x400&data=${data}`;
+            qrModal.classList.add("show");
+        }
+        function closeQr() { qrModal.classList.remove("show"); }
+        document.getElementById("qr-cancel").addEventListener("click", closeQr);
+        document.getElementById("qr-confirm").addEventListener("click", function () {
+            closeQr();
+            submitOrder("QR", "Paid");
+        });
+
+        // ---------- Đặt hàng ----------
+        function buildShippingAddress(a, note) {
+            const parts = [
+                `Người nhận: ${aField(a, "recipient", "Recipient")}`,
+                `SĐT: ${aField(a, "phone", "Phone")}`,
+                `Địa chỉ: ${aField(a, "address", "Address")}`,
+                note ? `Ghi chú: ${note}` : ""
+            ].filter(Boolean);
+            return parts.join(" | ");
+        }
+
+        async function submitOrder(method, paymentStatus) {
+            const a = selectedAddress();
+            if (!a) { alert("Vui lòng chọn địa chỉ nhận hàng."); return; }
+
+            const note = document.getElementById("order-note").value.trim();
+            const btn = document.getElementById("place-order-btn");
+            btn.disabled = true; btn.textContent = "ĐANG XỬ LÝ...";
+
+            const result = await placeOrder({
+                shippingAddress: buildShippingAddress(a, note),
+                recipientName: aField(a, "recipient", "Recipient"),
+                recipientPhone: aField(a, "phone", "Phone"),
+                paymentMethod: method,
+                paymentStatus: paymentStatus
+            });
+
+            btn.disabled = false; btn.textContent = "ĐẶT HÀNG";
+
+            if (result.success) {
+                const orderId = result.order ? (result.order.id || result.order.Id) : null;
+                const paidNote = paymentStatus === "Paid" ? " Thanh toán đã được ghi nhận." : " Bạn sẽ thanh toán khi nhận hàng.";
+                document.getElementById("success-msg").textContent =
+                    (orderId ? `Mã đơn hàng #${orderId}. ` : "") + "Cảm ơn bạn đã mua sắm tại Lumière Perfume." + paidNote;
+                document.getElementById("success-modal").classList.add("show");
+            } else {
+                alert(result.message || "Đặt hàng thất bại.");
+            }
+        }
+
+        document.getElementById("place-order-btn").addEventListener("click", function () {
+            const cart = getCart();
+            if (cart.length === 0) { alert("Giỏ hàng đang trống."); return; }
+            if (!selectedAddress()) { alert("Vui lòng chọn hoặc thêm địa chỉ nhận hàng."); return; }
+
+            const method = selectedMethod();
+            if (method === "GooglePay") { openOtp(); }
+            else if (method === "QR") { openQr(); }
+            else { submitOrder("COD", "Unpaid"); }
+        });
+
+        // ---------- Khởi động ----------
+        function init() {
+            const cart = getCart();
+            const root = document.getElementById("checkout-root");
+            if (cart.length === 0) {
+                root.innerHTML = `
+                    <div class="co-panel co-empty">
+                        <i class="fa fa-shopping-cart fa-3x" style="color:#d4af37;margin-bottom:18px;"></i>
+                        <h3 style="color:#fff;">Giỏ hàng đang trống</h3>
+                        <p style="color:#b8b0a4;">Vui lòng chọn sản phẩm trước khi thanh toán.</p>
+                        <a href="products.html" class="gold-btn" style="display:inline-block;margin-top:12px;">Tiếp tục mua sắm</a>
+                    </div>`;
+                return;
+            }
+
+            // Google Pay chỉ hiển thị với tài khoản đăng nhập bằng Google.
+            const gpayOption = document.getElementById("gpay-option");
+            if (gpayOption) {
+                if (isGoogleUser()) {
+                    gpayOption.style.display = "";
+                } else {
+                    gpayOption.style.display = "none";
+                    // Nếu Google Pay đang được chọn thì reset về COD.
+                    const gpayRadio = gpayOption.querySelector("input");
+                    if (gpayRadio && gpayRadio.checked) {
+                        const codRadio = document.querySelector('input[name="payment"][value="COD"]');
+                        if (codRadio) {
+                            codRadio.checked = true;
+                            codRadio.closest(".pay-option").classList.add("active");
+                        }
+                    }
+                }
+            }
+
+            renderItems();
+            loadAddresses();
+        }
+
+        if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", init);
+        else init();
+    })();
     </script>
 </body>
 </html>

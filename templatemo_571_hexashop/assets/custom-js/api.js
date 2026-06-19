@@ -1,6 +1,10 @@
 const API_BASE_URL = "http://localhost:5000/api";
 window.API_BASE_URL = API_BASE_URL;
 
+// Google Client ID: thay bằng Client ID thật từ Google Cloud Console.
+// Xem hướng dẫn cấu hình ở README hoặc trong auth-widget.js.
+window.GOOGLE_CLIENT_ID = "YOUR_GOOGLE_CLIENT_ID.apps.googleusercontent.com";
+
 async function apiGet(endpoint) {
     const response = await fetch(`${API_BASE_URL}${endpoint}`);
 
